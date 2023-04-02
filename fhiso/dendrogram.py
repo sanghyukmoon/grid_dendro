@@ -49,7 +49,7 @@ def construct_dendrogram(arr, boundary_flag='periodic'):
     node = {nd: [nd] for nd in leaf_nodes}
     parent_node = np.full(num_cells, -1, dtype=int)
     parent_node[leaf_nodes] = leaf_nodes
-    child_node = {nd: set() for nd in leaf_nodes}
+    child_node = {nd: [] for nd in leaf_nodes}
     ancestor_node = {nd: nd for nd in leaf_nodes}
     descendant_node = {nd: [nd] for nd in leaf_nodes}
 
@@ -81,7 +81,7 @@ def construct_dendrogram(arr, boundary_flag='periodic'):
             # This cell is at the critical point; create new node.
             node[idx] = [idx]
             parent_node[idx] = idx
-            child_node[idx] = ancestors
+            child_node[idx] = list(ancestors)
             ancestor_node[idx] = idx
             descendant_node[idx] = [idx]
             for child in child_node[idx]:
