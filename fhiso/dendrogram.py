@@ -1,16 +1,20 @@
-"""A one-line summary of the module or program, terminated by a period.
-
-Leave one blank line.  The rest of this docstring should contain an
-overall description of the module or program.  Optionally, it may also
-contain a brief description of exported classes and functions and/or usage
-examples.
+"""Constructs dendrogram.
 
 Terminology:
-    index (indices): flattend array index of each cell.
     node: Any structure in dendrogram hierarchy (e.g., leaf, branch, trunk).
-          Stored in dictionary structure.
+    parent: The node that a cell belongs to is its parent.
+    child: When two nodes merge to create a new node, they are child nodes of
+           the newly created node. Leaf nodes have no children.
+    ancestor: Ancestor of a node is the most distant parent node, up along the
+              dendrogram hierarchy. Ancestor of any given node changes in the
+              course of dendrogram construction, whenever a new node is
+              created.
+    descendant: When children of a node have their own children, and so on and
+                so forth, all child nodes down to the leaf nodes are
+                the descendants of the node.
 """
 
+from collections import deque
 import numpy as np
 from scipy.ndimage import minimum_filter
 from fhiso import boundary
@@ -24,10 +28,10 @@ def construct_dendrogram(arr, boundary_flag='periodic'):
         boundary_flag: string representing the boundary condition, optional.
 
     Returns:
-        nodes: dictionary containing {node: list(member cells)}
-        child_nodes: dictionary containing {node: set(child nodes)}
+        node: dictionary containing {node: list(member cells)}
+        child_node: dictionary containing {node: set(child nodes)}
     """
-    # sort flat indices in an ascending order of arr
+    # Sort flat indices in an ascending order of arr.
     arr_flat = arr.flatten()
     indices_ordered = arr_flat.argsort()
     num_cells = len(indices_ordered)
@@ -39,58 +43,61 @@ def construct_dendrogram(arr, boundary_flag='periodic'):
         raise ValueError(f"Boundary flag {boundary_flag} is not supported")
     arr_min_filtered = minimum_filter(arr, size=3, mode=filter_mode)
     leaf_nodes = np.where(arr_flat == arr_min_filtered.flatten())[0]
-
     num_leaves = len(leaf_nodes)
-    nodes = {idx: [idx,] for idx in leaf_nodes}
-    child_nodes = {idx: set() for idx in leaf_nodes}
     print("Found {} minima".format(num_leaves))
 
-    # initially, all the cells have no parent
+    # Initialize node, parent, child, ancestor, and descendant.
+    node = {nd: deque([nd]) for nd in leaf_nodes}
     parent_node = np.full(num_cells, -1, dtype=int)
     parent_node[leaf_nodes] = leaf_nodes
-    descendant_node = {idx: [idx,] for idx in leaf_nodes}
-    ancestor_node = {idx: idx for idx in leaf_nodes}
+    child_node = {nd: set() for nd in leaf_nodes}
+    ancestor_node = {nd: nd for nd in leaf_nodes}
+    descendant_node = {nd: deque([nd]) for nd in leaf_nodes}
 
-    # Load neighbor dictionary
+    # Load neighbor dictionary.
     my_neighbors = boundary.precompute_neighbor(arr.shape, boundary_flag,
                                                 corner=True)
 
-    # Climb up the potential and construct nodes and their children
-    nmerge = 0
-    for idx in indices_ordered:
+    # Climb up the potential and construct dendrogram.
+    num_remaining_nodes = num_leaves - 1
+    for idx in iter(indices_ordered):
         if idx in leaf_nodes:
             continue
-        neighbors = my_neighbors[idx]
-        mask = parent_node[neighbors] != -1
-        neighbors = neighbors[mask]
-        parents = parent_node[neighbors]
+        # Find parents of neighboring cells.
+        parents = set(parent_node[my_neighbors[idx]])
+        parents.discard(-1)
+
+        # Find ancestors of their parents, which can be themselves.
         ancestors = set([ancestor_node[prnt] for prnt in parents])
-        num_parents = len(ancestors)
-        if num_parents == 0:
+        num_ancestors = len(ancestors)
+
+        if num_ancestors == 0:
             raise ValueError("Should not reach here")
-        elif num_parents == 1:
-            # This cell is a member of an existing node.
-            prnt = ancestors.pop()
-            parent_node[idx] = prnt
-            nodes[prnt].append(idx)
-        elif num_parents == 2:
-            # This cell is at the critical point, thus becomes a new parent node;
-            nodes[idx] = [idx,]
+        elif num_ancestors == 1:
+            # Add this cell to the existing node
+            nd = ancestors.pop()
+            parent_node[idx] = nd
+            node[nd].append(idx)
+        elif num_ancestors == 2:
+            # This cell is at the critical point; create new node.
+            node[idx] = deque([idx])
             parent_node[idx] = idx
-            child_nodes[idx] = ancestors
+            child_node[idx] = ancestors
             ancestor_node[idx] = idx
-            descendant_node[idx] = [idx,]
-            for child in child_nodes[idx]:
+            descendant_node[idx] = deque([idx])
+            for child in child_node[idx]:
+                # inherit all descendants of children
                 descendant_node[idx] += descendant_node[child]
                 for descendant in descendant_node[child]:
+                    # This node becomes a new ancestor of all its descendants
                     ancestor_node[descendant] = idx
-            nmerge += 1
-            num_remaining_nodes = num_leaves - 1 - nmerge
-            print("Reaching critical point. number of remaining nodes = {}"
-                  .format(num_remaining_nodes))
+            num_remaining_nodes -= 1
+            msg = ("Added a new node at the critical point. "
+                   f"number of remaining nodes = {num_remaining_nodes}")
+            print(msg)
             if num_remaining_nodes == 0:
                 print("We have reached the trunk. Stop climbing up")
                 break
         else:
-            raise ValueError("This cell have more than two neighboring parent.")
-    return nodes, child_nodes
+            raise ValueError("Should not reach here")
+    return node, child_node, parent_node, descendant_node
