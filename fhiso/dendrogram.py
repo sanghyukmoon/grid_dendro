@@ -14,7 +14,6 @@ Terminology:
                 the descendants of the node.
 """
 
-from collections import deque
 import numpy as np
 from scipy.ndimage import minimum_filter
 from fhiso import boundary
@@ -47,12 +46,12 @@ def construct_dendrogram(arr, boundary_flag='periodic'):
     print("Found {} minima".format(num_leaves))
 
     # Initialize node, parent, child, ancestor, and descendant.
-    node = {nd: deque([nd]) for nd in leaf_nodes}
+    node = {nd: [nd] for nd in leaf_nodes}
     parent_node = np.full(num_cells, -1, dtype=int)
     parent_node[leaf_nodes] = leaf_nodes
     child_node = {nd: set() for nd in leaf_nodes}
     ancestor_node = {nd: nd for nd in leaf_nodes}
-    descendant_node = {nd: deque([nd]) for nd in leaf_nodes}
+    descendant_node = {nd: [nd] for nd in leaf_nodes}
 
     # Load neighbor dictionary.
     my_neighbors = boundary.precompute_neighbor(arr.shape, boundary_flag,
@@ -80,11 +79,11 @@ def construct_dendrogram(arr, boundary_flag='periodic'):
             node[nd].append(idx)
         elif num_ancestors == 2:
             # This cell is at the critical point; create new node.
-            node[idx] = deque([idx])
+            node[idx] = [idx]
             parent_node[idx] = idx
             child_node[idx] = ancestors
             ancestor_node[idx] = idx
-            descendant_node[idx] = deque([idx])
+            descendant_node[idx] = [idx]
             for child in child_node[idx]:
                 # inherit all descendants of children
                 descendant_node[idx] += descendant_node[child]
