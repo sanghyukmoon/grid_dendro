@@ -22,7 +22,6 @@ Terminology:
 """
 
 import numpy as np
-from collections import deque
 from scipy.ndimage import minimum_filter
 from fhiso import boundary
 
@@ -54,8 +53,8 @@ def construct_dendrogram(arr, boundary_flag='periodic'):
     arr_min_filtered = minimum_filter(arr, size=3, mode=filter_mode)
     leaf_nodes = np.where(arr_flat == arr_min_filtered.flatten())[0]
     num_leaves = len(leaf_nodes)
-    nodes = {idx: deque([idx,]) for idx in leaf_nodes}
-    child_nodes = {idx: [] for idx in leaf_nodes}
+    nodes = {idx: [idx,] for idx in leaf_nodes}
+    child_nodes = {idx: set() for idx in leaf_nodes}
     print("Found {} minima".format(num_leaves))
 
     # Create my_seed list and add seeds of themselves.
@@ -87,8 +86,8 @@ def construct_dendrogram(arr, boundary_flag='periodic'):
             # This cell is at the critical point, thus becomes a new seed;
             # create new node.
             my_seed[idx] = idx
-            nodes[idx] = deque([idx,])
-            child_nodes[idx] = list(ngb_seeds)
+            nodes[idx] = [idx,]
+            child_nodes[idx] = ngb_seeds
             flesh = recursive_members(nodes, child_nodes, idx)
             my_seed[flesh] = idx
             nmerge += 1
