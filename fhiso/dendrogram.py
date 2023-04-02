@@ -7,18 +7,8 @@ examples.
 
 Terminology:
     index (indices): flattend array index of each cell.
-    seed: The index of the cell that has a critical value of the input array,
-          above and below which the nodes merge or split.
-    flesh: indices of all cells that belong to a node, including the seed.
     node: Any structure in dendrogram hierarchy (e.g., leaf, branch, trunk).
-          Stored in dictionary structure such that nodes[seed] = flesh.
-     ___________
-    |xxxxxxxxxxx|
-    |xxxxx xxxxx|    . seed
-    |xxxx . xxxx|    x flesh
-    |xxxxx xxxxx|
-    |xxxxxxxxxxx|
-     -----------
+          Stored in dictionary structure.
 """
 
 import numpy as np
@@ -34,10 +24,8 @@ def construct_dendrogram(arr, boundary_flag='periodic'):
         boundary_flag: string representing the boundary condition, optional.
 
     Returns:
-        nodes: dictionary in which each key represents the flat index of the
-          seed cell, and the corresponding values contain the flat indices of
-          flesh cells of this node.
-        child_nodes: dictionary containing child seeds of each seed (not recursive).
+        nodes: dictionary containing {node: list(member cells)}
+        child_nodes: dictionary containing {node: set(child nodes)}
     """
     # sort flat indices in an ascending order of arr
     arr_flat = arr.flatten()
@@ -45,7 +33,6 @@ def construct_dendrogram(arr, boundary_flag='periodic'):
     num_cells = len(indices_ordered)
 
     # Create leaf nodes by finding all local minima.
-    # Note that local minima are seeds of the leaf nodes.
     if boundary_flag == 'periodic':
         filter_mode = 'wrap'
     else:
@@ -57,11 +44,9 @@ def construct_dendrogram(arr, boundary_flag='periodic'):
     child_nodes = {idx: set() for idx in leaf_nodes}
     print("Found {} minima".format(num_leaves))
 
-    # Create my_seed list and add seeds of themselves.
-    # my_seed is indexed by flattened indices. Note that my_seed is not sorted
-    # cells with my_seed = -1 has not been added to any nodes.
-    my_seed = np.full(num_cells, -1, dtype=int)
-    my_seed[leaf_nodes] = leaf_nodes
+    # initially, all the cells have no parent
+    parent_node = np.full(num_cells, -1, dtype=int)
+    parent_node[leaf_nodes] = leaf_nodes
 
     # Load neighbor dictionary
     my_neighbors = boundary.precompute_neighbor(arr.shape, boundary_flag,
@@ -72,24 +57,25 @@ def construct_dendrogram(arr, boundary_flag='periodic'):
     for idx in indices_ordered:
         if idx in leaf_nodes:
             continue
-        ngb_seeds = set(my_seed[my_neighbors[idx]])
-        ngb_seeds.discard(-1)
-        num_ngb_seeds = len(ngb_seeds)
-        if num_ngb_seeds == 0:
+        neighbors = my_neighbors[idx]
+        mask = parent_node[neighbors] != -1
+        neighbors = neighbors[mask]
+        parents = find_ancestor(parent_node, neighbors)
+        num_parents = len(parents)
+        if num_parents == 0:
             raise ValueError("Should not reach here")
-        elif num_ngb_seeds == 1:
-            # This cell is a flesh of an existing node.
-            seed = ngb_seeds.pop()
-            my_seed[idx] = seed
-            nodes[seed].append(idx)
-        elif num_ngb_seeds == 2:
-            # This cell is at the critical point, thus becomes a new seed;
-            # create new node.
-            my_seed[idx] = idx
+        elif num_parents == 1:
+            # This cell is a member of an existing node.
+            prnt = parents.pop()
+            parent_node[idx] = prnt
+            nodes[prnt].append(idx)
+        elif num_parents == 2:
+            # This cell is at the critical point, thus becomes a new parent node;
+            parent_node[idx] = idx
             nodes[idx] = [idx,]
-            child_nodes[idx] = ngb_seeds
-            flesh = recursive_members(nodes, child_nodes, idx)
-            my_seed[flesh] = idx
+            child_nodes[idx] = parents
+            for child in child_nodes[idx]:
+                parent_node[child] = idx
             nmerge += 1
             num_remaining_nodes = num_leaves - 1 - nmerge
             print("Reaching critical point. number of remaining nodes = {}"
@@ -97,12 +83,13 @@ def construct_dendrogram(arr, boundary_flag='periodic'):
             if num_remaining_nodes == 0:
                 print("We have reached the trunk. Stop climbing up")
                 break
+        else:
+            raise ValueError("This cell have more than two neighboring parent.")
     return nodes, child_nodes
 
 
-def recursive_members(nodes, child_nodes, idx):
-    flesh = []
-    flesh += nodes[idx]
-    for child in child_nodes[idx]:
-        flesh += recursive_members(nodes, child_nodes, child)
-    return flesh
+def find_ancestor(parent_node, indices):
+    parents = parent_node[indices]
+    if not np.all(parents == indices):
+        parents = find_ancestor(parent_node, parents)
+    return set(parents)
