@@ -2,7 +2,9 @@
 
 Terminology:
     node: Any structure in dendrogram hierarchy (e.g., leaf, branch, trunk).
-    parent: The node that a cell belongs to is its parent.
+    parent: The node that a cell belongs to is its parent. Also, when two nodes
+            merge to create a new node, it is a parent node of the two merging
+            nodes.
     child: When two nodes merge to create a new node, they are child nodes of
            the newly created node. Leaf nodes have no children.
     ancestor: Ancestor of a node is the most distant parent node, up along the
@@ -85,6 +87,8 @@ def construct_dendrogram(arr, boundary_flag='periodic'):
             ancestor_node[idx] = idx
             descendant_node[idx] = [idx]
             for child in child_node[idx]:
+                # This node becomes a parent of its immediate children
+                parent_node[child] = idx
                 # inherit all descendants of children
                 descendant_node[idx] += descendant_node[child]
                 for descendant in descendant_node[child]:
