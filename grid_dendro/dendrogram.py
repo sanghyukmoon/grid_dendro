@@ -10,21 +10,24 @@ class Dendrogram:
 
     Attributes:
         cells_in_node: {node: cells}
-                       Any structure in dendrogram hierarchy (e.g., leaf, branch, trunk).
+          All nodes in dendrogram hierarchy and the cells belong to them.
         cells_in_leaf: {node: cells}
+          Leaf nodes and the cells belong to them.
         parent: {cells: node}
-                The node that a cell belongs to is its parent. If a cell is a node-generating
-                cell, its parent is the parent node of the node that the cell is belong to.
+          All cells and their parent node. Note that when a cell is a
+          node-generating cell and therefore itself a node, its parent is its
+          parent node instead of itself.
         child: {node: node}
-               When two nodes merge to create a new node, they are child nodes of
-               the newly created node. Leaf nodes have no children.
+          All nodes and their child nodes. When two nodes merge to create a new
+          node, they are child nodes of the newly created node. Leaf nodes have
+          no children.
         descendant: {node: node}
-                    When children of a node have their own children, and so on and
-                    so forth, all child nodes down to the leaf nodes are
-                    the descendants of the node.
+          All nodes and their descendant nodes. When children of a node have
+          their own children, all child nodes down to the leaf nodes are the
+          descendants of the node.
     """
 
-    def __init__(self, arr, boundary_flag = 'periodic'):
+    def __init__(self, arr, boundary_flag='periodic'):
         """Initializes the instance based on spam preference.
 
         Args:
@@ -45,7 +48,8 @@ class Dendrogram:
         if self.boundary_flag == 'periodic':
             filter_mode = 'wrap'
         else:
-            raise ValueError(f"Boundary flag {self.boundary_flag} is not supported")
+            msg = f"Boundary flag {self.boundary_flag} is not supported"
+            raise ValueError(msg)
         arr_min_filtered = minimum_filter(self.arr, size=3, mode=filter_mode)
         leaf_nodes = np.where(arr_flat == arr_min_filtered.flatten())[0]
         num_leaves = len(leaf_nodes)
@@ -63,7 +67,8 @@ class Dendrogram:
         ancestor = {nd: nd for nd in leaf_nodes}
 
         # Load neighbor dictionary.
-        my_neighbors = boundary.precompute_neighbor(self.arr.shape, self.boundary_flag,
+        my_neighbors = boundary.precompute_neighbor(self.arr.shape,
+                                                    self.boundary_flag,
                                                     corner=True)
 
         # Climb up the potential and construct dendrogram.
@@ -99,7 +104,8 @@ class Dendrogram:
                     # inherit all descendants of children
                     self.descendant[cell] += self.descendant[nd]
                     for nd in self.descendant[nd]:
-                        # This node becomes a new ancestor of all its descendants
+                        # This node becomes a new ancestor of all its
+                        # descendants
                         ancestor[nd] = cell
                 num_remaining_nodes -= 1
                 msg = ("Added a new node at the critical point. "
@@ -117,7 +123,7 @@ class Dendrogram:
             if self.num_children(nd) == 0:
                 self.cells_in_leaf[nd] = self.cells_in_node[nd]
 
-    def prune(self, ncells_min = 27):
+    def prune(self, ncells_min=27):
         """Prune the buds by applying minimum number of cell criterion"""
         leaf_key_copy = list(self.cells_in_leaf.keys())
         for leaf in leaf_key_copy:
@@ -130,7 +136,8 @@ class Dendrogram:
                 sibling.remove(leaf)
                 sibling = sibling[0]
                 # Reset parent
-                orphans = self.cells_in_node[my_parent] + self.cells_in_node[leaf]
+                orphans = (self.cells_in_node[my_parent]
+                           + self.cells_in_node[leaf])
                 for cell in orphans:
                     self.parent[cell] = sibling
                 self.parent[sibling] = my_grandparent

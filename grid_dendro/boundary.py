@@ -1,6 +1,8 @@
 from itertools import product
 import numpy as np
 
+# TODO(SMOON): refactoring is required
+
 
 def get_edge_cells(cells, pcn):
     """Find edge cells of the given region
