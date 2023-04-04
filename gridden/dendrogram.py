@@ -18,7 +18,7 @@ Terminology:
 
 import numpy as np
 from scipy.ndimage import minimum_filter
-from fhiso import boundary
+from gridden import boundary
 
 
 def construct_dendrogram(arr, boundary_flag='periodic'):
@@ -29,8 +29,10 @@ def construct_dendrogram(arr, boundary_flag='periodic'):
         boundary_flag: string representing the boundary condition, optional.
 
     Returns:
-        node: dictionary containing {node: list(member cells)}
-        child_node: dictionary containing {node: set(child nodes)}
+        node: dictionary containing {node index: list(member cells)}
+        child_node: dictionary containing {node index: set(child nodes)}
+        parent_node: dictionary containing {index: parent node index}
+        descendant_node: dictionary containing {index: descendant node indices}
     """
     # Sort flat indices in an ascending order of arr.
     arr_flat = arr.flatten()
