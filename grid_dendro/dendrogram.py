@@ -2,7 +2,7 @@
 
 import numpy as np
 from scipy.ndimage import minimum_filter
-from gridden import boundary
+from grid_dendro import boundary
 
 
 class Dendrogram:
