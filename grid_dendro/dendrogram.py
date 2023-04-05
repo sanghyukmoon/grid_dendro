@@ -9,22 +9,23 @@ class Dendrogram:
     """Dendrogram representing hierarchical structure in 3D data
 
     Attributes:
-        nodes: dict, {node: cells}
-          All nodes in dendrogram hierarchy and the cells belong to them.
-        leaves: dict, {node: cells}
-          Leaf nodes and the cells belong to them.
-        parent: np.ndarray, {cells: node}
-          All cells and their parent node. Note that when a cell is a
-          node-generating cell and therefore itself a node, its parent is its
-          parent node instead of itself.
-        child: dict, {node: node}
-          All nodes and their child nodes. When two nodes merge to create a new
-          node, they are child nodes of the newly created node. Leaf nodes have
-          no children.
-        descendant: dict, {node: node}
-          All nodes and their descendant nodes. When children of a node have
-          their own children, all child nodes down to the leaf nodes are the
-          descendants of the node.
+        nodes: dictionary mapping all nodes in dendrogram hierarchy to the
+          cells belong to them.
+          Access pattern: {node: cells}
+        leaves: dictionary mapping all leaf nodes to the cells belong to them.
+          Access pattern: {node: cells}
+        parent: numpy array mapping all cells to their parent node. When a cell
+          is a node-generating cell and therefore itself a node, its parent is
+          not itself, but the parent node of it.
+          Access pattern: {cells: node}
+        children: dictionary mapping all nodes to their child nodes. Note that
+          leaf nodes have no children.
+          Access pattern: {node: list of nodes}
+        ancestor: dictionary mapping all nodes to their ancestor node.
+          Access pattern: {node: node}
+        descendants: dictionary mapping all nodes to their descendant nodes.
+          Access pattern: {node: list of nodes}
+        minima: indices of the cell at the local minima of input array.
     """
 
     def __init__(self, arr, boundary_flag='periodic'):
@@ -36,46 +37,42 @@ class Dendrogram:
           arr: numpy.ndarray instance representing the input data.
           boundary_flag: string representing the boundary condition, optional.
         """
-        self.arr_shape = arr.shape
-        self.boundary_flag = boundary_flag
+        self._arr_shape = arr.shape
+        self._boundary_flag = boundary_flag
 
         # Sort flat indices in an ascending order of arr.
         arr_flat = arr.flatten()
-        self.cells_ordered = arr_flat.argsort()
-        self.num_cells = len(self.cells_ordered)
+        self._cells_ordered = arr_flat.argsort()
+        self._num_cells = len(self._cells_ordered)
 
         # Create leaf nodes by finding all local minima.
-        if self.boundary_flag == 'periodic':
+        if self._boundary_flag == 'periodic':
             filter_mode = 'wrap'
         else:
             msg = f"Boundary flag {self.boundary_flag} is not supported"
             raise ValueError(msg)
         arr_min_filtered = minimum_filter(arr, size=3, mode=filter_mode)
         self.minima = np.where(arr_flat == arr_min_filtered.flatten())[0]
-        self.num_leaves = len(self.minima)
 
     def construct(self):
-        """Construct dendrogram to set node, parent, child, and descendant"""
+        """Construct dendrogram to set node, parent, children, and descendants"""
 
-        # Initialize node, parent, child, descendant, and ancestor
+        # Initialize node, parent, children, descendants, and ancestor
         self.nodes = {nd: [nd] for nd in self.minima}
-        self.parent = np.full(self.num_cells, -1, dtype=int)
+        self.parent = np.full(self._num_cells, -1, dtype=int)
         self.parent[self.minima] = self.minima
-        self.child = {nd: [] for nd in self.minima}
-        self.descendant = {nd: [] for nd in self.minima}
-        # Ancestor of a node is the most distant parent node, up along the
-        # dendrogram hierarchy. Ancestor of any given node changes in the
-        # course of dendrogram construction, whenever a new node is created.
-        ancestor = {nd: nd for nd in self.minima}
+        self.children = {nd: [] for nd in self.minima}
+        self.descendants = {nd: [] for nd in self.minima}
+        self.ancestor = {nd: nd for nd in self.minima}
 
         # Load neighbor dictionary.
-        my_neighbors = boundary.precompute_neighbor(self.arr_shape,
-                                                    self.boundary_flag,
+        my_neighbors = boundary.precompute_neighbor(self._arr_shape,
+                                                    self._boundary_flag,
                                                     corner=True)
 
         # Climb up the potential and construct dendrogram.
-        num_remaining_nodes = self.num_leaves - 1
-        for cell in iter(self.cells_ordered):
+        num_remaining_nodes = len(self.minima) - 1
+        for cell in iter(self._cells_ordered):
             if cell in self.minima:
                 continue
             # Find parents of neighboring cells.
@@ -83,7 +80,7 @@ class Dendrogram:
             parents.discard(-1)
 
             # Find ancestors of their parents, which can be themselves.
-            neighboring_nodes = set([ancestor[prnt] for prnt in parents])
+            neighboring_nodes = set([self.ancestor[prnt] for prnt in parents])
             num_nghbr_nodes = len(neighboring_nodes)
 
             if num_nghbr_nodes == 0:
@@ -97,18 +94,18 @@ class Dendrogram:
                 # This cell is at the critical point; create new node.
                 self.nodes[cell] = [cell]
                 self.parent[cell] = cell
-                ancestor[cell] = cell
-                self.child[cell] = list(neighboring_nodes)
-                self.descendant[cell] = list(neighboring_nodes)
-                for nd in self.child[cell]:
+                self.ancestor[cell] = cell
+                self.children[cell] = list(neighboring_nodes)
+                self.descendants[cell] = list(neighboring_nodes)
+                for child in self.children[cell]:
                     # This node becomes a parent of its immediate children
-                    self.parent[nd] = cell
+                    self.parent[child] = cell
                     # inherit all descendants of children
-                    self.descendant[cell] += self.descendant[nd]
-                    for nd in self.descendant[nd]:
-                        # This node becomes a new ancestor of all its
-                        # descendants
-                        ancestor[nd] = cell
+                    self.descendants[cell] += self.descendants[child]
+                for child in self.descendants[cell]:
+                    # This node becomes a new ancestor of all its
+                    # descendants
+                    self.ancestor[child] = cell
                 num_remaining_nodes -= 1
                 msg = ("Added a new node at the critical point. "
                        f"number of remaining nodes = {num_remaining_nodes}")
@@ -127,7 +124,7 @@ class Dendrogram:
                 # this leaf is a bud.
                 my_parent = self.parent[leaf]
                 my_grandparent = self.parent[my_parent]
-                sibling = self.child[my_parent]
+                sibling = self.children[my_parent]
                 sibling.remove(leaf)
                 sibling = sibling[0]
                 if sibling in self.leaves and len(self.leaves[sibling]) < ncells_min:
@@ -146,8 +143,8 @@ class Dendrogram:
                     # Remove orphaned node
                     for nd in [my_parent, leaf]:
                         self.nodes.pop(nd)
-                        self.child.pop(nd)
-                        self.descendant.pop(nd)
+                        self.children.pop(nd)
+                        self.descendants.pop(nd)
                 else:
                     # Reset parent
                     orphaned_cells = (self.nodes[my_parent]
@@ -156,28 +153,26 @@ class Dendrogram:
                         self.parent[cell] = sibling
                         self.nodes[sibling].append(cell)
                     self.parent[sibling] = my_grandparent
-                    # Reset child
-                    self.child[my_grandparent].remove(my_parent)
-                    self.child[my_grandparent].append(sibling)
-                    # Reset descendant
-                    self.descendant[my_grandparent].remove(my_parent)
-                    self.descendant[my_grandparent].remove(leaf)
+                    # Reset children
+                    self.children[my_grandparent].remove(my_parent)
+                    self.children[my_grandparent].append(sibling)
+                    # Reset descendants
+                    self.descendants[my_grandparent].remove(my_parent)
+                    self.descendants[my_grandparent].remove(leaf)
                     # Remove orphaned node
                     for nd in [my_parent, leaf]:
                         self.nodes.pop(nd)
-                        self.child.pop(nd)
-                        self.descendant.pop(nd)
+                        self.children.pop(nd)
+                        self.descendants.pop(nd)
 
     def find_leaf(self):
         self.leaves = {}
         for nd in self.nodes:
             if self.num_children(nd) == 0:
                 self.leaves[nd] = self.nodes[nd]
-        self.num_leaves = len(self.leaves)
-
 
     def num_children(self, nd):
-        return len(self.child[nd])
+        return len(self.children[nd])
 
     def check_sanity(self):
         for nd in self.nodes:
