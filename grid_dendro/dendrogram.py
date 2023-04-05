@@ -9,19 +9,19 @@ class Dendrogram:
     """Dendrogram representing hierarchical structure in 3D data
 
     Attributes:
-        cells_in_node: {node: cells}
+        nodes: dict, {node: cells}
           All nodes in dendrogram hierarchy and the cells belong to them.
-        cells_in_leaf: {node: cells}
+        leaves: dict, {node: cells}
           Leaf nodes and the cells belong to them.
-        parent: {cells: node}
+        parent: np.ndarray, {cells: node}
           All cells and their parent node. Note that when a cell is a
           node-generating cell and therefore itself a node, its parent is its
           parent node instead of itself.
-        child: {node: node}
+        child: dict, {node: node}
           All nodes and their child nodes. When two nodes merge to create a new
           node, they are child nodes of the newly created node. Leaf nodes have
           no children.
-        descendant: {node: node}
+        descendant: dict, {node: node}
           All nodes and their descendant nodes. When children of a node have
           their own children, all child nodes down to the leaf nodes are the
           descendants of the node.
@@ -56,7 +56,7 @@ class Dendrogram:
         print("Found {} minima".format(num_leaves))
 
         # Initialize node, parent, child, descendant, and ancestor
-        self.cells_in_node = {nd: [nd] for nd in leaf_nodes}
+        self.nodes = {nd: [nd] for nd in leaf_nodes}
         self.parent = np.full(num_cells, -1, dtype=int)
         self.parent[leaf_nodes] = leaf_nodes
         self.child = {nd: [] for nd in leaf_nodes}
@@ -73,7 +73,7 @@ class Dendrogram:
 
         # Climb up the potential and construct dendrogram.
         num_remaining_nodes = num_leaves - 1
-        for cell in cells_ordered:
+        for cell in iter(cells_ordered):
             if cell in leaf_nodes:
                 continue
             # Find parents of neighboring cells.
@@ -90,10 +90,10 @@ class Dendrogram:
                 # Add this cell to the existing node
                 nd = neighboring_nodes.pop()
                 self.parent[cell] = nd
-                self.cells_in_node[nd].append(cell)
+                self.nodes[nd].append(cell)
             elif num_nghbr_nodes == 2:
                 # This cell is at the critical point; create new node.
-                self.cells_in_node[cell] = [cell]
+                self.nodes[cell] = [cell]
                 self.parent[cell] = cell
                 self.child[cell] = list(neighboring_nodes)
                 ancestor[cell] = cell
@@ -119,8 +119,8 @@ class Dendrogram:
 
     def prune(self, ncells_min=27):
         """Prune the buds by applying minimum number of cell criterion"""
-        for leaf in self.cells_in_leaf:
-            num_cells = len(self.cells_in_leaf[leaf])
+        for leaf in self.leaves:
+            num_cells = len(self.leaves[leaf])
             if num_cells < ncells_min:
                 # this leaf is a bud.
                 my_parent = self.parent[leaf]
@@ -128,31 +128,31 @@ class Dendrogram:
                 sibling = self.child[my_parent]
                 sibling.remove(leaf)
                 sibling = sibling[0]
-                if sibling in self.cells_in_leaf and len(self.cells_in_leaf[sibling]) < ncells_min:
+                if sibling in self.leaves and len(self.leaves[sibling]) < ncells_min:
                     print("WARNING: sibling is also a bud")
 
                 if (my_parent == my_grandparent):
                     # This is a bud at the trunk. Cut it and define new trunk
-                    orphans = (self.cells_in_node[my_parent]
-                               + self.cells_in_node[leaf]
-                               + self.cells_in_node[sibling])
-                    for cell in orphans:
+                    orphaned_cells = (self.nodes[my_parent]
+                                      + self.nodes[leaf]
+                                      + self.nodes[sibling])
+                    for cell in orphaned_cells:
                         self.parent[cell] = -1
                     # sibling becomes the trunk node
-                    self.cells_in_node[sibling] = [sibling,]
+                    self.nodes[sibling] = [sibling,]
                     self.parent[sibling] = sibling
                     # Remove orphaned node
                     for nd in [my_parent, leaf]:
-                        self.cells_in_node.pop(nd)
+                        self.nodes.pop(nd)
                         self.child.pop(nd)
                         self.descendant.pop(nd)
                 else:
                     # Reset parent
-                    orphans = (self.cells_in_node[my_parent]
-                               + self.cells_in_node[leaf])
-                    for cell in orphans:
+                    orphaned_cells = (self.nodes[my_parent]
+                               + self.nodes[leaf])
+                    for cell in orphaned_cells:
                         self.parent[cell] = sibling
-                        self.cells_in_node[sibling].append(cell)
+                        self.nodes[sibling].append(cell)
                     self.parent[sibling] = my_grandparent
                     # Reset child
                     self.child[my_grandparent].remove(my_parent)
@@ -162,21 +162,21 @@ class Dendrogram:
                     self.descendant[my_grandparent].remove(leaf)
                     # Remove orphaned node
                     for nd in [my_parent, leaf]:
-                        self.cells_in_node.pop(nd)
+                        self.nodes.pop(nd)
                         self.child.pop(nd)
                         self.descendant.pop(nd)
 
     def find_leaf(self):
-        self.cells_in_leaf = {}
-        for nd in self.cells_in_node:
+        self.leaves = {}
+        for nd in self.nodes:
             if self.num_children(nd) == 0:
-                self.cells_in_leaf[nd] = self.cells_in_node[nd]
+                self.leaves[nd] = self.nodes[nd]
 
     def num_children(self, nd):
         return len(self.child[nd])
 
     def check_sanity(self):
-        for nd in self.cells_in_node:
+        for nd in self.nodes:
             if not (self.num_children(nd) == 2 or self.num_children(nd) == 0):
                 raise ValueError("number of children is not 2")
         print("Sane.")
