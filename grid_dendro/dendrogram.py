@@ -117,16 +117,9 @@ class Dendrogram:
             else:
                 raise ValueError("Should not reach here")
 
-        # Initialize leaf nodes
-        self.cells_in_leaf = {}
-        for nd in self.cells_in_node:
-            if self.num_children(nd) == 0:
-                self.cells_in_leaf[nd] = self.cells_in_node[nd]
-
     def prune(self, ncells_min=27):
         """Prune the buds by applying minimum number of cell criterion"""
-        leaf_key_copy = list(self.cells_in_leaf.keys())
-        for leaf in leaf_key_copy:
+        for leaf in self.cells_in_leaf:
             num_cells = len(self.cells_in_leaf[leaf])
             if num_cells < ncells_min:
                 # this leaf is a bud.
@@ -135,24 +128,49 @@ class Dendrogram:
                 sibling = self.child[my_parent]
                 sibling.remove(leaf)
                 sibling = sibling[0]
-                # Reset parent
-                orphans = (self.cells_in_node[my_parent]
-                           + self.cells_in_node[leaf])
-                for cell in orphans:
-                    self.parent[cell] = sibling
-                self.parent[sibling] = my_grandparent
-                # Reset child
-                self.child[my_grandparent].remove(my_parent)
-                self.child[my_grandparent].append(sibling)
-                # Reset descendant
-                self.descendant[my_grandparent].remove(my_parent)
-                self.descendant[my_grandparent].remove(leaf)
-                # Remove node
-                for nd in [my_parent, leaf]:
-                    self.cells_in_node.pop(nd)
-                    self.child.pop(nd)
-                    self.descendant.pop(nd)
-                self.cells_in_leaf.pop(leaf)
+                if sibling in self.cells_in_leaf and len(self.cells_in_leaf[sibling]) < ncells_min:
+                    print("WARNING: sibling is also a bud")
+
+                if (my_parent == my_grandparent):
+                    # This is a bud at the trunk. Cut it and define new trunk
+                    orphans = (self.cells_in_node[my_parent]
+                               + self.cells_in_node[leaf]
+                               + self.cells_in_node[sibling])
+                    for cell in orphans:
+                        self.parent[cell] = -1
+                    # sibling becomes the trunk node
+                    self.cells_in_node[sibling] = [sibling,]
+                    self.parent[sibling] = sibling
+                    # Remove orphaned node
+                    for nd in [my_parent, leaf]:
+                        self.cells_in_node.pop(nd)
+                        self.child.pop(nd)
+                        self.descendant.pop(nd)
+                else:
+                    # Reset parent
+                    orphans = (self.cells_in_node[my_parent]
+                               + self.cells_in_node[leaf])
+                    for cell in orphans:
+                        self.parent[cell] = sibling
+                        self.cells_in_node[sibling].append(cell)
+                    self.parent[sibling] = my_grandparent
+                    # Reset child
+                    self.child[my_grandparent].remove(my_parent)
+                    self.child[my_grandparent].append(sibling)
+                    # Reset descendant
+                    self.descendant[my_grandparent].remove(my_parent)
+                    self.descendant[my_grandparent].remove(leaf)
+                    # Remove orphaned node
+                    for nd in [my_parent, leaf]:
+                        self.cells_in_node.pop(nd)
+                        self.child.pop(nd)
+                        self.descendant.pop(nd)
+
+    def find_leaf(self):
+        self.cells_in_leaf = {}
+        for nd in self.cells_in_node:
+            if self.num_children(nd) == 0:
+                self.cells_in_leaf[nd] = self.cells_in_node[nd]
 
     def num_children(self, nd):
         return len(self.child[nd])
