@@ -120,7 +120,7 @@ class Dendrogram:
     def prune(self, ncells_min=27):
         """Prune the buds by applying minimum number of cell criterion"""
         for leaf in self.leaves:
-            ncells = len(self.leaves[leaf])
+            ncells = len(self.nodes[leaf])
             if ncells < ncells_min:
                 # this leaf is a bud.
                 my_parent = self.parent[leaf]
@@ -129,7 +129,10 @@ class Dendrogram:
                 sibling.remove(leaf)
                 sibling = sibling[0]
                 if sibling in self.leaves and len(self.leaves[sibling]) < ncells_min:
+                    # TODO(Should prune the smaller bud)
                     print("WARNING: sibling is also a bud")
+                    print("leaf = ", leaf)
+                    print("sibling = ", sibling)
 
                 if (my_parent == my_grandparent):
                     # This is a bud at the trunk. Cut it and define new trunk
