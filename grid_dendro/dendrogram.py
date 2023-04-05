@@ -62,8 +62,7 @@ class Dendrogram:
         self.parent = np.full(self.num_cells, -1, dtype=int)
         self.parent[self.minima] = self.minima
         self.child = {nd: [] for nd in self.minima}
-        # TODO exclude self in descendant
-        self.descendant = {nd: [nd] for nd in self.minima}
+        self.descendant = {nd: [] for nd in self.minima}
         # Ancestor of a node is the most distant parent node, up along the
         # dendrogram hierarchy. Ancestor of any given node changes in the
         # course of dendrogram construction, whenever a new node is created.
@@ -98,9 +97,9 @@ class Dendrogram:
                 # This cell is at the critical point; create new node.
                 self.nodes[cell] = [cell]
                 self.parent[cell] = cell
-                self.child[cell] = list(neighboring_nodes)
                 ancestor[cell] = cell
-                self.descendant[cell] = [cell]
+                self.child[cell] = list(neighboring_nodes)
+                self.descendant[cell] = list(neighboring_nodes)
                 for nd in self.child[cell]:
                     # This node becomes a parent of its immediate children
                     self.parent[nd] = cell
