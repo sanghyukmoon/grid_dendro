@@ -30,19 +30,19 @@ class Dendrogram:
     def __init__(self, arr, boundary_flag='periodic'):
         """Initializes the instance based on spam preference.
 
+        Find minima in constructor and do not store input array to save memory.
+
         Args:
           arr: numpy.ndarray instance representing the input data.
           boundary_flag: string representing the boundary condition, optional.
         """
-        self.arr = arr
+        self.arr_shape = arr.shape
         self.boundary_flag = boundary_flag
 
-    def construct(self):
-        """Construct dendrogram to set node, parent, child, and descendant"""
         # Sort flat indices in an ascending order of arr.
-        arr_flat = self.arr.flatten()
-        cells_ordered = arr_flat.argsort()
-        num_cells = len(cells_ordered)
+        arr_flat = arr.flatten()
+        self.cells_ordered = arr_flat.argsort()
+        self.num_cells = len(self.cells_ordered)
 
         # Create leaf nodes by finding all local minima.
         if self.boundary_flag == 'periodic':
@@ -50,31 +50,34 @@ class Dendrogram:
         else:
             msg = f"Boundary flag {self.boundary_flag} is not supported"
             raise ValueError(msg)
-        arr_min_filtered = minimum_filter(self.arr, size=3, mode=filter_mode)
-        leaf_nodes = np.where(arr_flat == arr_min_filtered.flatten())[0]
-        num_leaves = len(leaf_nodes)
-        print("Found {} minima".format(num_leaves))
+        arr_min_filtered = minimum_filter(arr, size=3, mode=filter_mode)
+        self.minima = np.where(arr_flat == arr_min_filtered.flatten())[0]
+        self.num_leaves = len(self.minima)
+
+    def construct(self):
+        """Construct dendrogram to set node, parent, child, and descendant"""
 
         # Initialize node, parent, child, descendant, and ancestor
-        self.nodes = {nd: [nd] for nd in leaf_nodes}
-        self.parent = np.full(num_cells, -1, dtype=int)
-        self.parent[leaf_nodes] = leaf_nodes
-        self.child = {nd: [] for nd in leaf_nodes}
-        self.descendant = {nd: [nd] for nd in leaf_nodes}
+        self.nodes = {nd: [nd] for nd in self.minima}
+        self.parent = np.full(self.num_cells, -1, dtype=int)
+        self.parent[self.minima] = self.minima
+        self.child = {nd: [] for nd in self.minima}
+        # TODO exclude self in descendant
+        self.descendant = {nd: [nd] for nd in self.minima}
         # Ancestor of a node is the most distant parent node, up along the
         # dendrogram hierarchy. Ancestor of any given node changes in the
         # course of dendrogram construction, whenever a new node is created.
-        ancestor = {nd: nd for nd in leaf_nodes}
+        ancestor = {nd: nd for nd in self.minima}
 
         # Load neighbor dictionary.
-        my_neighbors = boundary.precompute_neighbor(self.arr.shape,
+        my_neighbors = boundary.precompute_neighbor(self.arr_shape,
                                                     self.boundary_flag,
                                                     corner=True)
 
         # Climb up the potential and construct dendrogram.
-        num_remaining_nodes = num_leaves - 1
-        for cell in iter(cells_ordered):
-            if cell in leaf_nodes:
+        num_remaining_nodes = self.num_leaves - 1
+        for cell in iter(self.cells_ordered):
+            if cell in self.minima:
                 continue
             # Find parents of neighboring cells.
             parents = set(self.parent[my_neighbors[cell]])
@@ -120,8 +123,8 @@ class Dendrogram:
     def prune(self, ncells_min=27):
         """Prune the buds by applying minimum number of cell criterion"""
         for leaf in self.leaves:
-            num_cells = len(self.leaves[leaf])
-            if num_cells < ncells_min:
+            ncells = len(self.leaves[leaf])
+            if ncells < ncells_min:
                 # this leaf is a bud.
                 my_parent = self.parent[leaf]
                 my_grandparent = self.parent[my_parent]
@@ -171,6 +174,8 @@ class Dendrogram:
         for nd in self.nodes:
             if self.num_children(nd) == 0:
                 self.leaves[nd] = self.nodes[nd]
+        self.num_leaves = len(self.leaves)
+
 
     def num_children(self, nd):
         return len(self.child[nd])
