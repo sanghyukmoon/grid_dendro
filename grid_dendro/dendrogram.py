@@ -12,8 +12,6 @@ class Dendrogram:
         nodes: dictionary mapping all nodes in dendrogram hierarchy to the
           cells belong to them.
           Access pattern: {node: cells}
-        leaves: dictionary mapping all leaf nodes to the cells belong to them.
-          Access pattern: {node: cells}
         parent: numpy array mapping all cells to their parent node. When a cell
           is a node-generating cell and therefore itself a node, its parent is
           not itself, but the parent node of it.
@@ -25,6 +23,8 @@ class Dendrogram:
           Access pattern: {node: node}
         descendants: dictionary mapping all nodes to their descendant nodes.
           Access pattern: {node: list of nodes}
+        leaves: dictionary mapping all leaf nodes to the cells belong to them.
+          Access pattern: {node: cells}
         minima: indices of the cell at the local minima of input array.
     """
 
@@ -115,6 +115,7 @@ class Dendrogram:
                     break
             else:
                 raise ValueError("Should not reach here")
+        self._find_leaf()
 
     def prune(self, ncells_min=27):
         """Prune the buds by applying minimum number of cell criterion"""
@@ -164,18 +165,19 @@ class Dendrogram:
                         self.nodes.pop(nd)
                         self.children.pop(nd)
                         self.descendants.pop(nd)
-
-    def find_leaf(self):
-        self.leaves = {}
-        for nd in self.nodes:
-            if self.num_children(nd) == 0:
-                self.leaves[nd] = self.nodes[nd]
-
-    def num_children(self, nd):
-        return len(self.children[nd])
+        self._find_leaf()
 
     def check_sanity(self):
         for nd in self.nodes:
-            if not (self.num_children(nd) == 2 or self.num_children(nd) == 0):
+            if not (self._num_children(nd) == 2 or self._num_children(nd) == 0):
                 raise ValueError("number of children is not 2")
         print("Sane.")
+
+    def _find_leaf(self):
+        self.leaves = {}
+        for nd in self.nodes:
+            if self._num_children(nd) == 0:
+                self.leaves[nd] = self.nodes[nd]
+
+    def _num_children(self, nd):
+        return len(self.children[nd])
