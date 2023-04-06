@@ -1,6 +1,7 @@
 """Implements Dendrogram class"""
 
 import numpy as np
+import xarray as xr
 from scipy.ndimage import minimum_filter
 from grid_dendro import boundary
 
@@ -184,3 +185,56 @@ class Dendrogram:
 
     def _num_children(self, nd):
         return len(self.children[nd])
+
+
+def filter_by_node(dat, nodes=None, nodes_select=None, cells_select=None,
+                   fill_value=np.nan):
+    """Mask DataArray using FISO dictionary or the flattened indexes.
+
+    Args:
+        dat: input array to be filtered.
+          Supported data types: xarray.DataArray, numpy.ndarray
+        nodes: grid_dendro nodes dictionary, optional.
+        nodes_select: int or sequence of ints representing the selected nodes,
+          optional.
+        cells_select: flat indices of selected cells. If given, overrides nodes
+          and nodes_select, optional
+        fill_value: value to fill outside of the filtered region, optional.
+                    Default value is np.nan.
+
+    Returns:
+        out: Filtered array matching the input array type
+    """
+    if isinstance(dat, xr.DataArray):
+        dtype='xarray'
+        coords = dat.coords
+        dims = dat.dims
+        dat = dat.to_numpy()
+    elif isinstance(dat, np.ndarray):
+        dtype='numpy'
+    else:
+        raise TypeError("type {} is not supported".format(type(dat)))
+
+    # retreive flat indices of selected cells
+    if nodes is None and nodes_select is None and cells_select is None:
+        # nothing to do
+        return dat
+    elif nodes is not None and cells_select is None:
+        cells_select = []
+        if nodes_select is None:
+            # select all cells
+            for v in nodes.values():
+                cells_select += list(v)
+        elif isinstance(nodes_select, (int, np.int64, np.int32)):
+            cells_select += nodes[nodes_select]
+        else:
+            for node in nodes_select:
+                cells_select += nodes[node]
+
+    dat1d = dat.flatten()
+    out = np.full(len(dat1d), fill_value)
+    out[cells_select] = dat1d[cells_select]
+    out = out.reshape(dat.shape)
+    if dtype == 'xarray':
+        out = xr.DataArray(data=out, coords=coords, dims=dims)
+    return out
