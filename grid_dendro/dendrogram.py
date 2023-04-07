@@ -91,7 +91,7 @@ class Dendrogram:
                 nd = neighboring_nodes.pop()
                 self.parent[cell] = nd
                 self.nodes[nd].append(cell)
-            elif num_nghbr_nodes == 2:
+            elif num_nghbr_nodes >= 2:
                 # This cell is at the critical point; create new node.
                 self.nodes[cell] = [cell]
                 self.parent[cell] = cell
@@ -114,8 +114,6 @@ class Dendrogram:
                 if num_remaining_nodes == 0:
                     print("We have reached the trunk. Stop climbing up")
                     break
-            else:
-                raise ValueError("Should not reach here")
         self._find_leaf()
 
     def prune(self, ncells_min=27):
