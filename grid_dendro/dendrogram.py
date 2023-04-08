@@ -169,10 +169,12 @@ class Dendrogram:
 
         # climb up the family tree and remove this node from family register.
         self.children[parent_node].remove(nd)
-        self.descendants[parent_node].remove(nd)
-        while parent_node != ancestor_node:
-            parent_node = self.parent[parent_node]
+        while True:
             self.descendants[parent_node].remove(nd)
+            parent_node = self.parent[parent_node]
+            if parent_node == ancestor_node:
+                self.descendants[parent_node].remove(nd)
+                break
 
         # climb down the family tree and remove this node from family register.
         if len(self.children[nd]) > 0:
@@ -208,10 +210,12 @@ class Dendrogram:
 
         # climb up the family tree and add child node to family register.
         self.children[parent_node].append(child_node)
-        self.descendants[parent_node].append(child_node)
-        while parent_node != ancestor_node:
-            parent_node = self.parent[parent_node]
+        while True:
             self.descendants[parent_node].append(child_node)
+            parent_node = self.parent[parent_node]
+            if parent_node == ancestor_node:
+                self.descendants[parent_node].append(child_node)
+                break
 
         # climb down the family tree and add parent node to family register.
         self.parent[child_node] = parent_node
