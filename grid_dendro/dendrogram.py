@@ -107,6 +107,8 @@ class Dendrogram:
                     # This node becomes a new ancestor of all its
                     # descendants
                     self.ancestor[child] = cell
+                # TODO(SMOON) num_remaining_nodes would not work anymore when
+                # there is a node that have non-two children.
                 num_remaining_nodes -= 1
                 msg = ("Added a new node at the critical point. "
                        f"number of remaining nodes = {num_remaining_nodes}")
@@ -118,73 +120,81 @@ class Dendrogram:
 
     def prune(self, ncells_min=27):
         """Prune the buds by applying minimum number of cell criterion"""
-        for leaf in self.leaves:
-            ncells = len(self.nodes[leaf])
-            if ncells < ncells_min:
-                # this leaf is a bud.
-                my_parent = self.parent[leaf]
-                my_grandparent = self.parent[my_parent]
-                sibling = self.children[my_parent]
-                sibling.remove(leaf)
-                sibling = sibling[0]
-                if sibling in self.leaves and len(self.leaves[sibling]) < ncells_min:
-                    # TODO(Should prune the smaller bud)
-                    print("WARNING: sibling is also a bud")
-                    print("leaf = ", leaf)
-                    print("sibling = ", sibling)
+        print(f"All leaves = {list(self.leaves.keys())}")
 
-                if (my_parent == my_grandparent):
-                    # This is a bud at the trunk. Cut it and define new trunk
-                    orphaned_cells = (self.nodes[my_parent]
-                                      + self.nodes[leaf]
-                                      + self.nodes[sibling])
-                    for cell in orphaned_cells:
-                        self.parent[cell] = -1
-                    # sibling becomes the trunk node
-                    self.nodes[sibling] = [sibling,]
-                    self.parent[sibling] = sibling
-                    # Remove orphaned node
-                    for nd in [my_parent, leaf]:
-                        self.nodes.pop(nd)
-                        self.children.pop(nd)
-                        self.descendants.pop(nd)
-                else:
-                    # Reset parent
-                    orphaned_cells = (self.nodes[my_parent]
-                               + self.nodes[leaf])
-                    for cell in orphaned_cells:
-                        self.parent[cell] = sibling
-                        self.nodes[sibling].append(cell)
-                    self.parent[sibling] = my_grandparent
-                    # Reset children
-                    self.children[my_grandparent].remove(my_parent)
-                    self.children[my_grandparent].append(sibling)
-                    # Reset descendants
-                    self.descendants[my_grandparent].remove(my_parent)
-                    self.descendants[my_grandparent].remove(leaf)
-                    # Remove orphaned node
-                    for nd in [my_parent, leaf]:
-                        self.nodes.pop(nd)
-                        self.children.pop(nd)
-                        self.descendants.pop(nd)
-        self._find_leaf()
+        bud = self._find_bud(ncells_min)
+        while bud is not None:
+            parent = self.parent[bud]
+            grandparent = self.parent[parent]
+            siblings = set(self.children[parent])
+            sibling_buds = {nd for nd in siblings if nd in self.leaves
+                            and len(self.nodes[nd]) < ncells_min}
+            sibling_branches = siblings - sibling_buds
+
+            if len(sibling_branches) >= 2:
+                # Simply cut the bud.
+                print("There are at least two branches. Simply cut the buds")
+                for nd in sibling_buds:
+                    print(f"Cutting the bud {nd}")
+                    self.delete_node(nd)
+            elif len(sibling_branches) == 1:
+                # Subsume to a branch and remove the parent node
+                branch = sibling_branches.pop()
+                print(f"Subsume buds {sibling_buds} into a branch {branch}")
+                self._subsume(sibling_buds, branch)
+                # Remove dangling parent node
+                self._remove_singleton(parent)
+            else:
+                # Subsume to the longest bud and remove the parent node
+                # Find longest bud (i.e., deepest potential)
+                shorter_buds = sibling_buds.copy()
+                longest_bud = sibling_buds.pop()
+                rank_min = np.where(self._cells_ordered == longest_bud)[0][0]
+                while len(sibling_buds) > 0:
+                    nd = sibling_buds.pop()
+                    rank = np.where(self._cells_ordered == nd)[0][0]
+                    if rank < rank_min:
+                        longest_bud = nd
+                        rank_min = rank
+                shorter_buds.remove(longest_bud)
+                print("There are only buds; merge shorter buds {} to longest bud {}".format(
+                    shorter_buds, longest_bud))
+                self._subsume(shorter_buds, longest_bud)
+                self._remove_singleton(parent)
+            self._find_leaf()
+            bud = self._find_bud(ncells_min)
 
     def delete_node(self, nd):
         parent_node = self.parent[nd]
         ancestor_node = self.ancestor[nd]
+        if parent_node == nd:
+            raise ValueError("Cannot delete trunk")
+
+        # climb up the family tree and remove this node from family register.
+        self.children[parent_node].remove(nd)
+        self.descendants[parent_node].remove(nd)
+        while parent_node != ancestor_node:
+            parent_node = self.parent[parent_node]
+            self.descendants[parent_node].remove(nd)
+
+        # climb down the family tree and remove this node from family register.
+        if len(self.children[nd]) > 0:
+            for child in self.children[nd]:
+                self.parent[child] = -1
+            for child in self.descendants[nd]:
+                if self.ancestor[child] == nd:
+                    self.ancestor[child] = -1
+
+        # Remove this node
         for cell in self.nodes[nd]:
             self.parent[cell] = -1
         orphaned_cells = self.nodes[nd]
+
         self.nodes.pop(nd)
         self.children.pop(nd)
         self.descendants.pop(nd)
         self.ancestor.pop(nd)
-        self.children[parent_node].remove(nd)
-        self.descendants[parent_node].remove(nd)
-        # climb up the family tree and remove me from family register
-        while parent_node != ancestor_node:
-            parent_node = self.parent[parent_node]
-            self.descendants[parent_node].remove(nd)
+
         return orphaned_cells
 
     def check_sanity(self):
@@ -224,6 +234,38 @@ class Dendrogram:
         for cell in orphaned_cells:
             self.parent[cell] = dst_node
             self.nodes[dst_node].append(cell)
+
+    def _remove_singleton(self, nd):
+        if len(self.children[nd]) != 1:
+            raise ValueError("This node is not singleton.")
+        child_node = self.children[nd][0]
+        parent_node = self.parent[nd]
+        ancestor_node = self.ancestor[nd]
+        orphaned_cells = self.delete_node(nd)
+        # TODO(SMOON) extract this to function, e.g., assign_cells_to_node
+        for cell in orphaned_cells:
+            self.parent[cell] = child_node
+            self.nodes[child_node].append(cell)
+
+        # climb up the family tree and add child node to family register.
+        self.children[parent_node].append(child_node)
+        self.descendants[parent_node].append(child_node)
+        while parent_node != ancestor_node:
+            parent_node = self.parent[parent_node]
+            self.descendants[parent_node].append(child_node)
+
+        # climb down the family tree and add parent node to family register.
+        self.parent[child_node] = parent_node
+        for child in self.descendants[child_node]:
+            if self.ancestor[child] == -1:
+                self.ancestor[child] = parent_node
+
+    def _find_bud(self, ncells_min):
+        for leaf in self.leaves:
+            ncells = len(self.nodes[leaf])
+            if ncells < ncells_min:
+                return leaf
+        return None
 
 
 def filter_by_node(dat, nodes=None, nodes_select=None, cells_select=None,
