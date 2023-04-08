@@ -140,7 +140,7 @@ class Dendrogram:
                 print(f"Subsume buds {sibling_buds} into a branch {branch}")
                 self._subsume(sibling_buds, branch)
                 # Remove dangling parent node
-                self._remove_singleton(parent)
+                self._remove_knag(parent)
             else:
                 # Subsume to the longest bud and remove the parent node
                 # Find longest bud (i.e., deepest potential)
@@ -157,7 +157,7 @@ class Dendrogram:
                 print("There are only buds; merge shorter buds {} to longest bud {}".format(
                     shorter_buds, longest_bud))
                 self._subsume(shorter_buds, longest_bud)
-                self._remove_singleton(parent)
+                self._remove_knag(parent)
             self._find_leaves()
             bud = self._find_bud(ncells_min)
 
@@ -196,9 +196,9 @@ class Dendrogram:
 
         return orphaned_cells
 
-    def _remove_singleton(self, nd):
+    def _remove_knag(self, nd):
         if len(self.children[nd]) != 1:
-            raise ValueError("This node is not singleton.")
+            raise ValueError("This node is not knag.")
         child_node = self.children[nd][0]
         parent_node = self.parent[nd]
         ancestor_node = self.ancestor[nd]
