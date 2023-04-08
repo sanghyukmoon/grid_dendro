@@ -116,7 +116,7 @@ class Dendrogram:
                 if num_remaining_nodes == 0:
                     print("We have reached the trunk. Stop climbing up")
                     break
-        self._find_leaf()
+        self._find_leaves()
 
     def prune(self, ncells_min=27):
         """Prune the buds by applying minimum number of cell criterion"""
@@ -161,7 +161,7 @@ class Dendrogram:
                     shorter_buds, longest_bud))
                 self._subsume(shorter_buds, longest_bud)
                 self._remove_singleton(parent)
-            self._find_leaf()
+            self._find_leaves()
             bud = self._find_bud(ncells_min)
 
     def delete_node(self, nd):
@@ -197,44 +197,6 @@ class Dendrogram:
 
         return orphaned_cells
 
-    def check_sanity(self):
-        for nd in self.nodes:
-            if not (self._num_children(nd) == 2 or self._num_children(nd) == 0):
-                raise ValueError("number of children is not 2")
-        print("Sane.")
-
-    def _find_leaf(self):
-        self.leaves = {}
-        for nd in self.nodes:
-            if self._num_children(nd) == 0:
-                self.leaves[nd] = self.nodes[nd]
-
-    def _num_children(self, nd):
-        return len(self.children[nd])
-
-    def _subsume(self, src_nodes, dst_node):
-        """Subsume selected nodes into a destination node.
-
-        Reassign all cells contained in src_nodes to dst_node and delete
-        src_nodes from the tree.
-
-        Args:
-          src_nodes: nodes to be subsumed into other branch.
-          dst_node: destination node that subsumes src_nodes.
-        """
-        parents = {self.parent[nd] for nd in src_nodes}
-        parents.add(self.parent[dst_node])
-        if len(parents) != 1:
-            raise ValueError("Subsume operation can only be done at the same"
-                              "level in a dendrogram hierarchy")
-        parent = parents.pop()
-        orphaned_cells = []
-        for nd in src_nodes:
-            orphaned_cells += self.delete_node(nd)
-        for cell in orphaned_cells:
-            self.parent[cell] = dst_node
-            self.nodes[dst_node].append(cell)
-
     def _remove_singleton(self, nd):
         if len(self.children[nd]) != 1:
             raise ValueError("This node is not singleton.")
@@ -260,6 +222,35 @@ class Dendrogram:
             if self.ancestor[child] == -1:
                 self.ancestor[child] = parent_node
 
+    def _subsume(self, src_nodes, dst_node):
+        """Subsume selected nodes into a destination node.
+
+        Reassign all cells contained in src_nodes to dst_node and delete
+        src_nodes from the tree.
+
+        Args:
+          src_nodes: nodes to be subsumed into other branch.
+          dst_node: destination node that subsumes src_nodes.
+        """
+        parents = {self.parent[nd] for nd in src_nodes}
+        parents.add(self.parent[dst_node])
+        if len(parents) != 1:
+            raise ValueError("Subsume operation can only be done at the same"
+                              "level in a dendrogram hierarchy")
+        parent = parents.pop()
+        orphaned_cells = []
+        for nd in src_nodes:
+            orphaned_cells += self.delete_node(nd)
+        for cell in orphaned_cells:
+            self.parent[cell] = dst_node
+            self.nodes[dst_node].append(cell)
+
+    def _find_leaves(self):
+        self.leaves = {}
+        for nd in self.nodes:
+            if self._num_children(nd) == 0:
+                self.leaves[nd] = self.nodes[nd]
+
     def _find_bud(self, ncells_min):
         for leaf in self.leaves:
             ncells = len(self.nodes[leaf])
@@ -267,6 +258,8 @@ class Dendrogram:
                 return leaf
         return None
 
+    def _num_children(self, nd):
+        return len(self.children[nd])
 
 def filter_by_node(dat, nodes=None, nodes_select=None, cells_select=None,
                    fill_value=np.nan):
