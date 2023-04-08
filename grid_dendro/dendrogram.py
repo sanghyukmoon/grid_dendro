@@ -71,8 +71,9 @@ class Dendrogram:
                                                     self._boundary_flag,
                                                     corner=True)
 
+        print("Start climbing up the tree from the leaf nodes.\t"
+              f"Number of nodes = {len(self.nodes)}")
         # Climb up the potential and construct dendrogram.
-        num_remaining_nodes = len(self.minima) - 1
         for cell in iter(self._cells_ordered):
             if cell in self.minima:
                 continue
@@ -107,13 +108,9 @@ class Dendrogram:
                     # This node becomes a new ancestor of all its
                     # descendants
                     self.ancestor[child] = cell
-                # TODO(SMOON) num_remaining_nodes would not work anymore when
-                # there is a node that have non-two children.
-                num_remaining_nodes -= 1
-                msg = ("Added a new node at the critical point. "
-                       f"number of remaining nodes = {num_remaining_nodes}")
-                print(msg)
-                if num_remaining_nodes == 0:
+                print("Added a new node at the critical point.\t\t"
+                      f"Number of nodes = {len(self.nodes)}")
+                if set(self.minima).issubset(set(self.descendants[cell])):
                     print("We have reached the trunk. Stop climbing up")
                     break
         self._find_leaves()
