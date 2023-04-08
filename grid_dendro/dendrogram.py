@@ -131,15 +131,15 @@ class Dendrogram:
             if len(sibling_branches) >= 2:
                 # Simply cut the bud.
                 print("There are at least two branches. Simply cut the buds")
-                for nd in sibling_buds:
-                    print(f"Cutting the bud {nd}")
-                    self.delete_node(nd)
+                for bud in sibling_buds:
+                    print(f"Cutting the bud {bud}")
+                    self._cut_bud(bud)
             elif len(sibling_branches) == 1:
                 # Subsume to a branch and remove the parent node
                 branch = sibling_branches.pop()
                 print(f"Subsume buds {sibling_buds} into a branch {branch}")
                 self._subsume(sibling_buds, branch)
-                # Remove dangling parent node
+                # Remove knag
                 self._remove_knag(parent)
             else:
                 # Subsume to the longest bud and remove the parent node
@@ -161,90 +161,92 @@ class Dendrogram:
             self._find_leaves()
             bud = self._find_bud(ncells_min)
 
-    def delete_node(self, nd):
-        parent_node = self.parent[nd]
-        ancestor_node = self.ancestor[nd]
-        if parent_node == nd:
+    def _cut_bud(self, bud):
+        if len(self.children[bud]) > 0:
+            raise ValueError("This is not a bud")
+        parent_node = self.parent[bud]
+        ancestor_node = self.ancestor[bud]
+        if parent_node == bud:
             raise ValueError("Cannot delete trunk")
 
         # climb up the family tree and remove this node from family register.
-        self.children[parent_node].remove(nd)
+        self.children[parent_node].remove(bud)
         while True:
-            self.descendants[parent_node].remove(nd)
-            parent_node = self.parent[parent_node]
+            self.descendants[parent_node].remove(bud)
             if parent_node == ancestor_node:
-                self.descendants[parent_node].remove(nd)
                 break
-
-        # climb down the family tree and remove this node from family register.
-        if len(self.children[nd]) > 0:
-            for child in self.children[nd]:
-                self.parent[child] = -1
-            for child in self.descendants[nd]:
-                if self.ancestor[child] == nd:
-                    self.ancestor[child] = -1
+            else:
+                parent_node = self.parent[parent_node]
+        parent_node = self.parent[bud]
 
         # Remove this node
-        for cell in self.nodes[nd]:
-            self.parent[cell] = -1
-        orphaned_cells = self.nodes[nd]
+        orphans = self.nodes[bud]
+        for orphan in orphans:
+            self.parent[orphan] = -1
 
-        self.nodes.pop(nd)
-        self.children.pop(nd)
-        self.descendants.pop(nd)
-        self.ancestor.pop(nd)
+        self.nodes.pop(bud)
+        self.children.pop(bud)
+        self.descendants.pop(bud)
+        self.ancestor.pop(bud)
 
-        return orphaned_cells
+        return orphans
 
-    def _remove_knag(self, nd):
-        if len(self.children[nd]) != 1:
-            raise ValueError("This node is not knag.")
-        child_node = self.children[nd][0]
-        parent_node = self.parent[nd]
-        ancestor_node = self.ancestor[nd]
-        orphaned_cells = self.delete_node(nd)
-        # TODO(SMOON) extract this to function, e.g., assign_cells_to_node
-        for cell in orphaned_cells:
-            self.parent[cell] = child_node
-            self.nodes[child_node].append(cell)
+    def _remove_knag(self, knag):
+        if len(self.children[knag]) != 1:
+            raise ValueError("This is not a knag.")
+        child_node = self.children[knag][0]
+        parent_node = self.parent[knag]
+        ancestor_node = self.ancestor[knag]
+        if parent_node == knag:
+            raise ValueError("Cannot delete trunk")
 
-        # climb up the family tree and add child node to family register.
+        # climb up the family tree and reset the family register.
+        self.children[parent_node].remove(knag)
         self.children[parent_node].append(child_node)
         while True:
-            self.descendants[parent_node].append(child_node)
-            parent_node = self.parent[parent_node]
+            self.descendants[parent_node].remove(knag)
             if parent_node == ancestor_node:
-                self.descendants[parent_node].append(child_node)
                 break
+            else:
+                parent_node = self.parent[parent_node]
+        parent_node = self.parent[knag]
 
-        # climb down the family tree and add parent node to family register.
+        # climb down the family tree and reset the family register.
         self.parent[child_node] = parent_node
-        for child in self.descendants[child_node]:
-            if self.ancestor[child] == -1:
-                self.ancestor[child] = parent_node
 
-    def _subsume(self, src_nodes, dst_node):
-        """Subsume selected nodes into a destination node.
+        # Remove this node
+        orphans = self.nodes[knag]
+        for orphan in orphans:
+            self.parent[orphan] = child_node
+            self.nodes[child_node].append(orphan)
 
-        Reassign all cells contained in src_nodes to dst_node and delete
-        src_nodes from the tree.
+        self.nodes.pop(knag)
+        self.children.pop(knag)
+        self.descendants.pop(knag)
+        self.ancestor.pop(knag)
+
+    def _subsume(self, buds, branch):
+        """Subsume selected buds into a branch.
+
+        Reassign all cells contained in buds to branch and delete
+        buds from the tree.
 
         Args:
-          src_nodes: nodes to be subsumed into other branch.
-          dst_node: destination node that subsumes src_nodes.
+          buds: buds to be subsumed into other branch.
+          branch: destination branch that subsumes bud.
         """
-        parents = {self.parent[nd] for nd in src_nodes}
-        parents.add(self.parent[dst_node])
+        parents = {self.parent[bud] for bud in buds}
+        parents.add(self.parent[branch])
         if len(parents) != 1:
-            raise ValueError("Subsume operation can only be done at the same"
-                              "level in a dendrogram hierarchy")
+            raise ValueError("Subsume operation can only be done within the"
+                              "same generation.")
         parent = parents.pop()
-        orphaned_cells = []
-        for nd in src_nodes:
-            orphaned_cells += self.delete_node(nd)
-        for cell in orphaned_cells:
-            self.parent[cell] = dst_node
-            self.nodes[dst_node].append(cell)
+        orphans = []
+        for bud in buds:
+            orphans += self._cut_bud(bud)
+        for orphan in orphans:
+            self.parent[orphan] = branch
+            self.nodes[branch].append(orphan)
 
     def _find_leaves(self):
         self.leaves = {}
