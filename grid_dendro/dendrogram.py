@@ -169,6 +169,24 @@ class Dendrogram:
                         self.descendants.pop(nd)
         self._find_leaf()
 
+    def delete_node(self, nd):
+        if len(self.children[nd]) > 0:
+            raise ValueError("Inner node deletion is not yet implemented")
+        parent_node = self.parent[nd]
+        ancestor_node = self.ancestor[nd]
+        for cell in self.nodes[nd]:
+            self.parent[cell] = -1
+        self.nodes.pop(nd)
+        self.children.pop(nd)
+        self.descendants.pop(nd)
+        self.ancestor.pop(nd)
+        self.children[parent_node].remove(nd)
+        self.descendants[parent_node].remove(nd)
+        # climb up the family tree and remove me from family register
+        while parent_node != ancestor_node:
+            parent_node = self.parent[parent_node]
+            self.descendants[parent_node].remove(nd)
+
     def check_sanity(self):
         for nd in self.nodes:
             if not (self._num_children(nd) == 2 or self._num_children(nd) == 0):
