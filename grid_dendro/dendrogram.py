@@ -56,15 +56,18 @@ class Dendrogram:
         self.minima = np.where(arr_flat == arr_min_filtered.flatten())[0]
 
     def construct(self):
-        """Construct dendrogram to set node, parent, children, and descendants"""
+        """Construct dendrogram tree
+
+        Initialize nodes, parent, children, ancestor, descendants, and leaves
+        """
 
         # Initialize node, parent, children, descendants, and ancestor
         self.nodes = {nd: [nd] for nd in self.minima}
         self.parent = np.full(self._num_cells, -1, dtype=int)
         self.parent[self.minima] = self.minima
         self.children = {nd: [] for nd in self.minima}
-        self.descendants = {nd: [] for nd in self.minima}
         self.ancestor = {nd: nd for nd in self.minima}
+        self.descendants = {nd: [] for nd in self.minima}
 
         # Load neighbor dictionary.
         my_neighbors = boundary.precompute_neighbor(self._arr_shape,
@@ -116,13 +119,14 @@ class Dendrogram:
         self._find_leaves()
 
     def prune(self, ncells_min=27):
-        """Prune the buds by applying minimum number of cell criterion"""
-        print(f"All leaves = {list(self.leaves.keys())}")
+        """Prune the buds by applying minimum number of cell criterion
 
+        Args:
+          ncells_min: minimum number of cells to be a leaf, optional.
+        """
         bud = self._find_bud(ncells_min)
         while bud is not None:
             parent = self.parent[bud]
-            grandparent = self.parent[parent]
             siblings = set(self.children[parent])
             sibling_buds = {nd for nd in siblings if nd in self.leaves
                             and len(self.nodes[nd]) < ncells_min}
@@ -153,8 +157,9 @@ class Dendrogram:
                         longest_bud = nd
                         rank_min = rank
                 shorter_buds.remove(longest_bud)
-                print("There are only buds; merge shorter buds {} to longest bud {}".format(
-                    shorter_buds, longest_bud))
+                print("There are only buds; "
+                      "merge shorter buds {} to longest bud {}".format(
+                       shorter_buds, longest_bud))
                 self._subsume_buds(shorter_buds, longest_bud)
             self._find_leaves()
             bud = self._find_bud(ncells_min)
@@ -202,8 +207,8 @@ class Dendrogram:
         parents = {self.parent[bud] for bud in buds}
         parents.add(self.parent[branch])
         if len(parents) != 1:
-            raise ValueError("Subsume operation can only be done within the"
-                              "same generation.")
+            raise ValueError("Subsume operation can only be done within the "
+                             "same generation.")
         knag = parents.pop()
         orphans = []
         for bud in buds:
@@ -215,6 +220,11 @@ class Dendrogram:
         self._remove_knag(knag)
 
     def _remove_knag(self, knag):
+        """Remove a knag that can results from subsume operation.
+
+        Knag is a node that have only one child. Knag forms when buds are
+        subsumed into a branch (or a longest bud when there are only buds).
+        """
         if len(self.children[knag]) != 1:
             raise ValueError("This is not a knag.")
         child_node = self.children[knag][0]
@@ -253,17 +263,27 @@ class Dendrogram:
         self.ancestor.pop(knag)
 
     def _find_leaves(self):
+        """Find leaf nodes."""
         self.leaves = {}
         for nd in self.nodes:
             if len(self.children[nd]) == 0:
                 self.leaves[nd] = self.nodes[nd]
 
     def _find_bud(self, ncells_min):
+        """Loop through all leaves and return the first occurence of a bud.
+
+        Args:
+          ncells_min: minimum number of cells to be a leaf, optional.
+
+        Returns:
+          leaf: bud node.
+        """
         for leaf in self.leaves:
             ncells = len(self.nodes[leaf])
             if ncells < ncells_min:
                 return leaf
         return None
+
 
 def filter_by_node(dat, nodes=None, nodes_select=None, cells_select=None,
                    fill_value=np.nan):
@@ -284,12 +304,12 @@ def filter_by_node(dat, nodes=None, nodes_select=None, cells_select=None,
         out: Filtered array matching the input array type
     """
     if isinstance(dat, xr.DataArray):
-        dtype='xarray'
+        dtype = 'xarray'
         coords = dat.coords
         dims = dat.dims
         dat = dat.to_numpy()
     elif isinstance(dat, np.ndarray):
-        dtype='numpy'
+        dtype = 'numpy'
     else:
         raise TypeError("type {} is not supported".format(type(dat)))
 
