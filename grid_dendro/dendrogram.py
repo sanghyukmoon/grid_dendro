@@ -129,21 +129,20 @@ class Dendrogram:
             sibling_branches = siblings - sibling_buds
 
             if len(sibling_branches) >= 2:
-                # Simply cut the bud.
+                # There are at least two branches at this node.
+                # Simply cut the buds.
                 print("There are at least two branches. Simply cut the buds")
                 for bud in sibling_buds:
                     print(f"Cutting the bud {bud}")
                     self._cut_bud(bud)
             elif len(sibling_branches) == 1:
-                # Subsume to a branch and remove the parent node
+                # There are only one branch.
+                # Subsume buds to the branch and remove the resulting knag.
                 branch = sibling_branches.pop()
                 print(f"Subsume buds {sibling_buds} into a branch {branch}")
-                self._subsume(sibling_buds, branch)
-                # Remove knag
-                self._remove_knag(parent)
+                self._subsume_buds(sibling_buds, branch)
             else:
-                # Subsume to the longest bud and remove the parent node
-                # Find longest bud (i.e., deepest potential)
+                # Subsume short buds to the longest bud and remove the knag.
                 shorter_buds = sibling_buds.copy()
                 longest_bud = sibling_buds.pop()
                 rank_min = np.where(self._cells_ordered == longest_bud)[0][0]
@@ -156,8 +155,7 @@ class Dendrogram:
                 shorter_buds.remove(longest_bud)
                 print("There are only buds; merge shorter buds {} to longest bud {}".format(
                     shorter_buds, longest_bud))
-                self._subsume(shorter_buds, longest_bud)
-                self._remove_knag(parent)
+                self._subsume_buds(shorter_buds, longest_bud)
             self._find_leaves()
             bud = self._find_bud(ncells_min)
 
@@ -190,6 +188,31 @@ class Dendrogram:
         self.ancestor.pop(bud)
 
         return orphans
+
+    def _subsume_buds(self, buds, branch):
+        """Subsume selected buds into a branch.
+
+        Reassign all cells contained in buds to branch and delete
+        buds from the tree.
+
+        Args:
+          buds: buds to be subsumed into other branch.
+          branch: destination branch that subsumes bud.
+        """
+        parents = {self.parent[bud] for bud in buds}
+        parents.add(self.parent[branch])
+        if len(parents) != 1:
+            raise ValueError("Subsume operation can only be done within the"
+                              "same generation.")
+        knag = parents.pop()
+        orphans = []
+        for bud in buds:
+            orphans += self._cut_bud(bud)
+        for orphan in orphans:
+            self.parent[orphan] = branch
+            self.nodes[branch].append(orphan)
+
+        self._remove_knag(knag)
 
     def _remove_knag(self, knag):
         if len(self.children[knag]) != 1:
@@ -229,33 +252,10 @@ class Dendrogram:
         self.descendants.pop(knag)
         self.ancestor.pop(knag)
 
-    def _subsume(self, buds, branch):
-        """Subsume selected buds into a branch.
-
-        Reassign all cells contained in buds to branch and delete
-        buds from the tree.
-
-        Args:
-          buds: buds to be subsumed into other branch.
-          branch: destination branch that subsumes bud.
-        """
-        parents = {self.parent[bud] for bud in buds}
-        parents.add(self.parent[branch])
-        if len(parents) != 1:
-            raise ValueError("Subsume operation can only be done within the"
-                              "same generation.")
-        parent = parents.pop()
-        orphans = []
-        for bud in buds:
-            orphans += self._cut_bud(bud)
-        for orphan in orphans:
-            self.parent[orphan] = branch
-            self.nodes[branch].append(orphan)
-
     def _find_leaves(self):
         self.leaves = {}
         for nd in self.nodes:
-            if self._num_children(nd) == 0:
+            if len(self.children[nd]) == 0:
                 self.leaves[nd] = self.nodes[nd]
 
     def _find_bud(self, ncells_min):
@@ -264,9 +264,6 @@ class Dendrogram:
             if ncells < ncells_min:
                 return leaf
         return None
-
-    def _num_children(self, nd):
-        return len(self.children[nd])
 
 def filter_by_node(dat, nodes=None, nodes_select=None, cells_select=None,
                    fill_value=np.nan):
