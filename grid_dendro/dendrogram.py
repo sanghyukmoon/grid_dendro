@@ -202,6 +202,30 @@ class Dendrogram:
     def _num_children(self, nd):
         return len(self.children[nd])
 
+    def _subsume(self, src_nodes, dst_node):
+        """Subsume selected nodes into a destination node.
+
+        Reassign all cells contained in src_nodes to dst_node and delete
+        src_nodes from the tree.
+
+        Args:
+          src_nodes: nodes to be subsumed into other branch.
+          dst_node: destination node that subsumes src_nodes.
+        """
+        parents = {self.parent[nd] for nd in src_nodes}
+        parents.add(self.parent[dst_node])
+        if len(parents) != 1:
+            raise ValueError("Subsume operation can only be done at the same"
+                              "level in a dendrogram hierarchy")
+        parent = parents.pop()
+        orphaned_cells = []
+        for nd in src_nodes:
+            orphaned_cells += self.nodes[nd]
+            self.delete_node(nd)
+        for cell in orphaned_cells:
+            self.parent[cell] = dst_node
+            self.nodes[dst_node].append(cell)
+
 
 def filter_by_node(dat, nodes=None, nodes_select=None, cells_select=None,
                    fill_value=np.nan):
