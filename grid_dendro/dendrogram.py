@@ -197,22 +197,26 @@ class Dendrogram:
         child_node = self.children[knag][0]
         parent_node = self.parent[knag]
         ancestor_node = self.ancestor[knag]
+
         if parent_node == knag:
-            raise ValueError("Cannot delete trunk")
+            # This knag was a trunk. Now, child_node becomes a new trunk.
+            self.parent[child_node] = child_node
+            for nd in self.descendants[knag]:
+                self.ancestor[nd] = child_node
+        else:
+            # climb up the family tree and reset the family register.
+            self.children[parent_node].remove(knag)
+            self.children[parent_node].append(child_node)
+            while True:
+                self.descendants[parent_node].remove(knag)
+                if parent_node == ancestor_node:
+                    break
+                else:
+                    parent_node = self.parent[parent_node]
+            parent_node = self.parent[knag]
 
-        # climb up the family tree and reset the family register.
-        self.children[parent_node].remove(knag)
-        self.children[parent_node].append(child_node)
-        while True:
-            self.descendants[parent_node].remove(knag)
-            if parent_node == ancestor_node:
-                break
-            else:
-                parent_node = self.parent[parent_node]
-        parent_node = self.parent[knag]
-
-        # climb down the family tree and reset the family register.
-        self.parent[child_node] = parent_node
+            # climb down the family tree and reset the family register.
+            self.parent[child_node] = parent_node
 
         # Remove this node
         orphans = self.nodes[knag]
