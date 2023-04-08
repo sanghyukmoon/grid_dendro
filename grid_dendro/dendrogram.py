@@ -170,12 +170,11 @@ class Dendrogram:
         self._find_leaf()
 
     def delete_node(self, nd):
-        if len(self.children[nd]) > 0:
-            raise ValueError("Inner node deletion is not yet implemented")
         parent_node = self.parent[nd]
         ancestor_node = self.ancestor[nd]
         for cell in self.nodes[nd]:
             self.parent[cell] = -1
+        orphaned_cells = self.nodes[nd]
         self.nodes.pop(nd)
         self.children.pop(nd)
         self.descendants.pop(nd)
@@ -186,6 +185,7 @@ class Dendrogram:
         while parent_node != ancestor_node:
             parent_node = self.parent[parent_node]
             self.descendants[parent_node].remove(nd)
+        return orphaned_cells
 
     def check_sanity(self):
         for nd in self.nodes:
@@ -220,8 +220,7 @@ class Dendrogram:
         parent = parents.pop()
         orphaned_cells = []
         for nd in src_nodes:
-            orphaned_cells += self.nodes[nd]
-            self.delete_node(nd)
+            orphaned_cells += self.delete_node(nd)
         for cell in orphaned_cells:
             self.parent[cell] = dst_node
             self.nodes[dst_node].append(cell)
