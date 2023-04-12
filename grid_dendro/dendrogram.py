@@ -41,11 +41,6 @@ class Dendrogram:
         self._arr_shape = arr.shape
         self._boundary_flag = boundary_flag
 
-        # Sort flat indices in an ascending order of arr.
-        arr_flat = arr.flatten()
-        self._cells_ordered = arr_flat.argsort()
-        self._num_cells = len(self._cells_ordered)
-
         # Create leaf nodes by finding all local minima.
         if self._boundary_flag == 'periodic':
             filter_mode = 'wrap'
@@ -53,7 +48,12 @@ class Dendrogram:
             msg = f"Boundary flag {self.boundary_flag} is not supported"
             raise ValueError(msg)
         arr_min_filtered = minimum_filter(arr, size=3, mode=filter_mode)
-        self.minima = np.where(arr_flat == arr_min_filtered.flatten())[0]
+        arr = arr.flatten()
+        self.minima = np.where(arr == arr_min_filtered.flatten())[0]
+
+        # Sort flat indices in an ascending order of arr.
+        self._cells_ordered = arr.argsort()
+        self._num_cells = len(self._cells_ordered)
 
     def construct(self):
         """Construct dendrogram tree
