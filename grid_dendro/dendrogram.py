@@ -30,9 +30,7 @@ class Dendrogram:
     """
 
     def __init__(self, arr, boundary_flag='periodic'):
-        """Initializes the instance based on spam preference.
-
-        Find minima in constructor and do not store input array to save memory.
+        """Find minima in constructor and do not store input array to save memory.
 
         Args:
           arr: numpy.ndarray instance representing the input data.
