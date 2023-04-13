@@ -286,7 +286,7 @@ class Dendrogram:
 
 
 def filter_by_node(dat, nodes=None, nodes_select=None, cells_select=None,
-                   fill_value=np.nan):
+                   fill_value=np.nan, drop=False):
     """Mask DataArray using FISO dictionary or the flattened indexes.
 
     Args:
@@ -298,7 +298,9 @@ def filter_by_node(dat, nodes=None, nodes_select=None, cells_select=None,
         cells_select: flat indices of selected cells. If given, overrides nodes
           and nodes_select, optional
         fill_value: value to fill outside of the filtered region, optional.
-                    Default value is np.nan.
+          Default value is np.nan.
+        drop: bool. If true, return flatten dat that only include selected
+          cells.
 
     Returns:
         out: Filtered array matching the input array type
@@ -330,9 +332,13 @@ def filter_by_node(dat, nodes=None, nodes_select=None, cells_select=None,
                 cells_select += nodes[node]
 
     dat1d = dat.flatten()
-    out = np.full(len(dat1d), fill_value)
-    out[cells_select] = dat1d[cells_select]
-    out = out.reshape(dat.shape)
-    if dtype == 'xarray':
-        out = xr.DataArray(data=out, coords=coords, dims=dims)
-    return out
+    if drop:
+        out = dat1d[cells_select]
+        return out
+    else:
+        out = np.full(len(dat1d), fill_value)
+        out[cells_select] = dat1d[cells_select]
+        out = out.reshape(dat.shape)
+        if dtype == 'xarray':
+            out = xr.DataArray(data=out, coords=coords, dims=dims)
+        return out
