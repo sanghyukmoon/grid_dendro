@@ -23,7 +23,8 @@ def get_edge_cells(cells, pcn):
     # For each cell, are there neighboring cells which is not contained
     # in the given region? That is, is there any element of "pcn" which is
     # not contained in "cells"?
-    adjacent_exterior = np.isin(pcn[cells], cells, invert=True)
+    neighbors = [pcn[i] for i in cells]
+    adjacent_exterior = np.isin(neighbors, cells, invert=True)
     # If any of N_neighbor cells fall in exterior region, mark True.
     edge_mask = np.any(adjacent_exterior, axis=1)
     edge_cells = cells[edge_mask]
