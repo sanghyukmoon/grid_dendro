@@ -8,6 +8,3 @@ cd grid_dendro
 conda env create -f env.yml
 conda activate grid_dendro
 ```
-
-(TODO) add `env.yml`
-

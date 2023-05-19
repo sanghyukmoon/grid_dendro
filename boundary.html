@@ -3,7 +3,7 @@
 <!DOCTYPE html>
 
 
-<html >
+<html lang="en" >
 
   <head>
     <meta charset="utf-8" />
@@ -44,6 +44,7 @@
     <script data-url_root="./" id="documentation_options" src="_static/documentation_options.js"></script>
     <script src="_static/jquery.js"></script>
     <script src="_static/underscore.js"></script>
+    <script src="_static/_sphinx_javascript_frameworks_compat.js"></script>
     <script src="_static/doctools.js"></script>
     <script src="_static/clipboard.min.js"></script>
     <script src="_static/copybutton.js"></script>
@@ -66,7 +67,7 @@ const thebe_selector_output = ".output, .cell_output"
     <link rel="next" title="Utility functions" href="energy.html" />
     <link rel="prev" title="Dendrogram class" href="dendrogram.html" />
   <meta name="viewport" content="width=device-width, initial-scale=1"/>
-  <meta name="docsearch:language" content="None"/>
+  <meta name="docsearch:language" content="en"/>
   </head>
   
   
@@ -354,57 +355,8 @@ document.write(`
 <div id="searchbox"></div>
                 <article class="bd-article" role="main">
                   
-  <section id="module-grid_dendro.boundary">
-<span id="boundary"></span><h1>boundary<a class="headerlink" href="#module-grid_dendro.boundary" title="Permalink to this headline">#</a></h1>
-<dl class="py function">
-<dt class="sig sig-object py" id="grid_dendro.boundary.get_edge_cells">
-<span class="sig-prename descclassname"><span class="pre">grid_dendro.boundary.</span></span><span class="sig-name descname"><span class="pre">get_edge_cells</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">cells</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">pcn</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="_modules/grid_dendro/boundary.html#get_edge_cells"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#grid_dendro.boundary.get_edge_cells" title="Permalink to this definition">#</a></dt>
-<dd><p>Find edge cells of the given region</p>
-<dl class="field-list simple">
-<dt class="field-odd">Parameters</dt>
-<dd class="field-odd"><ul class="simple">
-<li><p><strong>cells</strong> (<em>array_like</em>) – flattened indices that defines some region</p></li>
-<li><p><strong>pcn</strong> (<em>array_like</em>) – precomputed neighbors.</p></li>
-</ul>
-</dd>
-<dt class="field-even">Returns</dt>
-<dd class="field-even"><p><strong>edge_cells</strong> – flattened indices that defines edge cells of the given region</p>
-</dd>
-<dt class="field-odd">Return type</dt>
-<dd class="field-odd"><p>array_like</p>
-</dd>
-</dl>
-</dd></dl>
-
-<dl class="py function">
-<dt class="sig sig-object py" id="grid_dendro.boundary.precompute_neighbor">
-<span class="sig-prename descclassname"><span class="pre">grid_dendro.boundary.</span></span><span class="sig-name descname"><span class="pre">precompute_neighbor</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">shape</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">boundary_flag</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">corner</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">True</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="_modules/grid_dendro/boundary.html#precompute_neighbor"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#grid_dendro.boundary.precompute_neighbor" title="Permalink to this definition">#</a></dt>
-<dd><p>Precompute neighbor indices</p>
-<dl class="field-list simple">
-<dt class="field-odd">Parameters</dt>
-<dd class="field-odd"><ul class="simple">
-<li><p><strong>shape</strong> (<em>tuple</em>) – shape of the input data</p></li>
-<li><p><strong>boundary_flag</strong> (<em>str</em>) – Flag for boundary condition. Affects how to set neighbors of the edge cells.</p></li>
-<li><p><strong>corner</strong> (<em>Boolean</em><em>, </em><em>optional</em>) – If true, the corner cells are counted as neighbors (26 neighbors in total)</p></li>
-</ul>
-</dd>
-<dt class="field-even">Returns</dt>
-<dd class="field-even"><p><strong>pcn</strong> – This is a pseudo-array of the shape (Ncells, N_neighbors), such that
-pcn[1][0] is the flattened index of the (-1,-1,-1) neighbor of the
-(k,j,i) = (0,0,1) cell, which is (k,j,i) = (-1, -1, 0) = (Nz-1, Ny-1, 0)
-for periodic BC. See docstring of get_offsets for the ordering of
-neighbor directions.
-The actual data is stored in memory only along the boundary points
-(e.g., i=0, j=32, k=32 for 64^3 mesh), such that the dictionary
-returns the value bpcn when given a key bi; otherwise, it computes
-the neighbor indices on-the-fly, by index+displacements.</p>
-</dd>
-<dt class="field-odd">Return type</dt>
-<dd class="field-odd"><p>pcnDict</p>
-</dd>
-</dl>
-</dd></dl>
-
+  <section id="boundary">
+<h1>boundary<a class="headerlink" href="#boundary" title="Permalink to this heading">#</a></h1>
 </section>
 
     <script type="text/x-thebe-config">
