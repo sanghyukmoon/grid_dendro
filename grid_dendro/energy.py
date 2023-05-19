@@ -4,16 +4,24 @@ from grid_dendro import dendrogram
 def calculate_cumulative_energies(prims, dvol, nodes, node):
     """Calculate cumulative energies as a function of radius in a given node
 
-    Args:
-        prims: dictionary containing primitive variables.
-        dvol: float representing volume element.
-        nodes: grid_dendro nodes dictionary.
-        node: int representing the selected node.
+    Parameters
+    ----------
+        prims : dict
+            dictionary containing primitive variables.
+        dvol : float
+            representing volume element.
+        nodes : dict
+            grid_dendro nodes dictionary.
+        node : int
+            representing the selected node.
 
-    Returns:
-        reff: effective radii.
-        energies: thermal, kinetic, gravitational, and total energies
-          integrated up to each radius.
+    Returns
+    -------
+        reff : float
+            effective radii.
+        energies : dict
+            thermal, kinetic, gravitational, and total energies
+            integrated up to each radius.
     """
 
     # Create 1-D flattened primitive variables of this node
