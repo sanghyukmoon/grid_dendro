@@ -165,7 +165,7 @@ class Dendrogram:
 
     def get_all_descendant_cells(self, node):
         """Return all member cells of the node, including descendant nodes"""
-        cells = []
+        cells = self.nodes[node]
         for nd in self.descendants[node]:
             cells += self.nodes[nd]
         return cells
