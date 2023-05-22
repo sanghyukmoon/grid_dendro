@@ -4,6 +4,7 @@ import numpy as np
 import xarray as xr
 from scipy.ndimage import minimum_filter
 from grid_dendro import boundary
+from grid_dendro import energy
 
 
 class Dendrogram:
@@ -161,6 +162,19 @@ class Dendrogram:
                 self._subsume_buds(shorter_buds, longest_bud)
             self._find_leaves()
             bud = self._find_bud(ncells_min)
+
+    def get_all_descendant_cells(self, node):
+        """Return all member cells of the node, including descendant nodes"""
+        cells = []
+        for nd in self.descendants[node]:
+            cells += self.nodes[nd]
+        return cells
+
+#    def find_hbr(self, prims):
+#        # TODO
+#        # find hbr top-down
+#        dvol = 1  # scale does not matter here, so let it be unity.
+#        reff, engs = energy.calculate_cumulative_energies(prims, dvol, self.nodes, nds)
 
     def _cut_bud(self, bud):
         if len(self.children[bud]) > 0:
