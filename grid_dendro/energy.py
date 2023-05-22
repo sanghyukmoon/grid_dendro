@@ -1,19 +1,17 @@
 import numpy as np
 from grid_dendro import dendrogram
 
-def calculate_cumulative_energies(prims, dvol, nodes, node):
+def calculate_cumulative_energies(gd, data, node):
     """Calculate cumulative energies as a function of radius in a given node
 
     Parameters
     ----------
-        prims : dict
-            dictionary containing primitive variables.
-        dvol : float
-            representing volume element.
-        nodes : dict
-            grid_dendro nodes dictionary.
+        gd : grid_dendro.Dendrogram
+            : Dendrogram object
+        data : dict
+            Dictionary containing hydro variables
         node : int
-            representing the selected node.
+            Selected GRID-dendro node
 
     Returns
     -------
@@ -25,18 +23,18 @@ def calculate_cumulative_energies(prims, dvol, nodes, node):
     """
 
     # Create 1-D flattened primitive variables of this node
-    req_var = {'rho', 'vel1', 'vel2', 'vel3', 'prs', 'phi'}
-    if not req_var.issubset(prims):
-        raise ValueError("prims must contain the following variables: {}".format(req_var))
+    req_var = {'rho', 'vel1', 'vel2', 'vel3', 'prs', 'phi', 'dvol'}
+    if not req_var.issubset(data):
+        raise ValueError("data must contain the following variables: {}".format(req_var))
 
     # Flatten variables
-    prims = {k: dendrogram.filter_by_node(v, nodes, node, drop=True)
-             for k, v in prims.items()}
+    prims = {k: gd.filter_data(v, node, drop=True)
+             for k, v in data.items() if k != 'dvol'}
+    dvol = data['dvol']
 
-     # Sort variables in ascending order of potential
+    # Sort variables in ascending order of potential
     cells_ordered = prims['phi'].argsort()
     prims = {k: v[cells_ordered] for k, v in prims.items()}
-
 
     # Gravitational potential at the HBP boundary
     phimax = prims['phi'][-1]
