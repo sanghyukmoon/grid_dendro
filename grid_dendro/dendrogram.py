@@ -10,24 +10,30 @@ from grid_dendro import energy
 class Dendrogram:
     """Dendrogram representing hierarchical structure in 3D data
 
-    Attributes:
-        nodes: dictionary mapping all nodes in dendrogram hierarchy to the
-          cells belong to them.
-          Access pattern: {node: cells}
-        parent: numpy array mapping all cells to their parent node. When a cell
-          is a node-generating cell and therefore itself a node, its parent is
-          not itself, but the parent node of it.
-          Access pattern: {cells: node}
-        children: dictionary mapping all nodes to their child nodes. Note that
-          leaf nodes have no children.
-          Access pattern: {node: list of nodes}
-        ancestor: dictionary mapping all nodes to their ancestor node.
-          Access pattern: {node: node}
-        descendants: dictionary mapping all nodes to their descendant nodes.
-          Access pattern: {node: list of nodes}
-        leaves: dictionary mapping all leaf nodes to the cells belong to them.
-          Access pattern: {node: cells}
-        minima: indices of the cell at the local minima of input array.
+    Attributes
+    ----------
+    nodes : dict
+        Maps a node to flat indices of its member cells.
+        {node: cells}
+    parent : array
+        Maps a flat index of a cell to its parent node. When a cell is a parent
+        cell of a node, maps to the parent node of that node.
+        {cell: node}
+    children : dict
+        Maps a node to its child nodes.
+        {node: list of nodes}
+    ancestor : dict
+        Maps a node to its ancestor.
+        {node: node}
+    descendants : dict
+        Maps a node to its descendant nodes.
+        {node: list of nodes}
+    leaves : dict
+        Subset of nodes that do not have children.
+    trunk : int
+        Id of the trunk node.
+    minima : array
+        Flat indices at the local potential minima.
     """
 
     def __init__(self, arr, boundary_flag='periodic'):
@@ -115,7 +121,9 @@ class Dendrogram:
                 if set(self.minima).issubset(set(self.descendants[cell])):
                     print("We have reached the trunk. Stop climbing up")
                     break
+
         self._find_leaves()
+        self._find_trunk()
 
     def prune(self, ncells_min=27):
         """Prune the buds by applying minimum number of cell criterion
@@ -160,8 +168,10 @@ class Dendrogram:
                       "merge shorter buds {} to longest bud {}".format(
                        shorter_buds, longest_bud))
                 self._subsume_buds(shorter_buds, longest_bud)
+
             self._find_leaves()
             bud = self._find_bud(ncells_min)
+        self._find_trunk()
 
     def get_all_descendant_cells(self, node):
         """Return all member cells of the node, including descendant nodes"""
@@ -339,6 +349,14 @@ class Dendrogram:
             if ncells < ncells_min:
                 return leaf
         return None
+
+    def _find_trunk(self):
+        trunk = np.unique(list(self.ancestor.values()))
+        if len(trunk) != 1:
+            raise Exception("There are more than one trunk."
+                            " Something must be wrong")
+        else:
+            self.trunk = trunk[0]
 
 
 def filter_by_node(dat, nodes=None, nodes_select=None, cells_select=None,
