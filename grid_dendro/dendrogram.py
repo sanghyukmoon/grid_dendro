@@ -170,6 +170,50 @@ class Dendrogram:
             cells += self.nodes[nd]
         return cells
 
+    def filter_data(self, dat, nodes, fill_value=np.nan, drop=False):
+        """Filter data by node
+        
+        Parameters
+        ----------
+        dat : xarray.DataArray or numpy.ndarray
+            Input array to be filtered.
+        nodes : int or array of ints
+            Selected nodes.
+        fill_value : float, optional
+            The value to fill outside of the filtered region. Default to nan.
+        drop : bool
+            If true, return faltten data that only include filtered cells.
+        """
+        if isinstance(dat, xr.DataArray):
+            dtype = 'xarray'
+            coords = dat.coords
+            dims = dat.dims
+            dat = dat.to_numpy()
+        elif isinstance(dat, np.ndarray):
+            dtype = 'numpy'
+        else:
+            raise TypeError("type {} is not supported".format(type(dat)))
+
+        # retreive flat indices of selected cells
+        if isinstance(nodes, (int, np.int64, np.int32)):
+            cells = self.get_all_descendant_cells(nodes)
+        else:
+            cells = []
+            for node in nodes:
+                cells += self.get_all_descendant_cells(node)
+
+        dat1d = dat.flatten()
+        if drop:
+            out = dat1d[cells]
+            return out
+        else:
+            out = np.full(len(dat1d), fill_value)
+            out[cells] = dat1d[cells]
+            out = out.reshape(dat.shape)
+            if dtype == 'xarray':
+                out = xr.DataArray(data=out, coords=coords, dims=dims)
+            return out
+
 #    def find_hbr(self, prims):
 #        # TODO
 #        # find hbr top-down
