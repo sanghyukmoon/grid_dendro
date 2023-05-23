@@ -4,7 +4,6 @@ import numpy as np
 import xarray as xr
 from scipy.ndimage import minimum_filter
 from grid_dendro import boundary
-from grid_dendro import energy
 
 
 class Dendrogram:
@@ -37,11 +36,14 @@ class Dendrogram:
     """
 
     def __init__(self, arr, boundary_flag='periodic'):
-        """Find minima in constructor and do not store input array to save memory.
+        """Read data and find local miniima
 
-        Args:
-          arr: numpy.ndarray instance representing the input data.
-          boundary_flag: string representing the boundary condition, optional.
+        Parameters
+        ----------
+        arr : numpy.ndarray
+            Input array.
+        boundary_flag : str, optional
+            String representing boundary condition.
         """
         self._arr_shape = arr.shape
         self._boundary_flag = boundary_flag
@@ -182,7 +184,7 @@ class Dendrogram:
 
     def filter_data(self, dat, nodes, fill_value=np.nan, drop=False):
         """Filter data by node
-        
+
         Parameters
         ----------
         dat : xarray.DataArray or numpy.ndarray
@@ -223,12 +225,6 @@ class Dendrogram:
             if dtype == 'xarray':
                 out = xr.DataArray(data=out, coords=coords, dims=dims)
             return out
-
-#    def find_hbr(self, prims):
-#        # TODO
-#        # find hbr top-down
-#        dvol = 1  # scale does not matter here, so let it be unity.
-#        reff, engs = energy.calculate_cumulative_energies(prims, dvol, self.nodes, nds)
 
     def _cut_bud(self, bud):
         if len(self.children[bud]) > 0:
