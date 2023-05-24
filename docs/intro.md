@@ -1,6 +1,6 @@
 # GRID-Dendro -- Gravitational Identification with Dendrogram
 
-[![Jupyter Book Badge](https://jupyterbook.org/badge.svg)](https://changgoo.github.io/grid_dendro)
+[![Jupyter Book Badge](https://jupyterbook.org/badge.svg)](https://sanghyukmoon.github.io/grid_dendro)
 
 **WARNING: This package is under construction 🏗**
 
