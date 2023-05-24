@@ -130,8 +130,10 @@ class Dendrogram:
     def prune(self, ncells_min=27):
         """Prune the buds by applying minimum number of cell criterion
 
-        Args:
-          ncells_min: minimum number of cells to be a leaf, optional.
+        Parameters
+        ----------
+        ncells_min : int, optional
+            Minimum number of cells of a leaf node.
         """
         bud = self._find_bud(ncells_min)
         while bud is not None:
@@ -262,9 +264,12 @@ class Dendrogram:
         Reassign all cells contained in buds to branch and delete
         buds from the tree.
 
-        Args:
-          buds: buds to be subsumed into other branch.
-          branch: destination branch that subsumes bud.
+        Parameters
+        ----------
+        buds : array of ints
+            IDs of the bud nodes to be subsumed into other branch.
+        branch : int
+            Destination branch that subsumes bud.
         """
         parents = {self.parent[bud] for bud in buds}
         parents.add(self.parent[branch])
@@ -334,11 +339,15 @@ class Dendrogram:
     def _find_bud(self, ncells_min):
         """Loop through all leaves and return the first occurence of a bud.
 
-        Args:
-          ncells_min: minimum number of cells to be a leaf, optional.
+        Parameters
+        ----------
+        ncells_min : int
+            Minimum number of cells of a leaf node.
 
-        Returns:
-          leaf: bud node.
+        Returns
+        -------
+        leaf : int
+            ID of the bud node.
         """
         for leaf in self.leaves:
             ncells = len(self.nodes[leaf])
