@@ -54,9 +54,9 @@ class Dendrogram:
         else:
             msg = f"Boundary flag {self.boundary_flag} is not supported"
             raise ValueError(msg)
-        arr_min_filtered = minimum_filter(arr, size=3, mode=filter_mode)
+        arr_min_filtered = minimum_filter(arr, size=3, mode=filter_mode).flatten()
         arr = arr.flatten()
-        self.minima = np.where(arr == arr_min_filtered.flatten())[0]
+        self.minima = set((arr == arr_min_filtered).nonzero()[0])
 
         # Sort flat indices in an ascending order of arr.
         self._cells_ordered = arr.argsort()
@@ -71,7 +71,7 @@ class Dendrogram:
         # Initialize node, parent, children, descendants, and ancestor
         self.nodes = {nd: [nd] for nd in self.minima}
         self.parent = np.full(self._num_cells, -1, dtype=int)
-        self.parent[self.minima] = self.minima
+        self.parent[list(self.minima)] = list(self.minima)
         self.children = {nd: [] for nd in self.minima}
         self.ancestor = {nd: nd for nd in self.minima}
         self.descendants = {nd: [] for nd in self.minima}
@@ -86,6 +86,8 @@ class Dendrogram:
         # Climb up the potential and construct dendrogram.
         for cell in iter(self._cells_ordered):
             if cell in self.minima:
+                # Performance critical to have type(self.minima) = set for
+                # efficient "in" operation.
                 continue
             # Find parents of neighboring cells.
             parents = set(self.parent[my_neighbors[cell]])
