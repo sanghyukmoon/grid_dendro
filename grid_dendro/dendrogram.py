@@ -55,11 +55,22 @@ class Dendrogram:
             raise ValueError(msg)
         arr_min_filtered = minimum_filter(arr, size=3, mode=filter_mode).flatten()
         arr = arr.flatten()
-        self.minima = set((arr == arr_min_filtered).nonzero()[0])
+        minima = (arr == arr_min_filtered).nonzero()[0]
 
         # Sort flat indices in an ascending order of arr.
-        self._cells_ordered = arr.argsort()
-        self._num_cells = len(self._cells_ordered)
+        cells_ordered = arr.argsort()
+        self.num_cells = len(cells_ordered)
+
+        # cast type based on the size of array
+        if self.num_cells < 2**31:
+            dtype = np.int32
+        elif self.num_cells < 2**63:
+            dtype = np.int64
+        else:
+            raise MemoryError("Input array size is too large")
+        self.minima = set(minima.astype(dtype))
+        self.cells_ordered = cells_ordered.astype(dtype)
+        self.dtype = dtype
 
     def construct(self):
         """Construct dendrogram tree
@@ -69,7 +80,7 @@ class Dendrogram:
 
         # Initialize node, parent, children, descendants, and ancestor
         self.nodes = {nd: [nd] for nd in self.minima}
-        parent_array = np.full(self._num_cells, -1, dtype=int)
+        parent_array = np.full(self.num_cells, -1, dtype=int)
         parent_array[list(self.minima)] = list(self.minima)
         self.children = {nd: [] for nd in self.minima}
         self.ancestor = {nd: nd for nd in self.minima}
@@ -83,7 +94,7 @@ class Dendrogram:
         print("Start climbing up the tree from the leaf nodes.\t"
               f"Number of nodes = {len(self.nodes)}")
         # Climb up the potential and construct dendrogram.
-        for cell in iter(self._cells_ordered):
+        for cell in iter(self.cells_ordered):
             if cell in self.minima:
                 # Performance critical to have type(self.minima) = set for
                 # efficient "in" operation.
@@ -126,7 +137,7 @@ class Dendrogram:
                     break
         self.parent = {}
         for nd in self.nodes:
-            self.parent[nd] = parent_array[nd]
+            self.parent[nd] = parent_array[nd].astype(self.dtype)
         self._find_leaves()
         self._find_trunk()
 
@@ -163,10 +174,10 @@ class Dendrogram:
                 # Subsume short buds to the longest bud and remove the knag.
                 shorter_buds = sibling_buds.copy()
                 longest_bud = sibling_buds.pop()
-                rank_min = np.where(self._cells_ordered == longest_bud)[0][0]
+                rank_min = np.where(self.cells_ordered == longest_bud)[0][0]
                 while len(sibling_buds) > 0:
                     nd = sibling_buds.pop()
-                    rank = np.where(self._cells_ordered == nd)[0][0]
+                    rank = np.where(self.cells_ordered == nd)[0][0]
                     if rank < rank_min:
                         longest_bud = nd
                         rank_min = rank
