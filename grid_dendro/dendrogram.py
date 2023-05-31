@@ -14,10 +14,9 @@ class Dendrogram:
     nodes : dict
         Maps a node to flat indices of its member cells.
         {node: cells}
-    parent : array
-        Maps a flat index of a cell to its parent node. When a cell is a parent
-        cell of a node, maps to the parent node of that node.
-        {cell: node}
+    parent : dict
+        Maps a node to its parent node.
+        {node: node}
     children : dict
         Maps a node to its child nodes.
         {node: list of nodes}
@@ -70,8 +69,8 @@ class Dendrogram:
 
         # Initialize node, parent, children, descendants, and ancestor
         self.nodes = {nd: [nd] for nd in self.minima}
-        self.parent = np.full(self._num_cells, -1, dtype=int)
-        self.parent[list(self.minima)] = list(self.minima)
+        parent_array = np.full(self._num_cells, -1, dtype=int)
+        parent_array[list(self.minima)] = list(self.minima)
         self.children = {nd: [] for nd in self.minima}
         self.ancestor = {nd: nd for nd in self.minima}
         self.descendants = {nd: [] for nd in self.minima}
@@ -90,7 +89,7 @@ class Dendrogram:
                 # efficient "in" operation.
                 continue
             # Find parents of neighboring cells.
-            parents = set(self.parent[my_neighbors[cell]])
+            parents = set(parent_array[my_neighbors[cell]])
             parents.discard(-1)
 
             # Find ancestors of their parents, which can be themselves.
@@ -102,18 +101,18 @@ class Dendrogram:
             elif num_nghbr_nodes == 1:
                 # Add this cell to the existing node
                 nd = neighboring_nodes.pop()
-                self.parent[cell] = nd
+                parent_array[cell] = nd
                 self.nodes[nd].append(cell)
             elif num_nghbr_nodes >= 2:
                 # This cell is at the critical point; create new node.
                 self.nodes[cell] = [cell]
-                self.parent[cell] = cell
+                parent_array[cell] = cell
                 self.ancestor[cell] = cell
                 self.children[cell] = list(neighboring_nodes)
                 self.descendants[cell] = list(neighboring_nodes)
                 for child in self.children[cell]:
                     # This node becomes a parent of its immediate children
-                    self.parent[child] = cell
+                    parent_array[child] = cell
                     # inherit all descendants of children
                     self.descendants[cell] += self.descendants[child]
                 for child in self.descendants[cell]:
@@ -125,7 +124,9 @@ class Dendrogram:
                 if set(self.minima).issubset(set(self.descendants[cell])):
                     print("We have reached the trunk. Stop climbing up")
                     break
-
+        self.parent = {}
+        for nd in self.nodes:
+            self.parent[nd] = parent_array[nd]
         self._find_leaves()
         self._find_trunk()
 
@@ -246,17 +247,14 @@ class Dendrogram:
                 break
             else:
                 parent_node = self.parent[parent_node]
-        parent_node = self.parent[bud]
 
         # Remove this node
         orphans = self.nodes[bud]
-        for orphan in orphans:
-            self.parent[orphan] = -1
-
         self.nodes.pop(bud)
+        self.parent.pop(bud)
         self.children.pop(bud)
-        self.descendants.pop(bud)
         self.ancestor.pop(bud)
+        self.descendants.pop(bud)
 
         return orphans
 
@@ -278,14 +276,12 @@ class Dendrogram:
         if len(parents) != 1:
             raise ValueError("Subsume operation can only be done within the "
                              "same generation.")
-        knag = parents.pop()
-        orphans = []
         for bud in buds:
-            orphans += self._cut_bud(bud)
-        for orphan in orphans:
-            self.parent[orphan] = branch
-            self.nodes[branch].append(orphan)
+            self.nodes[branch] += self._cut_bud(bud)
 
+        # Remove knag node resulting from subsume.
+        # knag node is the pseudo-node that have only one child.
+        knag = parents.pop()
         self._remove_knag(knag)
 
     def _remove_knag(self, knag):
@@ -321,15 +317,12 @@ class Dendrogram:
             self.parent[child_node] = parent_node
 
         # Remove this node
-        orphans = self.nodes[knag]
-        for orphan in orphans:
-            self.parent[orphan] = child_node
-            self.nodes[child_node].append(orphan)
-
+        self.nodes[child_node] += self.nodes[knag]
         self.nodes.pop(knag)
+        self.parent.pop(knag)
         self.children.pop(knag)
-        self.descendants.pop(knag)
         self.ancestor.pop(knag)
+        self.descendants.pop(knag)
 
     def _find_leaves(self):
         """Find leaf nodes."""
