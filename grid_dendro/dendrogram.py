@@ -27,11 +27,11 @@ class Dendrogram:
     descendants : dict
         Maps a node to its descendant nodes.
         {node: list of nodes}
-    leaves : dict
-        Subset of nodes that do not have children.
+    leaves : list
+        List of nodes that do not have children.
     trunk : int
         Id of the trunk node.
-    minima : array
+    minima : set
         Flat indices at the local potential minima.
     """
 
@@ -333,10 +333,10 @@ class Dendrogram:
 
     def _find_leaves(self):
         """Find leaf nodes."""
-        self.leaves = {}
+        self.leaves = []
         for nd in self.nodes:
             if len(self.children[nd]) == 0:
-                self.leaves[nd] = self.nodes[nd]
+                self.leaves.append(nd)
 
     def _find_bud(self, ncells_min):
         """Loop through all leaves and return the first occurence of a bud.
