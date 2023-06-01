@@ -3,7 +3,7 @@
 <!DOCTYPE html>
 
 
-<html >
+<html lang="en" >
 
   <head>
     <meta charset="utf-8" />
@@ -44,6 +44,7 @@
     <script data-url_root="./" id="documentation_options" src="_static/documentation_options.js"></script>
     <script src="_static/jquery.js"></script>
     <script src="_static/underscore.js"></script>
+    <script src="_static/_sphinx_javascript_frameworks_compat.js"></script>
     <script src="_static/doctools.js"></script>
     <script src="_static/clipboard.min.js"></script>
     <script src="_static/copybutton.js"></script>
@@ -65,7 +66,7 @@ const thebe_selector_output = ".output, .cell_output"
     <link rel="search" title="Search" href="search.html" />
     <link rel="next" title="Dendrogram class" href="dendrogram.html" />
   <meta name="viewport" content="width=device-width, initial-scale=1"/>
-  <meta name="docsearch:language" content="None"/>
+  <meta name="docsearch:language" content="en"/>
   </head>
   
   
@@ -366,34 +367,36 @@ document.write(`
                 <article class="bd-article" role="main">
                   
   <section class="tex2jax_ignore mathjax_ignore" id="grid-dendro-gravitational-identification-with-dendrogram">
-<h1>GRID-Dendro – Gravitational Identification with Dendrogram<a class="headerlink" href="#grid-dendro-gravitational-identification-with-dendrogram" title="Permalink to this headline">#</a></h1>
+<h1>GRID-Dendro – Gravitational Identification with Dendrogram<a class="headerlink" href="#grid-dendro-gravitational-identification-with-dendrogram" title="Permalink to this heading">#</a></h1>
 <p><a class="reference external" href="https://sanghyukmoon.github.io/grid_dendro"><img alt="Jupyter Book Badge" src="https://jupyterbook.org/badge.svg" /></a></p>
 <section id="acknowledgments-and-historical-remarks">
-<h2>Acknowledgments and Historical Remarks<a class="headerlink" href="#acknowledgments-and-historical-remarks" title="Permalink to this headline">#</a></h2>
+<h2>Acknowledgments and Historical Remarks<a class="headerlink" href="#acknowledgments-and-historical-remarks" title="Permalink to this heading">#</a></h2>
 <p><span id="id1">Gong and Ostriker [<a class="reference internal" href="#id6" title="Hao Gong and Eve C. Ostriker. Dense Core Formation in Supersonic Turbulent Converging Flows. ApJ, 729(2):120, March 2011. arXiv:1101.2650, doi:10.1088/0004-637X/729/2/120.">2011</a>]</span> developed and introduced a core finding method called GRID (GRavitatianal IDentification), which utilize isocontours of gravitational potential to provide physically motivated definition of bound cores. <span id="id2">Mao <em>et al.</em> [<a class="reference internal" href="#id5" title="S. Alwin Mao, Eve C. Ostriker, and Chang-Goo Kim. Cloud Properties and Correlations with Star Formation in Self-consistent Simulations of the Multiphase ISM. ApJ, 898(1):52, July 2020. arXiv:1911.05078, doi:10.3847/1538-4357/ab989c.">2020</a>]</span> extended this algorithm to identify hierarchical structures of the interstellar medium using dendrogram, as well as significantly improve the efficiency of the algorithm. Alwin Mao, who is the first author of <span id="id3">Mao <em>et al.</em> [<a class="reference internal" href="#id5" title="S. Alwin Mao, Eve C. Ostriker, and Chang-Goo Kim. Cloud Properties and Correlations with Star Formation in Self-consistent Simulations of the Multiphase ISM. ApJ, 898(1):52, July 2020. arXiv:1911.05078, doi:10.3847/1538-4357/ab989c.">2020</a>]</span>, wrote a python pacakge <a class="reference external" href="https://github.com/alwinm/fiso">FISO</a> (fast isocontours) to implement this algorithm in the course of his PhD program. The code has an optimal performance thanks to Alwin’s huge effort to make it fast. Because FISO is so good, I wanted to make it more user-friendly in terms of code design and documentation. Alwin kindly agreed that I can refactor the code and maintain it in a <a class="reference external" href="https://github.com/sanghyukmoon/grid_dendro">separate repository</a>.</p>
 </section>
 <section id="example-usage">
-<h2>Example Usage<a class="headerlink" href="#example-usage" title="Permalink to this headline">#</a></h2>
+<h2>Example Usage<a class="headerlink" href="#example-usage" title="Permalink to this heading">#</a></h2>
 <div class="highlight-default notranslate"><div class="highlight"><pre><span></span><span class="gp">&gt;&gt;&gt; </span><span class="kn">import</span> <span class="nn">pyathena</span> <span class="k">as</span> <span class="nn">pa</span>
-<span class="gp">&gt;&gt;&gt; </span><span class="n">s</span> <span class="o">=</span> <span class="n">pa</span><span class="o">.</span><span class="n">LoadSim</span><span class="p">(</span><span class="s2">&quot;/scratch/smoon/M5J2P0N512&quot;</span><span class="p">)</span>
-<span class="gp">&gt;&gt;&gt; </span><span class="n">ds</span> <span class="o">=</span> <span class="n">s</span><span class="o">.</span><span class="n">load_hdf5</span><span class="p">(</span><span class="mi">50</span><span class="p">,</span> <span class="n">load_method</span><span class="o">=</span><span class="s1">&#39;pyathena&#39;</span><span class="p">)</span>
-<span class="gp">&gt;&gt;&gt; </span><span class="n">cs</span> <span class="o">=</span> <span class="mf">1.0</span> <span class="c1"># isothermal sound speed</span>
-<span class="gp">&gt;&gt;&gt; </span><span class="n">gd</span> <span class="o">=</span> <span class="n">dendrogram</span><span class="o">.</span><span class="n">Dendrogram</span><span class="p">(</span><span class="n">ds</span><span class="o">.</span><span class="n">phigas</span><span class="o">.</span><span class="n">data</span><span class="p">)</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="n">s</span> <span class="o">=</span> <span class="n">pa</span><span class="o">.</span><span class="n">LoadSim</span><span class="p">(</span><span class="s2">&quot;R8_2pc&quot;</span><span class="p">)</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="n">ds</span> <span class="o">=</span> <span class="n">s</span><span class="o">.</span><span class="n">load_vtk</span><span class="p">(</span><span class="mi">200</span><span class="p">)</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="n">dat</span> <span class="o">=</span> <span class="n">ds</span><span class="o">.</span><span class="n">get_field</span><span class="p">([</span><span class="s1">&#39;density&#39;</span><span class="p">,</span><span class="s1">&#39;velocity&#39;</span><span class="p">,</span><span class="s1">&#39;pressure&#39;</span><span class="p">])</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="n">ds_grav_pp</span> <span class="o">=</span> <span class="n">pa</span><span class="o">.</span><span class="n">read_vtk</span><span class="p">(</span><span class="s2">&quot;R8_2pc/phi_gas_only/R8_2pc.0200.Phi.vtk&quot;</span><span class="p">)</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="n">dat</span><span class="p">[</span><span class="s1">&#39;gravitational_potential&#39;</span><span class="p">]</span> <span class="o">=</span> <span class="n">ds_grav_pp</span><span class="o">.</span><span class="n">get_field</span><span class="p">(</span><span class="s1">&#39;Phi&#39;</span><span class="p">)</span><span class="o">.</span><span class="n">Phi</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="n">gd</span> <span class="o">=</span> <span class="n">dendrogram</span><span class="o">.</span><span class="n">Dendrogram</span><span class="p">(</span><span class="n">ds</span><span class="o">.</span><span class="n">gravitational_potential</span><span class="o">.</span><span class="n">data</span><span class="p">)</span>
 <span class="gp">&gt;&gt;&gt; </span><span class="n">gd</span><span class="o">.</span><span class="n">construct</span><span class="p">()</span>
 <span class="gp">&gt;&gt;&gt; </span><span class="n">gd</span><span class="o">.</span><span class="n">prune</span><span class="p">()</span>  <span class="c1"># Remove buds</span>
-<span class="gp">&gt;&gt;&gt; </span><span class="n">data</span> <span class="o">=</span> <span class="nb">dict</span><span class="p">(</span><span class="n">rho</span><span class="o">=</span><span class="n">ds</span><span class="o">.</span><span class="n">dens</span><span class="o">.</span><span class="n">data</span><span class="p">,</span>
-<span class="go">                vel1=(ds.mom1/ds.dens).data,</span>
-<span class="go">                vel2=(ds.mom2/ds.dens).data,</span>
-<span class="go">                vel3=(ds.mom3/ds.dens).data,</span>
-<span class="go">                prs=(cs**2*ds.dens).data,</span>
-<span class="go">                phi=ds.phigas.data,</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="n">data</span> <span class="o">=</span> <span class="nb">dict</span><span class="p">(</span><span class="n">rho</span><span class="o">=</span><span class="n">dat</span><span class="o">.</span><span class="n">density</span><span class="o">.</span><span class="n">data</span><span class="p">,</span>
+<span class="go">                vel1=dat.velocity1.data,</span>
+<span class="go">                vel2=dat.velocity2.data,</span>
+<span class="go">                vel3=dat.velocity3.data,</span>
+<span class="go">                prs=dat.pressure.data,</span>
+<span class="go">                phi=dat.gravitational_potential.data,</span>
 <span class="go">                dvol=s.domain[&#39;dx&#39;].prod())</span>
 <span class="gp">&gt;&gt;&gt; </span><span class="n">hbp</span><span class="p">,</span> <span class="n">hbr</span> <span class="o">=</span> <span class="n">find_bound_object</span><span class="p">(</span><span class="n">gd</span><span class="p">,</span> <span class="n">data</span><span class="p">)</span>
 </pre></div>
 </div>
 </section>
 <section id="references">
-<h2>References<a class="headerlink" href="#references" title="Permalink to this headline">#</a></h2>
+<h2>References<a class="headerlink" href="#references" title="Permalink to this heading">#</a></h2>
 <div class="docutils container" id="id4">
 <dl class="citation">
 <dt class="label" id="id6"><span class="brackets"><a class="fn-backref" href="#id1">GongOstriker11</a></span></dt>
