@@ -2,8 +2,6 @@
 
 [![Jupyter Book Badge](https://jupyterbook.org/badge.svg)](https://sanghyukmoon.github.io/grid_dendro)
 
-**WARNING: This package is under construction 🏗**
-
 ## References and Historical Remarks
 - {cite:t}`GongOstriker2011`: GRID
 - {cite:t}`Mao2020`: FISO
