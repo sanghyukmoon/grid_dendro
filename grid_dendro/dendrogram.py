@@ -235,7 +235,7 @@ class Dendrogram:
         """
         cells = self.nodes[node].copy()
         for nd in self.descendants[node]:
-            cells += self.nodes[nd]
+            cells = np.concatenate((cells, self.nodes[nd]))
         return cells
 
     def filter_data(self, dat, nodes, fill_value=np.nan, drop=False):
@@ -283,6 +283,24 @@ class Dendrogram:
             return out
 
     def _cut_bud(self, bud):
+        """Remove bud node and return its member cells
+
+        TODO: this can be generalized.
+
+        Parameters
+        ----------
+        bud : int
+            Id of a selected node.
+
+        Returns
+        -------
+        cells : array
+            Flattned indices of all member cells of this node.
+
+        See Also
+        --------
+        _remove_knag
+        """
         if len(self.children[bud]) > 0:
             raise ValueError("This is not a bud")
         parent_node = self.parent[bud]
@@ -328,7 +346,8 @@ class Dendrogram:
             raise ValueError("Subsume operation can only be done within the "
                              "same generation.")
         for bud in buds:
-            self.nodes[branch] += self._cut_bud(bud)
+            self.nodes[branch] = np.concatenate((self.nodes[branch],
+                                                 self._cut_bud(bud)))
 
         # Remove knag node resulting from subsume.
         # knag node is the pseudo-node that have only one child.
@@ -368,7 +387,8 @@ class Dendrogram:
             self.parent[child_node] = parent_node
 
         # Remove this node
-        self.nodes[child_node] += self.nodes[knag]
+        self.nodes[child_node] = np.concatenate((self.nodes[child_node],
+                                                 self.nodes[knag]))
         self.nodes.pop(knag)
         self.parent.pop(knag)
         self.children.pop(knag)
