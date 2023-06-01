@@ -9,7 +9,7 @@
     <meta charset="utf-8" />
     <meta name="viewport" content="width=device-width, initial-scale=1.0" /><meta name="generator" content="Docutils 0.17.1: http://docutils.sourceforge.net/" />
 
-    <title>Dendrogram class &#8212; GRID-Dendro</title>
+    <title>Dendrogram (grid_dendro.dendrogram) &#8212; GRID-Dendro</title>
   
   
   
@@ -64,8 +64,8 @@ const thebe_selector_output = ".output, .cell_output"
     <script>DOCUMENTATION_OPTIONS.pagename = 'dendrogram';</script>
     <link rel="index" title="Index" href="genindex.html" />
     <link rel="search" title="Search" href="search.html" />
-    <link rel="next" title="boundary" href="boundary.html" />
-    <link rel="prev" title="GRID-Dendro – Gravitational Identification with Dendrogram" href="intro.html" />
+    <link rel="next" title="Neighbors and boundary conditions (grid_dendro.boundary)" href="boundary.html" />
+    <link rel="prev" title="GRID-dendro documentation" href="intro.html" />
   <meta name="viewport" content="width=device-width, initial-scale=1"/>
   <meta name="docsearch:language" content="en"/>
   </head>
@@ -146,15 +146,15 @@ const thebe_selector_output = ".output, .cell_output"
         <ul class="nav bd-sidenav bd-sidenav__home-link">
             <li class="toctree-l1">
                 <a class="reference internal" href="intro.html">
-                    GRID-Dendro – Gravitational Identification with Dendrogram
+                    GRID-dendro documentation
                 </a>
             </li>
         </ul>
         <p aria-level="2" class="caption" role="heading"><span class="caption-text">API References</span></p>
 <ul class="current nav bd-sidenav">
-<li class="toctree-l1 current active"><a class="current reference internal" href="#">Dendrogram class</a></li>
-<li class="toctree-l1"><a class="reference internal" href="boundary.html">boundary</a></li>
-<li class="toctree-l1"><a class="reference internal" href="energy.html">energy</a></li>
+<li class="toctree-l1 current active"><a class="current reference internal" href="#">Dendrogram (grid_dendro.dendrogram)</a></li>
+<li class="toctree-l1"><a class="reference internal" href="boundary.html">Neighbors and boundary conditions (grid_dendro.boundary)</a></li>
+<li class="toctree-l1"><a class="reference internal" href="energy.html">Energies and boundness (grid_dendro.energy)</a></li>
 </ul>
 <p aria-level="2" class="caption" role="heading"><span class="caption-text">Installation</span></p>
 <ul class="nav bd-sidenav">
@@ -341,7 +341,7 @@ document.write(`
               
 
 <div id="jb-print-docs-body" class="onlyprint">
-    <h1>Dendrogram class</h1>
+    <h1>Dendrogram (grid_dendro.dendrogram)</h1>
     <!-- Table of contents -->
     <div id="print-main-content">
         <div id="jb-print-toc">
@@ -355,8 +355,9 @@ document.write(`
 <div id="searchbox"></div>
                 <article class="bd-article" role="main">
                   
-  <section id="dendrogram-class">
-<h1>Dendrogram class<a class="headerlink" href="#dendrogram-class" title="Permalink to this heading">#</a></h1>
+  <section id="module-grid_dendro.dendrogram">
+<span id="dendrogram-grid-dendro-dendrogram"></span><h1>Dendrogram (grid_dendro.dendrogram)<a class="headerlink" href="#module-grid_dendro.dendrogram" title="Permalink to this heading">#</a></h1>
+<p>Implements Dendrogram class</p>
 <dl class="py class">
 <dt class="sig sig-object py" id="grid_dendro.dendrogram.Dendrogram">
 <em class="property"><span class="pre">class</span><span class="w"> </span></em><span class="sig-prename descclassname"><span class="pre">grid_dendro.dendrogram.</span></span><span class="sig-name descname"><span class="pre">Dendrogram</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">arr</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">boundary_flag</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">'periodic'</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="_modules/grid_dendro/dendrogram.html#Dendrogram"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#grid_dendro.dendrogram.Dendrogram" title="Permalink to this definition">#</a></dt>
@@ -525,6 +526,34 @@ These memory optimization is only done to “nodes” and
 
 </dd></dl>
 
+<dl class="py function">
+<dt class="sig sig-object py" id="grid_dendro.dendrogram.filter_by_node">
+<span class="sig-prename descclassname"><span class="pre">grid_dendro.dendrogram.</span></span><span class="sig-name descname"><span class="pre">filter_by_node</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">dat</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">nodes</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">nodes_select</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">cells_select</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">fill_value</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">nan</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">drop</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">False</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="_modules/grid_dendro/dendrogram.html#filter_by_node"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#grid_dendro.dendrogram.filter_by_node" title="Permalink to this definition">#</a></dt>
+<dd><p>Mask DataArray using FISO dictionary or the flattened indexes.</p>
+<div class="deprecated">
+<p><span class="versionmodified deprecated">Deprecated since version 1.0.0: </span>This function will be removed in grid_dendro 1.0.0, it is
+replaced by Dendrogram.filter_data method.</p>
+</div>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters</dt>
+<dd class="field-odd"><ul class="simple">
+<li><p><strong>dat</strong> (<em>xarray.DataArray</em><em> or </em><em>numpy.ndarray</em>) – Input array to be filtered.</p></li>
+<li><p><strong>nodes</strong> (<em>dict</em><em>, </em><em>optional</em>) – Dendrogram nodes dictionary.</p></li>
+<li><p><strong>nodes_select</strong> (<em>int</em><em> or </em><em>sequence of ints</em><em>, </em><em>optional</em>) – Id of selected node(s).</p></li>
+<li><p><strong>cells_select</strong> (<em>array</em><em>, </em><em>optional</em>) – Flat indices of selected cells. Overrides nodes and nodes_select.</p></li>
+<li><p><strong>fill_value</strong> (<em>float</em><em>, </em><em>optional</em>) – Value to fill outside of the filtered region. Default is np.nan.</p></li>
+<li><p><strong>drop</strong> (<em>bool</em><em>, </em><em>optional</em>) – If true, return flatten dat that only include selected cells.</p></li>
+</ul>
+</dd>
+<dt class="field-even">Returns</dt>
+<dd class="field-even"><p><strong>out</strong> – Filtered array matching the input array type</p>
+</dd>
+<dt class="field-odd">Return type</dt>
+<dd class="field-odd"><p>xarray.DataArray or numpy.ndarray</p>
+</dd>
+</dl>
+</dd></dl>
+
 </section>
 
     <script type="text/x-thebe-config">
@@ -564,7 +593,7 @@ These memory optimization is only done to “nodes” and
       <i class="fa-solid fa-angle-left"></i>
       <div class="prev-next-info">
         <p class="prev-next-subtitle">previous</p>
-        <p class="prev-next-title">GRID-Dendro – Gravitational Identification with Dendrogram</p>
+        <p class="prev-next-title">GRID-dendro documentation</p>
       </div>
     </a>
     <a class="right-next"
@@ -572,7 +601,7 @@ These memory optimization is only done to “nodes” and
        title="next page">
       <div class="prev-next-info">
         <p class="prev-next-subtitle">next</p>
-        <p class="prev-next-title">boundary</p>
+        <p class="prev-next-title">Neighbors and boundary conditions (grid_dendro.boundary)</p>
       </div>
       <i class="fa-solid fa-angle-right"></i>
     </a>

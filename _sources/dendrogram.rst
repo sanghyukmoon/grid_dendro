@@ -1,5 +1,5 @@
-Dendrogram class
-----------------
+Dendrogram (grid_dendro.dendrogram)
+-----------------------------------
 
-.. autoclass:: grid_dendro.dendrogram.Dendrogram
+.. automodule:: grid_dendro.dendrogram
     :members:

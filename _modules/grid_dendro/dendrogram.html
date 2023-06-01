@@ -143,15 +143,15 @@ const thebe_selector_output = ".output, .cell_output"
         <ul class="nav bd-sidenav bd-sidenav__home-link">
             <li class="toctree-l1">
                 <a class="reference internal" href="../../intro.html">
-                    GRID-Dendro – Gravitational Identification with Dendrogram
+                    GRID-dendro documentation
                 </a>
             </li>
         </ul>
         <p aria-level="2" class="caption" role="heading"><span class="caption-text">API References</span></p>
 <ul class="nav bd-sidenav">
-<li class="toctree-l1"><a class="reference internal" href="../../dendrogram.html">Dendrogram class</a></li>
-<li class="toctree-l1"><a class="reference internal" href="../../boundary.html">boundary</a></li>
-<li class="toctree-l1"><a class="reference internal" href="../../energy.html">energy</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../dendrogram.html">Dendrogram (grid_dendro.dendrogram)</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../boundary.html">Neighbors and boundary conditions (grid_dendro.boundary)</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../energy.html">Energies and boundness (grid_dendro.energy)</a></li>
 </ul>
 <p aria-level="2" class="caption" role="heading"><span class="caption-text">Installation</span></p>
 <ul class="nav bd-sidenav">
@@ -746,7 +746,7 @@ document.write(`
             <span class="bp">self</span><span class="o">.</span><span class="n">trunk</span> <span class="o">=</span> <span class="n">trunk</span><span class="p">[</span><span class="mi">0</span><span class="p">]</span></div>
 
 
-<span class="k">def</span> <span class="nf">filter_by_node</span><span class="p">(</span><span class="n">dat</span><span class="p">,</span> <span class="n">nodes</span><span class="o">=</span><span class="kc">None</span><span class="p">,</span> <span class="n">nodes_select</span><span class="o">=</span><span class="kc">None</span><span class="p">,</span> <span class="n">cells_select</span><span class="o">=</span><span class="kc">None</span><span class="p">,</span>
+<div class="viewcode-block" id="filter_by_node"><a class="viewcode-back" href="../../dendrogram.html#grid_dendro.dendrogram.filter_by_node">[docs]</a><span class="k">def</span> <span class="nf">filter_by_node</span><span class="p">(</span><span class="n">dat</span><span class="p">,</span> <span class="n">nodes</span><span class="o">=</span><span class="kc">None</span><span class="p">,</span> <span class="n">nodes_select</span><span class="o">=</span><span class="kc">None</span><span class="p">,</span> <span class="n">cells_select</span><span class="o">=</span><span class="kc">None</span><span class="p">,</span>
                    <span class="n">fill_value</span><span class="o">=</span><span class="n">np</span><span class="o">.</span><span class="n">nan</span><span class="p">,</span> <span class="n">drop</span><span class="o">=</span><span class="kc">False</span><span class="p">):</span>
 <span class="w">    </span><span class="sd">&quot;&quot;&quot;Mask DataArray using FISO dictionary or the flattened indexes.</span>
 
@@ -810,7 +810,7 @@ document.write(`
         <span class="n">out</span> <span class="o">=</span> <span class="n">out</span><span class="o">.</span><span class="n">reshape</span><span class="p">(</span><span class="n">dat</span><span class="o">.</span><span class="n">shape</span><span class="p">)</span>
         <span class="k">if</span> <span class="n">dtype</span> <span class="o">==</span> <span class="s1">&#39;xarray&#39;</span><span class="p">:</span>
             <span class="n">out</span> <span class="o">=</span> <span class="n">xr</span><span class="o">.</span><span class="n">DataArray</span><span class="p">(</span><span class="n">data</span><span class="o">=</span><span class="n">out</span><span class="p">,</span> <span class="n">coords</span><span class="o">=</span><span class="n">coords</span><span class="p">,</span> <span class="n">dims</span><span class="o">=</span><span class="n">dims</span><span class="p">)</span>
-        <span class="k">return</span> <span class="n">out</span>
+        <span class="k">return</span> <span class="n">out</span></div>
 </pre></div>
 
                 </article>
