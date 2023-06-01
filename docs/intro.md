@@ -10,18 +10,20 @@
 ## Example Usage
 ```
 >>> import pyathena as pa
->>> s = pa.LoadSim("/scratch/smoon/M5J2P0N512")
->>> ds = s.load_hdf5(50, load_method='pyathena')
->>> cs = 1.0 # isothermal sound speed
->>> gd = dendrogram.Dendrogram(ds.phigas.data)
+>>> s = pa.LoadSim("R8_2pc")
+>>> ds = s.load_vtk(200)
+>>> dat = ds.get_field(['density','velocity','pressure'])
+>>> ds_grav_pp = pa.read_vtk("R8_2pc/phi_gas_only/R8_2pc.0200.Phi.vtk")
+>>> dat['gravitational_potential'] = ds_grav_pp.get_field('Phi').Phi
+>>> gd = dendrogram.Dendrogram(ds.gravitational_potential.data)
 >>> gd.construct()
 >>> gd.prune()  # Remove buds
->>> data = dict(rho=ds.dens.data,
-                vel1=(ds.mom1/ds.dens).data,
-                vel2=(ds.mom2/ds.dens).data,
-                vel3=(ds.mom3/ds.dens).data,
-                prs=(cs**2*ds.dens).data,
-                phi=ds.phigas.data,
+>>> data = dict(rho=dat.density.data,
+                vel1=dat.velocity1.data,
+                vel2=dat.velocity2.data,
+                vel3=dat.velocity3.data,
+                prs=dat.pressure.data,
+                phi=dat.gravitational_potential.data,
                 dvol=s.domain['dx'].prod())
 >>> hbp, hbr = find_bound_object(gd, data)
 ```
