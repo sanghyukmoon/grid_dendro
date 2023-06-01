@@ -221,7 +221,18 @@ class Dendrogram:
         self._find_trunk()
 
     def get_all_descendant_cells(self, node):
-        """Return all member cells of the node, including descendant nodes"""
+        """Return all member cells of the node, including descendant nodes
+
+        Parameters
+        ----------
+        node : int
+            Id of a selected node.
+
+        Returns
+        -------
+        cells : array
+            Flattned indices of all member cells of this node.
+        """
         cells = self.nodes[node].copy()
         for nd in self.descendants[node]:
             cells += self.nodes[nd]
@@ -404,21 +415,25 @@ def filter_by_node(dat, nodes=None, nodes_select=None, cells_select=None,
                    fill_value=np.nan, drop=False):
     """Mask DataArray using FISO dictionary or the flattened indexes.
 
-    Args:
-        dat: input array to be filtered.
-          Supported data types: xarray.DataArray, numpy.ndarray
-        nodes: grid_dendro nodes dictionary, optional.
-        nodes_select: int or sequence of ints representing the selected nodes,
-          optional.
-        cells_select: flat indices of selected cells. If given, overrides nodes
-          and nodes_select, optional
-        fill_value: value to fill outside of the filtered region, optional.
-          Default value is np.nan.
-        drop: bool. If true, return flatten dat that only include selected
-          cells.
+    Parameters
+    ----------
+    dat : xarray.DataArray or numpy.ndarray
+        Input array to be filtered.
+    nodes : dict, optional
+        Dendrogram nodes dictionary.
+    nodes_select : int or sequence of ints, optional
+        Id of selected node(s).
+    cells_select : array, optional
+        Flat indices of selected cells. Overrides nodes and nodes_select.
+    fill_value : float, optional
+        Value to fill outside of the filtered region. Default is np.nan.
+    drop : bool, optional
+        If true, return flatten dat that only include selected cells.
 
-    Returns:
-        out: Filtered array matching the input array type
+    Returns
+    -------
+    out : xarray.DataArray or numpy.ndarray
+        Filtered array matching the input array type
     """
     if isinstance(dat, xr.DataArray):
         dtype = 'xarray'
