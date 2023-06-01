@@ -1,5 +1,4 @@
-energy
-------
+Utility functions
+-----------------
 
-.. automodule:: grid_dendro.energy
-    :members:
+.. autofunction:: grid_dendro.energy.calculate_cumulative_energies
