@@ -1,0 +1,884 @@
+
+
+<!DOCTYPE html>
+
+
+<html >
+
+  <head>
+    <meta charset="utf-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>grid_dendro.dendrogram &#8212; GRID-Dendro</title>
+  
+  
+  
+  <script data-cfasync="false">
+    document.documentElement.dataset.mode = localStorage.getItem("mode") || "";
+    document.documentElement.dataset.theme = localStorage.getItem("theme") || "light";
+  </script>
+  
+  <!-- Loaded before other Sphinx assets -->
+  <link href="../../_static/styles/theme.css?digest=e353d410970836974a52" rel="stylesheet" />
+<link href="../../_static/styles/bootstrap.css?digest=e353d410970836974a52" rel="stylesheet" />
+<link href="../../_static/styles/pydata-sphinx-theme.css?digest=e353d410970836974a52" rel="stylesheet" />
+
+  
+  <link href="../../_static/vendor/fontawesome/6.1.2/css/all.min.css?digest=e353d410970836974a52" rel="stylesheet" />
+  <link rel="preload" as="font" type="font/woff2" crossorigin href="../../_static/vendor/fontawesome/6.1.2/webfonts/fa-solid-900.woff2" />
+<link rel="preload" as="font" type="font/woff2" crossorigin href="../../_static/vendor/fontawesome/6.1.2/webfonts/fa-brands-400.woff2" />
+<link rel="preload" as="font" type="font/woff2" crossorigin href="../../_static/vendor/fontawesome/6.1.2/webfonts/fa-regular-400.woff2" />
+
+    <link rel="stylesheet" type="text/css" href="../../_static/pygments.css" />
+    <link rel="stylesheet" href="../../_static/styles/sphinx-book-theme.css?digest=14f4ca6b54d191a8c7657f6c759bf11a5fb86285" type="text/css" />
+    <link rel="stylesheet" type="text/css" href="../../_static/togglebutton.css" />
+    <link rel="stylesheet" type="text/css" href="../../_static/copybutton.css" />
+    <link rel="stylesheet" type="text/css" href="../../_static/mystnb.4510f1fc1dee50b3e5859aac5469c37c29e427902b24a333a5f9fcb2f0b3ac41.css" />
+    <link rel="stylesheet" type="text/css" href="../../_static/sphinx-thebe.css" />
+    <link rel="stylesheet" type="text/css" href="../../_static/design-style.4045f2051d55cab465a707391d5b2007.min.css" />
+  
+  <!-- Pre-loaded scripts that we'll load fully later -->
+  <link rel="preload" as="script" href="../../_static/scripts/bootstrap.js?digest=e353d410970836974a52" />
+<link rel="preload" as="script" href="../../_static/scripts/pydata-sphinx-theme.js?digest=e353d410970836974a52" />
+
+    <script data-url_root="../../" id="documentation_options" src="../../_static/documentation_options.js"></script>
+    <script src="../../_static/jquery.js"></script>
+    <script src="../../_static/underscore.js"></script>
+    <script src="../../_static/doctools.js"></script>
+    <script src="../../_static/clipboard.min.js"></script>
+    <script src="../../_static/copybutton.js"></script>
+    <script src="../../_static/scripts/sphinx-book-theme.js?digest=5a5c038af52cf7bc1a1ec88eea08e6366ee68824"></script>
+    <script>let toggleHintShow = 'Click to show';</script>
+    <script>let toggleHintHide = 'Click to hide';</script>
+    <script>let toggleOpenOnPrint = 'true';</script>
+    <script src="../../_static/togglebutton.js"></script>
+    <script>var togglebuttonSelector = '.toggle, .admonition.dropdown';</script>
+    <script src="../../_static/design-tabs.js"></script>
+    <script>const THEBE_JS_URL = "https://unpkg.com/thebe@0.8.2/lib/index.js"
+const thebe_selector = ".thebe,.cell"
+const thebe_selector_input = "pre"
+const thebe_selector_output = ".output, .cell_output"
+</script>
+    <script async="async" src="../../_static/sphinx-thebe.js"></script>
+    <script>DOCUMENTATION_OPTIONS.pagename = '_modules/grid_dendro/dendrogram';</script>
+    <link rel="index" title="Index" href="../../genindex.html" />
+    <link rel="search" title="Search" href="../../search.html" />
+  <meta name="viewport" content="width=device-width, initial-scale=1"/>
+  <meta name="docsearch:language" content="None"/>
+  </head>
+  
+  
+  <body data-bs-spy="scroll" data-bs-target=".bd-toc-nav" data-offset="180" data-bs-root-margin="0px 0px -60%" data-default-mode="">
+
+  
+  
+  <a class="skip-link" href="#main-content">Skip to main content</a>
+  
+  <input type="checkbox"
+          class="sidebar-toggle"
+          name="__primary"
+          id="__primary"/>
+  <label class="overlay overlay-primary" for="__primary"></label>
+  
+  <input type="checkbox"
+          class="sidebar-toggle"
+          name="__secondary"
+          id="__secondary"/>
+  <label class="overlay overlay-secondary" for="__secondary"></label>
+  
+  <div class="search-button__wrapper">
+    <div class="search-button__overlay"></div>
+    <div class="search-button__search-container">
+<form class="bd-search d-flex align-items-center"
+      action="../../search.html"
+      method="get">
+  <i class="fa-solid fa-magnifying-glass"></i>
+  <input type="search"
+         class="form-control"
+         name="q"
+         id="search-input"
+         placeholder="Search this book..."
+         aria-label="Search this book..."
+         autocomplete="off"
+         autocorrect="off"
+         autocapitalize="off"
+         spellcheck="false"/>
+  <span class="search-button__kbd-shortcut"><kbd class="kbd-shortcut__modifier">Ctrl</kbd>+<kbd>K</kbd></span>
+</form></div>
+  </div>
+  
+    <nav class="bd-header navbar navbar-expand-lg bd-navbar">
+    </nav>
+  
+  <div class="bd-container">
+    <div class="bd-container__inner bd-page-width">
+      
+      <div class="bd-sidebar-primary bd-sidebar">
+        
+
+  
+  <div class="sidebar-header-items sidebar-primary__section">
+    
+    
+    
+    
+  </div>
+  
+    <div class="sidebar-primary-items__start sidebar-primary__section">
+        <div class="sidebar-primary-item">
+  
+
+<a class="navbar-brand logo" href="../../intro.html">
+  
+  
+  
+  
+  
+    <p class="title logo__title">GRID-Dendro</p>
+  
+</a></div>
+        <div class="sidebar-primary-item"><nav class="bd-links" id="bd-docs-nav" aria-label="Main">
+    <div class="bd-toc-item navbar-nav active">
+        
+        <ul class="nav bd-sidenav bd-sidenav__home-link">
+            <li class="toctree-l1">
+                <a class="reference internal" href="../../intro.html">
+                    GRID-Dendro – Gravitational Identification with Dendrogram
+                </a>
+            </li>
+        </ul>
+        <p aria-level="2" class="caption" role="heading"><span class="caption-text">API References</span></p>
+<ul class="nav bd-sidenav">
+<li class="toctree-l1"><a class="reference internal" href="../../dendrogram.html">Dendrogram class</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../boundary.html">boundary</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../energy.html">energy</a></li>
+</ul>
+<p aria-level="2" class="caption" role="heading"><span class="caption-text">Installation</span></p>
+<ul class="nav bd-sidenav">
+<li class="toctree-l1"><a class="reference internal" href="../../installation.html">Installation</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../bookbuild.html">Building Documentation</a></li>
+</ul>
+
+    </div>
+</nav></div>
+    </div>
+  
+  
+  <div class="sidebar-primary-items__end sidebar-primary__section">
+  </div>
+  
+  <div id="rtd-footer-container"></div>
+
+
+      </div>
+      
+      <main id="main-content" class="bd-main">
+        
+        
+
+<div class="sbt-scroll-pixel-helper"></div>
+
+          <div class="bd-content">
+            <div class="bd-article-container">
+              
+              <div class="bd-header-article">
+<div class="header-article-items header-article__inner">
+  
+    <div class="header-article-items__start">
+      
+        <div class="header-article-item"><label class="sidebar-toggle primary-toggle btn btn-sm" for="__primary" title="Toggle primary sidebar" data-bs-placement="bottom" data-bs-toggle="tooltip">
+  <span class="fa-solid fa-bars"></span>
+</label></div>
+      
+    </div>
+  
+  
+    <div class="header-article-items__end">
+      
+        <div class="header-article-item">
+
+<div class="article-header-buttons">
+
+
+
+
+
+<div class="dropdown dropdown-source-buttons">
+  <button class="btn dropdown-toggle" type="button" data-bs-toggle="dropdown" aria-expanded="false" aria-label="Source repositories">
+    <i class="fab fa-github"></i>
+  </button>
+  <ul class="dropdown-menu">
+      
+      
+      
+      <li><a href="https://github.com/sanghyukmoon/grid_dendro" target="_blank"
+   class="btn btn-sm btn-source-repository-button dropdown-item"
+   title="Source repository"
+   data-bs-placement="left" data-bs-toggle="tooltip"
+>
+  
+
+<span class="btn__icon-container">
+  <i class="fab fa-github"></i>
+  </span>
+<span class="btn__text-container">Repository</span>
+</a>
+</li>
+      
+      
+      
+      
+      <li><a href="https://github.com/sanghyukmoon/grid_dendro/issues/new?title=Issue%20on%20page%20%2F_modules/grid_dendro/dendrogram.html&body=Your%20issue%20content%20here." target="_blank"
+   class="btn btn-sm btn-source-issues-button dropdown-item"
+   title="Open an issue"
+   data-bs-placement="left" data-bs-toggle="tooltip"
+>
+  
+
+<span class="btn__icon-container">
+  <i class="fas fa-lightbulb"></i>
+  </span>
+<span class="btn__text-container">Open issue</span>
+</a>
+</li>
+      
+  </ul>
+</div>
+
+
+
+
+<button onclick="toggleFullScreen()"
+  class="btn btn-sm btn-fullscreen-button"
+  title="Fullscreen mode"
+  data-bs-placement="bottom" data-bs-toggle="tooltip"
+>
+  
+
+<span class="btn__icon-container">
+  <i class="fas fa-expand"></i>
+  </span>
+
+</button>
+
+
+<script>
+document.write(`
+  <button class="theme-switch-button btn btn-sm btn-outline-primary navbar-btn rounded-circle" title="light/dark" aria-label="light/dark" data-bs-placement="bottom" data-bs-toggle="tooltip">
+    <span class="theme-switch" data-mode="light"><i class="fa-solid fa-sun"></i></span>
+    <span class="theme-switch" data-mode="dark"><i class="fa-solid fa-moon"></i></span>
+    <span class="theme-switch" data-mode="auto"><i class="fa-solid fa-circle-half-stroke"></i></span>
+  </button>
+`);
+</script>
+
+<script>
+document.write(`
+  <button class="btn btn-sm navbar-btn search-button search-button__button" title="Search" aria-label="Search" data-bs-placement="bottom" data-bs-toggle="tooltip">
+    <i class="fa-solid fa-magnifying-glass"></i>
+  </button>
+`);
+</script>
+
+</div></div>
+      
+    </div>
+  
+</div>
+</div>
+              
+              
+
+<div id="jb-print-docs-body" class="onlyprint">
+    <h1></h1>
+    <!-- Table of contents -->
+    <div id="print-main-content">
+        <div id="jb-print-toc">
+            
+        </div>
+    </div>
+</div>
+
+              
+                
+<div id="searchbox"></div>
+                <article class="bd-article" role="main">
+                  
+  <h1>Source code for grid_dendro.dendrogram</h1><div class="highlight"><pre>
+<span></span><span class="sd">&quot;&quot;&quot;Implements Dendrogram class&quot;&quot;&quot;</span>
+
+<span class="kn">import</span> <span class="nn">numpy</span> <span class="k">as</span> <span class="nn">np</span>
+<span class="kn">import</span> <span class="nn">xarray</span> <span class="k">as</span> <span class="nn">xr</span>
+<span class="kn">from</span> <span class="nn">scipy.ndimage</span> <span class="kn">import</span> <span class="n">minimum_filter</span>
+<span class="kn">from</span> <span class="nn">grid_dendro</span> <span class="kn">import</span> <span class="n">boundary</span>
+
+
+<div class="viewcode-block" id="Dendrogram"><a class="viewcode-back" href="../../dendrogram.html#grid_dendro.dendrogram.Dendrogram">[docs]</a><span class="k">class</span> <span class="nc">Dendrogram</span><span class="p">:</span>
+<span class="w">    </span><span class="sd">&quot;&quot;&quot;Dendrogram representing hierarchical structure in 3D data</span>
+
+<span class="sd">    Attributes</span>
+<span class="sd">    ----------</span>
+<span class="sd">    nodes : dict</span>
+<span class="sd">        Maps a node to flat indices of its member cells.</span>
+<span class="sd">        {node: cells}</span>
+<span class="sd">    parent : dict</span>
+<span class="sd">        Maps a node to its parent node.</span>
+<span class="sd">        {node: node}</span>
+<span class="sd">    children : dict</span>
+<span class="sd">        Maps a node to its child nodes.</span>
+<span class="sd">        {node: list of nodes}</span>
+<span class="sd">    ancestor : dict</span>
+<span class="sd">        Maps a node to its ancestor.</span>
+<span class="sd">        {node: node}</span>
+<span class="sd">    descendants : dict</span>
+<span class="sd">        Maps a node to its descendant nodes.</span>
+<span class="sd">        {node: list of nodes}</span>
+<span class="sd">    leaves : list</span>
+<span class="sd">        List of nodes that do not have children.</span>
+<span class="sd">    trunk : int</span>
+<span class="sd">        Id of the trunk node.</span>
+<span class="sd">    minima : set</span>
+<span class="sd">        Flat indices at the local potential minima.</span>
+<span class="sd">    &quot;&quot;&quot;</span>
+
+    <span class="k">def</span> <span class="fm">__init__</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">arr</span><span class="p">,</span> <span class="n">boundary_flag</span><span class="o">=</span><span class="s1">&#39;periodic&#39;</span><span class="p">):</span>
+<span class="w">        </span><span class="sd">&quot;&quot;&quot;Read data and find local miniima</span>
+
+<span class="sd">        Parameters</span>
+<span class="sd">        ----------</span>
+<span class="sd">        arr : numpy.ndarray</span>
+<span class="sd">            Input array.</span>
+<span class="sd">        boundary_flag : str, optional</span>
+<span class="sd">            String representing boundary condition.</span>
+<span class="sd">        &quot;&quot;&quot;</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">_arr_shape</span> <span class="o">=</span> <span class="n">arr</span><span class="o">.</span><span class="n">shape</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">_boundary_flag</span> <span class="o">=</span> <span class="n">boundary_flag</span>
+
+        <span class="c1"># Create leaf nodes by finding all local minima.</span>
+        <span class="k">if</span> <span class="bp">self</span><span class="o">.</span><span class="n">_boundary_flag</span> <span class="o">==</span> <span class="s1">&#39;periodic&#39;</span><span class="p">:</span>
+            <span class="n">filter_mode</span> <span class="o">=</span> <span class="s1">&#39;wrap&#39;</span>
+        <span class="k">else</span><span class="p">:</span>
+            <span class="n">msg</span> <span class="o">=</span> <span class="sa">f</span><span class="s2">&quot;Boundary flag </span><span class="si">{</span><span class="bp">self</span><span class="o">.</span><span class="n">boundary_flag</span><span class="si">}</span><span class="s2"> is not supported&quot;</span>
+            <span class="k">raise</span> <span class="ne">ValueError</span><span class="p">(</span><span class="n">msg</span><span class="p">)</span>
+        <span class="n">arr_min_filtered</span> <span class="o">=</span> <span class="n">minimum_filter</span><span class="p">(</span><span class="n">arr</span><span class="p">,</span> <span class="n">size</span><span class="o">=</span><span class="mi">3</span><span class="p">,</span> <span class="n">mode</span><span class="o">=</span><span class="n">filter_mode</span>
+                                          <span class="p">)</span><span class="o">.</span><span class="n">flatten</span><span class="p">()</span>
+        <span class="n">arr</span> <span class="o">=</span> <span class="n">arr</span><span class="o">.</span><span class="n">flatten</span><span class="p">()</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">minima</span> <span class="o">=</span> <span class="nb">set</span><span class="p">((</span><span class="n">arr</span> <span class="o">==</span> <span class="n">arr_min_filtered</span><span class="p">)</span><span class="o">.</span><span class="n">nonzero</span><span class="p">()[</span><span class="mi">0</span><span class="p">])</span>
+
+        <span class="c1"># Sort flat indices in an ascending order of arr.</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">cells_ordered</span> <span class="o">=</span> <span class="n">arr</span><span class="o">.</span><span class="n">argsort</span><span class="p">()</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">num_cells</span> <span class="o">=</span> <span class="nb">len</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">cells_ordered</span><span class="p">)</span>
+
+        <span class="c1"># Set data type based on the size of array</span>
+        <span class="k">if</span> <span class="bp">self</span><span class="o">.</span><span class="n">num_cells</span> <span class="o">&lt;</span> <span class="mi">2</span><span class="o">**</span><span class="mi">31</span><span class="p">:</span>
+            <span class="bp">self</span><span class="o">.</span><span class="n">_dtype</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">int32</span>
+        <span class="k">elif</span> <span class="bp">self</span><span class="o">.</span><span class="n">num_cells</span> <span class="o">&lt;</span> <span class="mi">2</span><span class="o">**</span><span class="mi">63</span><span class="p">:</span>
+            <span class="bp">self</span><span class="o">.</span><span class="n">_dtype</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">int64</span>
+        <span class="k">else</span><span class="p">:</span>
+            <span class="k">raise</span> <span class="ne">MemoryError</span><span class="p">(</span><span class="s2">&quot;Input array size is too large&quot;</span><span class="p">)</span>
+
+<div class="viewcode-block" id="Dendrogram.construct"><a class="viewcode-back" href="../../dendrogram.html#grid_dendro.dendrogram.Dendrogram.construct">[docs]</a>    <span class="k">def</span> <span class="nf">construct</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+<span class="w">        </span><span class="sd">&quot;&quot;&quot;Construct dendrogram</span>
+
+<span class="sd">        Constructs dendrogram dictionaries: nodes, parent, children,</span>
+<span class="sd">        ancestor, and descendants. Then finds leaf nodes and trunk node.</span>
+
+<span class="sd">        Notes</span>
+<span class="sd">        -----</span>
+<span class="sd">        Use int64 in a loop which seems to be faster in 64 bit system, and</span>
+<span class="sd">        then cast to int32 or int64 depending on the size of the array</span>
+<span class="sd">        after construction is done, in order to save memory. Similarly, use</span>
+<span class="sd">        list instead of numpy array for efficient append operation, then</span>
+<span class="sd">        cast to numpy array after construction is done to save memory.</span>
+<span class="sd">        These memory optimization is only done to &quot;nodes&quot; and</span>
+<span class="sd">        &quot;cells_ordered&quot;, which consume most of the memory.</span>
+
+<span class="sd">        Examples</span>
+<span class="sd">        --------</span>
+<span class="sd">        &gt;&gt;&gt; import pyathena as pa</span>
+<span class="sd">        &gt;&gt;&gt; s = pa.LoadSim(&quot;/scratch/smoon/M5J2P0N512&quot;)</span>
+<span class="sd">        &gt;&gt;&gt; ds = s.load_hdf5(50, load_method=&#39;pyathena&#39;)</span>
+<span class="sd">        &gt;&gt;&gt; gd = dendrogram.Dendrogram(ds.phigas.to_numpy())</span>
+<span class="sd">        &gt;&gt;&gt; gd.construct()</span>
+<span class="sd">        &gt;&gt;&gt; gd.prune()  # Remove buds</span>
+<span class="sd">        &quot;&quot;&quot;</span>
+
+        <span class="c1"># Initialize node, parent, children, descendants, and ancestor</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">nodes</span> <span class="o">=</span> <span class="p">{</span><span class="n">nd</span><span class="p">:</span> <span class="p">[</span><span class="n">nd</span><span class="p">]</span> <span class="k">for</span> <span class="n">nd</span> <span class="ow">in</span> <span class="bp">self</span><span class="o">.</span><span class="n">minima</span><span class="p">}</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">children</span> <span class="o">=</span> <span class="p">{</span><span class="n">nd</span><span class="p">:</span> <span class="p">[]</span> <span class="k">for</span> <span class="n">nd</span> <span class="ow">in</span> <span class="bp">self</span><span class="o">.</span><span class="n">minima</span><span class="p">}</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">ancestor</span> <span class="o">=</span> <span class="p">{</span><span class="n">nd</span><span class="p">:</span> <span class="n">nd</span> <span class="k">for</span> <span class="n">nd</span> <span class="ow">in</span> <span class="bp">self</span><span class="o">.</span><span class="n">minima</span><span class="p">}</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">descendants</span> <span class="o">=</span> <span class="p">{</span><span class="n">nd</span><span class="p">:</span> <span class="p">[]</span> <span class="k">for</span> <span class="n">nd</span> <span class="ow">in</span> <span class="bp">self</span><span class="o">.</span><span class="n">minima</span><span class="p">}</span>
+
+        <span class="c1"># parent_array is a numpy array that maps a cell to its &quot;parent&quot; node.</span>
+        <span class="c1"># When a cell is itself a node-generating point, than it is mapped to</span>
+        <span class="c1"># its parent node.</span>
+        <span class="n">parent_array</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">full</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">num_cells</span><span class="p">,</span> <span class="o">-</span><span class="mi">1</span><span class="p">,</span> <span class="n">dtype</span><span class="o">=</span><span class="nb">int</span><span class="p">)</span>
+        <span class="n">parent_array</span><span class="p">[</span><span class="nb">list</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">minima</span><span class="p">)]</span> <span class="o">=</span> <span class="nb">list</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">minima</span><span class="p">)</span>
+
+        <span class="c1"># Load neighbor dictionary.</span>
+        <span class="n">my_neighbors</span> <span class="o">=</span> <span class="n">boundary</span><span class="o">.</span><span class="n">precompute_neighbor</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">_arr_shape</span><span class="p">,</span>
+                                                    <span class="bp">self</span><span class="o">.</span><span class="n">_boundary_flag</span><span class="p">,</span>
+                                                    <span class="n">corner</span><span class="o">=</span><span class="kc">True</span><span class="p">)</span>
+
+        <span class="nb">print</span><span class="p">(</span><span class="s2">&quot;Start climbing up the tree from the leaf nodes.</span><span class="se">\t</span><span class="s2">&quot;</span>
+              <span class="sa">f</span><span class="s2">&quot;Number of nodes = </span><span class="si">{</span><span class="nb">len</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">nodes</span><span class="p">)</span><span class="si">}</span><span class="s2">&quot;</span><span class="p">)</span>
+        <span class="c1"># Climb up the potential and construct dendrogram.</span>
+        <span class="k">for</span> <span class="n">cell</span> <span class="ow">in</span> <span class="nb">iter</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">cells_ordered</span><span class="p">):</span>
+            <span class="k">if</span> <span class="n">cell</span> <span class="ow">in</span> <span class="bp">self</span><span class="o">.</span><span class="n">minima</span><span class="p">:</span>
+                <span class="c1"># Performance critical to have type(self.minima) = set for</span>
+                <span class="c1"># efficient &quot;in&quot; operation.</span>
+                <span class="k">continue</span>
+            <span class="c1"># Find parents of neighboring cells.</span>
+            <span class="n">parents</span> <span class="o">=</span> <span class="nb">set</span><span class="p">(</span><span class="n">parent_array</span><span class="p">[</span><span class="n">my_neighbors</span><span class="p">[</span><span class="n">cell</span><span class="p">]])</span>
+            <span class="n">parents</span><span class="o">.</span><span class="n">discard</span><span class="p">(</span><span class="o">-</span><span class="mi">1</span><span class="p">)</span>
+
+            <span class="c1"># Find ancestors of their parents, which can be themselves.</span>
+            <span class="n">neighboring_nodes</span> <span class="o">=</span> <span class="nb">set</span><span class="p">([</span><span class="bp">self</span><span class="o">.</span><span class="n">ancestor</span><span class="p">[</span><span class="n">prnt</span><span class="p">]</span> <span class="k">for</span> <span class="n">prnt</span> <span class="ow">in</span> <span class="n">parents</span><span class="p">])</span>
+            <span class="n">num_nghbr_nodes</span> <span class="o">=</span> <span class="nb">len</span><span class="p">(</span><span class="n">neighboring_nodes</span><span class="p">)</span>
+
+            <span class="k">if</span> <span class="n">num_nghbr_nodes</span> <span class="o">==</span> <span class="mi">0</span><span class="p">:</span>
+                <span class="k">raise</span> <span class="ne">ValueError</span><span class="p">(</span><span class="s2">&quot;Should not reach here&quot;</span><span class="p">)</span>
+            <span class="k">elif</span> <span class="n">num_nghbr_nodes</span> <span class="o">==</span> <span class="mi">1</span><span class="p">:</span>
+                <span class="c1"># Add this cell to the existing node</span>
+                <span class="n">nd</span> <span class="o">=</span> <span class="n">neighboring_nodes</span><span class="o">.</span><span class="n">pop</span><span class="p">()</span>
+                <span class="n">parent_array</span><span class="p">[</span><span class="n">cell</span><span class="p">]</span> <span class="o">=</span> <span class="n">nd</span>
+                <span class="bp">self</span><span class="o">.</span><span class="n">nodes</span><span class="p">[</span><span class="n">nd</span><span class="p">]</span><span class="o">.</span><span class="n">append</span><span class="p">(</span><span class="n">cell</span><span class="p">)</span>
+            <span class="k">elif</span> <span class="n">num_nghbr_nodes</span> <span class="o">&gt;=</span> <span class="mi">2</span><span class="p">:</span>
+                <span class="c1"># This cell is at the critical point; create new node.</span>
+                <span class="bp">self</span><span class="o">.</span><span class="n">nodes</span><span class="p">[</span><span class="n">cell</span><span class="p">]</span> <span class="o">=</span> <span class="p">[</span><span class="n">cell</span><span class="p">]</span>
+                <span class="n">parent_array</span><span class="p">[</span><span class="n">cell</span><span class="p">]</span> <span class="o">=</span> <span class="n">cell</span>
+                <span class="bp">self</span><span class="o">.</span><span class="n">ancestor</span><span class="p">[</span><span class="n">cell</span><span class="p">]</span> <span class="o">=</span> <span class="n">cell</span>
+                <span class="bp">self</span><span class="o">.</span><span class="n">children</span><span class="p">[</span><span class="n">cell</span><span class="p">]</span> <span class="o">=</span> <span class="nb">list</span><span class="p">(</span><span class="n">neighboring_nodes</span><span class="p">)</span>
+                <span class="bp">self</span><span class="o">.</span><span class="n">descendants</span><span class="p">[</span><span class="n">cell</span><span class="p">]</span> <span class="o">=</span> <span class="nb">list</span><span class="p">(</span><span class="n">neighboring_nodes</span><span class="p">)</span>
+                <span class="k">for</span> <span class="n">child</span> <span class="ow">in</span> <span class="bp">self</span><span class="o">.</span><span class="n">children</span><span class="p">[</span><span class="n">cell</span><span class="p">]:</span>
+                    <span class="c1"># This node becomes a parent of its immediate children</span>
+                    <span class="n">parent_array</span><span class="p">[</span><span class="n">child</span><span class="p">]</span> <span class="o">=</span> <span class="n">cell</span>
+                    <span class="c1"># inherit all descendants of children</span>
+                    <span class="bp">self</span><span class="o">.</span><span class="n">descendants</span><span class="p">[</span><span class="n">cell</span><span class="p">]</span> <span class="o">+=</span> <span class="bp">self</span><span class="o">.</span><span class="n">descendants</span><span class="p">[</span><span class="n">child</span><span class="p">]</span>
+                <span class="k">for</span> <span class="n">child</span> <span class="ow">in</span> <span class="bp">self</span><span class="o">.</span><span class="n">descendants</span><span class="p">[</span><span class="n">cell</span><span class="p">]:</span>
+                    <span class="c1"># This node becomes a new ancestor of all its</span>
+                    <span class="c1"># descendants</span>
+                    <span class="bp">self</span><span class="o">.</span><span class="n">ancestor</span><span class="p">[</span><span class="n">child</span><span class="p">]</span> <span class="o">=</span> <span class="n">cell</span>
+                <span class="nb">print</span><span class="p">(</span><span class="s2">&quot;Added a new node at the critical point.</span><span class="se">\t\t</span><span class="s2">&quot;</span>
+                      <span class="sa">f</span><span class="s2">&quot;Number of nodes = </span><span class="si">{</span><span class="nb">len</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">nodes</span><span class="p">)</span><span class="si">}</span><span class="s2">&quot;</span><span class="p">)</span>
+                <span class="k">if</span> <span class="nb">set</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">minima</span><span class="p">)</span><span class="o">.</span><span class="n">issubset</span><span class="p">(</span><span class="nb">set</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">descendants</span><span class="p">[</span><span class="n">cell</span><span class="p">])):</span>
+                    <span class="nb">print</span><span class="p">(</span><span class="s2">&quot;We have reached the trunk. Stop climbing up&quot;</span><span class="p">)</span>
+                    <span class="k">break</span>
+
+        <span class="c1"># Construct parent dictionary from parent_array</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">parent</span> <span class="o">=</span> <span class="p">{}</span>
+        <span class="k">for</span> <span class="n">k</span><span class="p">,</span> <span class="n">v</span> <span class="ow">in</span> <span class="bp">self</span><span class="o">.</span><span class="n">nodes</span><span class="o">.</span><span class="n">items</span><span class="p">():</span>
+            <span class="c1"># Cast to save memory</span>
+            <span class="bp">self</span><span class="o">.</span><span class="n">parent</span><span class="p">[</span><span class="n">k</span><span class="p">]</span> <span class="o">=</span> <span class="n">parent_array</span><span class="p">[</span><span class="n">k</span><span class="p">]</span><span class="o">.</span><span class="n">astype</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">_dtype</span><span class="p">)</span>
+            <span class="bp">self</span><span class="o">.</span><span class="n">nodes</span><span class="p">[</span><span class="n">k</span><span class="p">]</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">array</span><span class="p">(</span><span class="n">v</span><span class="p">)</span><span class="o">.</span><span class="n">astype</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">_dtype</span><span class="p">)</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">cells_ordered</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">cells_ordered</span><span class="o">.</span><span class="n">astype</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">_dtype</span><span class="p">)</span>
+
+        <span class="c1"># Find leaves and trunk</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">_find_leaves</span><span class="p">()</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">_find_trunk</span><span class="p">()</span></div>
+
+<div class="viewcode-block" id="Dendrogram.prune"><a class="viewcode-back" href="../../dendrogram.html#grid_dendro.dendrogram.Dendrogram.prune">[docs]</a>    <span class="k">def</span> <span class="nf">prune</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">ncells_min</span><span class="o">=</span><span class="mi">27</span><span class="p">):</span>
+<span class="w">        </span><span class="sd">&quot;&quot;&quot;Prune the buds by applying minimum number of cell criterion</span>
+
+<span class="sd">        Parameters</span>
+<span class="sd">        ----------</span>
+<span class="sd">        ncells_min : int, optional</span>
+<span class="sd">            Minimum number of cells of a leaf node.</span>
+<span class="sd">        &quot;&quot;&quot;</span>
+        <span class="n">bud</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">_find_bud</span><span class="p">(</span><span class="n">ncells_min</span><span class="p">)</span>
+        <span class="k">while</span> <span class="n">bud</span> <span class="ow">is</span> <span class="ow">not</span> <span class="kc">None</span><span class="p">:</span>
+            <span class="n">parent</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">parent</span><span class="p">[</span><span class="n">bud</span><span class="p">]</span>
+            <span class="n">siblings</span> <span class="o">=</span> <span class="nb">set</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">children</span><span class="p">[</span><span class="n">parent</span><span class="p">])</span>
+            <span class="n">sibling_buds</span> <span class="o">=</span> <span class="p">{</span><span class="n">nd</span> <span class="k">for</span> <span class="n">nd</span> <span class="ow">in</span> <span class="n">siblings</span> <span class="k">if</span> <span class="n">nd</span> <span class="ow">in</span> <span class="bp">self</span><span class="o">.</span><span class="n">leaves</span>
+                            <span class="ow">and</span> <span class="nb">len</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">nodes</span><span class="p">[</span><span class="n">nd</span><span class="p">])</span> <span class="o">&lt;</span> <span class="n">ncells_min</span><span class="p">}</span>
+            <span class="n">sibling_branches</span> <span class="o">=</span> <span class="n">siblings</span> <span class="o">-</span> <span class="n">sibling_buds</span>
+
+            <span class="k">if</span> <span class="nb">len</span><span class="p">(</span><span class="n">sibling_branches</span><span class="p">)</span> <span class="o">&gt;=</span> <span class="mi">2</span><span class="p">:</span>
+                <span class="c1"># There are at least two branches at this node.</span>
+                <span class="c1"># Simply cut the buds.</span>
+                <span class="nb">print</span><span class="p">(</span><span class="s2">&quot;There are at least two branches. Simply cut the buds&quot;</span><span class="p">)</span>
+                <span class="k">for</span> <span class="n">bud</span> <span class="ow">in</span> <span class="n">sibling_buds</span><span class="p">:</span>
+                    <span class="nb">print</span><span class="p">(</span><span class="sa">f</span><span class="s2">&quot;Cutting the bud </span><span class="si">{</span><span class="n">bud</span><span class="si">}</span><span class="s2">&quot;</span><span class="p">)</span>
+                    <span class="bp">self</span><span class="o">.</span><span class="n">_cut_bud</span><span class="p">(</span><span class="n">bud</span><span class="p">)</span>
+            <span class="k">elif</span> <span class="nb">len</span><span class="p">(</span><span class="n">sibling_branches</span><span class="p">)</span> <span class="o">==</span> <span class="mi">1</span><span class="p">:</span>
+                <span class="c1"># There are only one branch.</span>
+                <span class="c1"># Subsume buds to the branch and remove the resulting knag.</span>
+                <span class="n">branch</span> <span class="o">=</span> <span class="n">sibling_branches</span><span class="o">.</span><span class="n">pop</span><span class="p">()</span>
+                <span class="nb">print</span><span class="p">(</span><span class="sa">f</span><span class="s2">&quot;Subsume buds </span><span class="si">{</span><span class="n">sibling_buds</span><span class="si">}</span><span class="s2"> into a branch </span><span class="si">{</span><span class="n">branch</span><span class="si">}</span><span class="s2">&quot;</span><span class="p">)</span>
+                <span class="bp">self</span><span class="o">.</span><span class="n">_subsume_buds</span><span class="p">(</span><span class="n">sibling_buds</span><span class="p">,</span> <span class="n">branch</span><span class="p">)</span>
+            <span class="k">else</span><span class="p">:</span>
+                <span class="c1"># Subsume short buds to the longest bud and remove the knag.</span>
+                <span class="n">shorter_buds</span> <span class="o">=</span> <span class="n">sibling_buds</span><span class="o">.</span><span class="n">copy</span><span class="p">()</span>
+                <span class="n">longest_bud</span> <span class="o">=</span> <span class="n">sibling_buds</span><span class="o">.</span><span class="n">pop</span><span class="p">()</span>
+                <span class="n">rank_min</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">where</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">cells_ordered</span> <span class="o">==</span> <span class="n">longest_bud</span><span class="p">)[</span><span class="mi">0</span><span class="p">][</span><span class="mi">0</span><span class="p">]</span>
+                <span class="k">while</span> <span class="nb">len</span><span class="p">(</span><span class="n">sibling_buds</span><span class="p">)</span> <span class="o">&gt;</span> <span class="mi">0</span><span class="p">:</span>
+                    <span class="n">nd</span> <span class="o">=</span> <span class="n">sibling_buds</span><span class="o">.</span><span class="n">pop</span><span class="p">()</span>
+                    <span class="n">rank</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">where</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">cells_ordered</span> <span class="o">==</span> <span class="n">nd</span><span class="p">)[</span><span class="mi">0</span><span class="p">][</span><span class="mi">0</span><span class="p">]</span>
+                    <span class="k">if</span> <span class="n">rank</span> <span class="o">&lt;</span> <span class="n">rank_min</span><span class="p">:</span>
+                        <span class="n">longest_bud</span> <span class="o">=</span> <span class="n">nd</span>
+                        <span class="n">rank_min</span> <span class="o">=</span> <span class="n">rank</span>
+                <span class="n">shorter_buds</span><span class="o">.</span><span class="n">remove</span><span class="p">(</span><span class="n">longest_bud</span><span class="p">)</span>
+                <span class="nb">print</span><span class="p">(</span><span class="s2">&quot;There are only buds; &quot;</span>
+                      <span class="s2">&quot;merge shorter buds </span><span class="si">{}</span><span class="s2"> to longest bud </span><span class="si">{}</span><span class="s2">&quot;</span><span class="o">.</span><span class="n">format</span><span class="p">(</span>
+                       <span class="n">shorter_buds</span><span class="p">,</span> <span class="n">longest_bud</span><span class="p">))</span>
+                <span class="bp">self</span><span class="o">.</span><span class="n">_subsume_buds</span><span class="p">(</span><span class="n">shorter_buds</span><span class="p">,</span> <span class="n">longest_bud</span><span class="p">)</span>
+
+            <span class="bp">self</span><span class="o">.</span><span class="n">_find_leaves</span><span class="p">()</span>
+            <span class="n">bud</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">_find_bud</span><span class="p">(</span><span class="n">ncells_min</span><span class="p">)</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">_find_trunk</span><span class="p">()</span></div>
+
+<div class="viewcode-block" id="Dendrogram.get_all_descendant_cells"><a class="viewcode-back" href="../../dendrogram.html#grid_dendro.dendrogram.Dendrogram.get_all_descendant_cells">[docs]</a>    <span class="k">def</span> <span class="nf">get_all_descendant_cells</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">node</span><span class="p">):</span>
+<span class="w">        </span><span class="sd">&quot;&quot;&quot;Return all member cells of the node, including descendant nodes</span>
+
+<span class="sd">        Parameters</span>
+<span class="sd">        ----------</span>
+<span class="sd">        node : int</span>
+<span class="sd">            Id of a selected node.</span>
+
+<span class="sd">        Returns</span>
+<span class="sd">        -------</span>
+<span class="sd">        cells : array</span>
+<span class="sd">            Flattned indices of all member cells of this node.</span>
+<span class="sd">        &quot;&quot;&quot;</span>
+        <span class="n">cells</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">nodes</span><span class="p">[</span><span class="n">node</span><span class="p">]</span><span class="o">.</span><span class="n">copy</span><span class="p">()</span>
+        <span class="k">for</span> <span class="n">nd</span> <span class="ow">in</span> <span class="bp">self</span><span class="o">.</span><span class="n">descendants</span><span class="p">[</span><span class="n">node</span><span class="p">]:</span>
+            <span class="n">cells</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">concatenate</span><span class="p">((</span><span class="n">cells</span><span class="p">,</span> <span class="bp">self</span><span class="o">.</span><span class="n">nodes</span><span class="p">[</span><span class="n">nd</span><span class="p">]))</span>
+        <span class="k">return</span> <span class="n">cells</span></div>
+
+<div class="viewcode-block" id="Dendrogram.filter_data"><a class="viewcode-back" href="../../dendrogram.html#grid_dendro.dendrogram.Dendrogram.filter_data">[docs]</a>    <span class="k">def</span> <span class="nf">filter_data</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">dat</span><span class="p">,</span> <span class="n">nodes</span><span class="p">,</span> <span class="n">fill_value</span><span class="o">=</span><span class="n">np</span><span class="o">.</span><span class="n">nan</span><span class="p">,</span> <span class="n">drop</span><span class="o">=</span><span class="kc">False</span><span class="p">):</span>
+<span class="w">        </span><span class="sd">&quot;&quot;&quot;Filter data by node</span>
+
+<span class="sd">        Parameters</span>
+<span class="sd">        ----------</span>
+<span class="sd">        dat : xarray.DataArray or numpy.ndarray</span>
+<span class="sd">            Input array to be filtered.</span>
+<span class="sd">        nodes : int or array of ints</span>
+<span class="sd">            Selected nodes.</span>
+<span class="sd">        fill_value : float, optional</span>
+<span class="sd">            The value to fill outside of the filtered region. Default to nan.</span>
+<span class="sd">        drop : bool</span>
+<span class="sd">            If true, return faltten data that only include filtered cells.</span>
+<span class="sd">        &quot;&quot;&quot;</span>
+        <span class="k">if</span> <span class="nb">isinstance</span><span class="p">(</span><span class="n">dat</span><span class="p">,</span> <span class="n">xr</span><span class="o">.</span><span class="n">DataArray</span><span class="p">):</span>
+            <span class="n">dtype</span> <span class="o">=</span> <span class="s1">&#39;xarray&#39;</span>
+            <span class="n">coords</span> <span class="o">=</span> <span class="n">dat</span><span class="o">.</span><span class="n">coords</span>
+            <span class="n">dims</span> <span class="o">=</span> <span class="n">dat</span><span class="o">.</span><span class="n">dims</span>
+            <span class="n">dat</span> <span class="o">=</span> <span class="n">dat</span><span class="o">.</span><span class="n">to_numpy</span><span class="p">()</span>
+        <span class="k">elif</span> <span class="nb">isinstance</span><span class="p">(</span><span class="n">dat</span><span class="p">,</span> <span class="n">np</span><span class="o">.</span><span class="n">ndarray</span><span class="p">):</span>
+            <span class="n">dtype</span> <span class="o">=</span> <span class="s1">&#39;numpy&#39;</span>
+        <span class="k">else</span><span class="p">:</span>
+            <span class="k">raise</span> <span class="ne">TypeError</span><span class="p">(</span><span class="s2">&quot;type </span><span class="si">{}</span><span class="s2"> is not supported&quot;</span><span class="o">.</span><span class="n">format</span><span class="p">(</span><span class="nb">type</span><span class="p">(</span><span class="n">dat</span><span class="p">)))</span>
+
+        <span class="c1"># retreive flat indices of selected cells</span>
+        <span class="k">if</span> <span class="nb">isinstance</span><span class="p">(</span><span class="n">nodes</span><span class="p">,</span> <span class="p">(</span><span class="nb">int</span><span class="p">,</span> <span class="n">np</span><span class="o">.</span><span class="n">int64</span><span class="p">,</span> <span class="n">np</span><span class="o">.</span><span class="n">int32</span><span class="p">)):</span>
+            <span class="n">cells</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">get_all_descendant_cells</span><span class="p">(</span><span class="n">nodes</span><span class="p">)</span>
+        <span class="k">else</span><span class="p">:</span>
+            <span class="n">cells</span> <span class="o">=</span> <span class="p">[]</span>
+            <span class="k">for</span> <span class="n">node</span> <span class="ow">in</span> <span class="n">nodes</span><span class="p">:</span>
+                <span class="n">cells</span> <span class="o">+=</span> <span class="nb">list</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">get_all_descendant_cells</span><span class="p">(</span><span class="n">node</span><span class="p">))</span>
+
+        <span class="n">dat1d</span> <span class="o">=</span> <span class="n">dat</span><span class="o">.</span><span class="n">flatten</span><span class="p">()</span>
+        <span class="k">if</span> <span class="n">drop</span><span class="p">:</span>
+            <span class="n">out</span> <span class="o">=</span> <span class="n">dat1d</span><span class="p">[</span><span class="n">cells</span><span class="p">]</span>
+            <span class="k">return</span> <span class="n">out</span>
+        <span class="k">else</span><span class="p">:</span>
+            <span class="n">out</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">full</span><span class="p">(</span><span class="nb">len</span><span class="p">(</span><span class="n">dat1d</span><span class="p">),</span> <span class="n">fill_value</span><span class="p">)</span>
+            <span class="n">out</span><span class="p">[</span><span class="n">cells</span><span class="p">]</span> <span class="o">=</span> <span class="n">dat1d</span><span class="p">[</span><span class="n">cells</span><span class="p">]</span>
+            <span class="n">out</span> <span class="o">=</span> <span class="n">out</span><span class="o">.</span><span class="n">reshape</span><span class="p">(</span><span class="n">dat</span><span class="o">.</span><span class="n">shape</span><span class="p">)</span>
+            <span class="k">if</span> <span class="n">dtype</span> <span class="o">==</span> <span class="s1">&#39;xarray&#39;</span><span class="p">:</span>
+                <span class="n">out</span> <span class="o">=</span> <span class="n">xr</span><span class="o">.</span><span class="n">DataArray</span><span class="p">(</span><span class="n">data</span><span class="o">=</span><span class="n">out</span><span class="p">,</span> <span class="n">coords</span><span class="o">=</span><span class="n">coords</span><span class="p">,</span> <span class="n">dims</span><span class="o">=</span><span class="n">dims</span><span class="p">)</span>
+            <span class="k">return</span> <span class="n">out</span></div>
+
+    <span class="k">def</span> <span class="nf">_cut_bud</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">bud</span><span class="p">):</span>
+<span class="w">        </span><span class="sd">&quot;&quot;&quot;Remove bud node and return its member cells</span>
+
+<span class="sd">        Parameters</span>
+<span class="sd">        ----------</span>
+<span class="sd">        bud : int</span>
+<span class="sd">            Id of a selected node.</span>
+
+<span class="sd">        Returns</span>
+<span class="sd">        -------</span>
+<span class="sd">        cells : array</span>
+<span class="sd">            Flattned indices of all member cells of this node.</span>
+
+<span class="sd">        See Also</span>
+<span class="sd">        --------</span>
+<span class="sd">        _remove_knag</span>
+<span class="sd">        &quot;&quot;&quot;</span>
+        <span class="k">if</span> <span class="nb">len</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">children</span><span class="p">[</span><span class="n">bud</span><span class="p">])</span> <span class="o">&gt;</span> <span class="mi">0</span><span class="p">:</span>
+            <span class="k">raise</span> <span class="ne">ValueError</span><span class="p">(</span><span class="s2">&quot;This is not a bud&quot;</span><span class="p">)</span>
+        <span class="n">parent_node</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">parent</span><span class="p">[</span><span class="n">bud</span><span class="p">]</span>
+        <span class="n">ancestor_node</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">ancestor</span><span class="p">[</span><span class="n">bud</span><span class="p">]</span>
+        <span class="k">if</span> <span class="n">parent_node</span> <span class="o">==</span> <span class="n">bud</span><span class="p">:</span>
+            <span class="k">raise</span> <span class="ne">ValueError</span><span class="p">(</span><span class="s2">&quot;Cannot delete trunk&quot;</span><span class="p">)</span>
+
+        <span class="c1"># climb up the family tree and remove this node from family register.</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">children</span><span class="p">[</span><span class="n">parent_node</span><span class="p">]</span><span class="o">.</span><span class="n">remove</span><span class="p">(</span><span class="n">bud</span><span class="p">)</span>
+        <span class="k">while</span> <span class="kc">True</span><span class="p">:</span>
+            <span class="bp">self</span><span class="o">.</span><span class="n">descendants</span><span class="p">[</span><span class="n">parent_node</span><span class="p">]</span><span class="o">.</span><span class="n">remove</span><span class="p">(</span><span class="n">bud</span><span class="p">)</span>
+            <span class="k">if</span> <span class="n">parent_node</span> <span class="o">==</span> <span class="n">ancestor_node</span><span class="p">:</span>
+                <span class="k">break</span>
+            <span class="k">else</span><span class="p">:</span>
+                <span class="n">parent_node</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">parent</span><span class="p">[</span><span class="n">parent_node</span><span class="p">]</span>
+
+        <span class="c1"># Remove this node</span>
+        <span class="n">orphans</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">nodes</span><span class="p">[</span><span class="n">bud</span><span class="p">]</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">nodes</span><span class="o">.</span><span class="n">pop</span><span class="p">(</span><span class="n">bud</span><span class="p">)</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">parent</span><span class="o">.</span><span class="n">pop</span><span class="p">(</span><span class="n">bud</span><span class="p">)</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">children</span><span class="o">.</span><span class="n">pop</span><span class="p">(</span><span class="n">bud</span><span class="p">)</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">ancestor</span><span class="o">.</span><span class="n">pop</span><span class="p">(</span><span class="n">bud</span><span class="p">)</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">descendants</span><span class="o">.</span><span class="n">pop</span><span class="p">(</span><span class="n">bud</span><span class="p">)</span>
+
+        <span class="k">return</span> <span class="n">orphans</span>
+
+    <span class="k">def</span> <span class="nf">_subsume_buds</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">buds</span><span class="p">,</span> <span class="n">branch</span><span class="p">):</span>
+<span class="w">        </span><span class="sd">&quot;&quot;&quot;Subsume selected buds into a branch.</span>
+
+<span class="sd">        Reassign all cells contained in buds to branch and delete</span>
+<span class="sd">        buds from the tree.</span>
+
+<span class="sd">        Parameters</span>
+<span class="sd">        ----------</span>
+<span class="sd">        buds : array of ints</span>
+<span class="sd">            IDs of the bud nodes to be subsumed into other branch.</span>
+<span class="sd">        branch : int</span>
+<span class="sd">            Destination branch that subsumes bud.</span>
+<span class="sd">        &quot;&quot;&quot;</span>
+        <span class="n">parents</span> <span class="o">=</span> <span class="p">{</span><span class="bp">self</span><span class="o">.</span><span class="n">parent</span><span class="p">[</span><span class="n">bud</span><span class="p">]</span> <span class="k">for</span> <span class="n">bud</span> <span class="ow">in</span> <span class="n">buds</span><span class="p">}</span>
+        <span class="n">parents</span><span class="o">.</span><span class="n">add</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">parent</span><span class="p">[</span><span class="n">branch</span><span class="p">])</span>
+        <span class="k">if</span> <span class="nb">len</span><span class="p">(</span><span class="n">parents</span><span class="p">)</span> <span class="o">!=</span> <span class="mi">1</span><span class="p">:</span>
+            <span class="k">raise</span> <span class="ne">ValueError</span><span class="p">(</span><span class="s2">&quot;Subsume operation can only be done within the &quot;</span>
+                             <span class="s2">&quot;same generation.&quot;</span><span class="p">)</span>
+        <span class="k">for</span> <span class="n">bud</span> <span class="ow">in</span> <span class="n">buds</span><span class="p">:</span>
+            <span class="bp">self</span><span class="o">.</span><span class="n">nodes</span><span class="p">[</span><span class="n">branch</span><span class="p">]</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">concatenate</span><span class="p">((</span><span class="bp">self</span><span class="o">.</span><span class="n">nodes</span><span class="p">[</span><span class="n">branch</span><span class="p">],</span>
+                                                 <span class="bp">self</span><span class="o">.</span><span class="n">_cut_bud</span><span class="p">(</span><span class="n">bud</span><span class="p">)))</span>
+
+        <span class="c1"># Remove knag node resulting from subsume.</span>
+        <span class="c1"># knag node is the pseudo-node that have only one child.</span>
+        <span class="n">knag</span> <span class="o">=</span> <span class="n">parents</span><span class="o">.</span><span class="n">pop</span><span class="p">()</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">_remove_knag</span><span class="p">(</span><span class="n">knag</span><span class="p">)</span>
+
+    <span class="k">def</span> <span class="nf">_remove_knag</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">knag</span><span class="p">):</span>
+<span class="w">        </span><span class="sd">&quot;&quot;&quot;Remove a knag that can results from subsume operation.</span>
+
+<span class="sd">        Knag is a node that have only one child. Knag forms when buds are</span>
+<span class="sd">        subsumed into a branch (or into a longest bud when there are only</span>
+<span class="sd">        buds).</span>
+
+<span class="sd">        Parameters</span>
+<span class="sd">        ----------</span>
+<span class="sd">        knag : int</span>
+<span class="sd">            Id of a selected node.</span>
+
+<span class="sd">        See Also</span>
+<span class="sd">        --------</span>
+<span class="sd">        _cut_bud</span>
+<span class="sd">        &quot;&quot;&quot;</span>
+        <span class="k">if</span> <span class="nb">len</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">children</span><span class="p">[</span><span class="n">knag</span><span class="p">])</span> <span class="o">!=</span> <span class="mi">1</span><span class="p">:</span>
+            <span class="k">raise</span> <span class="ne">ValueError</span><span class="p">(</span><span class="s2">&quot;This is not a knag.&quot;</span><span class="p">)</span>
+        <span class="n">child_node</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">children</span><span class="p">[</span><span class="n">knag</span><span class="p">][</span><span class="mi">0</span><span class="p">]</span>
+        <span class="n">parent_node</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">parent</span><span class="p">[</span><span class="n">knag</span><span class="p">]</span>
+        <span class="n">ancestor_node</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">ancestor</span><span class="p">[</span><span class="n">knag</span><span class="p">]</span>
+
+        <span class="k">if</span> <span class="n">parent_node</span> <span class="o">==</span> <span class="n">knag</span><span class="p">:</span>
+            <span class="c1"># This knag was a trunk. Now, child_node becomes a new trunk.</span>
+            <span class="bp">self</span><span class="o">.</span><span class="n">parent</span><span class="p">[</span><span class="n">child_node</span><span class="p">]</span> <span class="o">=</span> <span class="n">child_node</span>
+            <span class="k">for</span> <span class="n">nd</span> <span class="ow">in</span> <span class="bp">self</span><span class="o">.</span><span class="n">descendants</span><span class="p">[</span><span class="n">knag</span><span class="p">]:</span>
+                <span class="bp">self</span><span class="o">.</span><span class="n">ancestor</span><span class="p">[</span><span class="n">nd</span><span class="p">]</span> <span class="o">=</span> <span class="n">child_node</span>
+        <span class="k">else</span><span class="p">:</span>
+            <span class="c1"># climb up the family tree and reset the family register.</span>
+            <span class="bp">self</span><span class="o">.</span><span class="n">children</span><span class="p">[</span><span class="n">parent_node</span><span class="p">]</span><span class="o">.</span><span class="n">remove</span><span class="p">(</span><span class="n">knag</span><span class="p">)</span>
+            <span class="bp">self</span><span class="o">.</span><span class="n">children</span><span class="p">[</span><span class="n">parent_node</span><span class="p">]</span><span class="o">.</span><span class="n">append</span><span class="p">(</span><span class="n">child_node</span><span class="p">)</span>
+            <span class="k">while</span> <span class="kc">True</span><span class="p">:</span>
+                <span class="bp">self</span><span class="o">.</span><span class="n">descendants</span><span class="p">[</span><span class="n">parent_node</span><span class="p">]</span><span class="o">.</span><span class="n">remove</span><span class="p">(</span><span class="n">knag</span><span class="p">)</span>
+                <span class="k">if</span> <span class="n">parent_node</span> <span class="o">==</span> <span class="n">ancestor_node</span><span class="p">:</span>
+                    <span class="k">break</span>
+                <span class="k">else</span><span class="p">:</span>
+                    <span class="n">parent_node</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">parent</span><span class="p">[</span><span class="n">parent_node</span><span class="p">]</span>
+            <span class="n">parent_node</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">parent</span><span class="p">[</span><span class="n">knag</span><span class="p">]</span>
+
+            <span class="c1"># climb down the family tree and reset the family register.</span>
+            <span class="bp">self</span><span class="o">.</span><span class="n">parent</span><span class="p">[</span><span class="n">child_node</span><span class="p">]</span> <span class="o">=</span> <span class="n">parent_node</span>
+
+        <span class="c1"># Remove this node</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">nodes</span><span class="p">[</span><span class="n">child_node</span><span class="p">]</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">concatenate</span><span class="p">((</span><span class="bp">self</span><span class="o">.</span><span class="n">nodes</span><span class="p">[</span><span class="n">child_node</span><span class="p">],</span>
+                                                 <span class="bp">self</span><span class="o">.</span><span class="n">nodes</span><span class="p">[</span><span class="n">knag</span><span class="p">]))</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">nodes</span><span class="o">.</span><span class="n">pop</span><span class="p">(</span><span class="n">knag</span><span class="p">)</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">parent</span><span class="o">.</span><span class="n">pop</span><span class="p">(</span><span class="n">knag</span><span class="p">)</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">children</span><span class="o">.</span><span class="n">pop</span><span class="p">(</span><span class="n">knag</span><span class="p">)</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">ancestor</span><span class="o">.</span><span class="n">pop</span><span class="p">(</span><span class="n">knag</span><span class="p">)</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">descendants</span><span class="o">.</span><span class="n">pop</span><span class="p">(</span><span class="n">knag</span><span class="p">)</span>
+
+    <span class="k">def</span> <span class="nf">_find_leaves</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+<span class="w">        </span><span class="sd">&quot;&quot;&quot;Find leaf nodes.&quot;&quot;&quot;</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">leaves</span> <span class="o">=</span> <span class="p">[]</span>
+        <span class="k">for</span> <span class="n">nd</span> <span class="ow">in</span> <span class="bp">self</span><span class="o">.</span><span class="n">nodes</span><span class="p">:</span>
+            <span class="k">if</span> <span class="nb">len</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">children</span><span class="p">[</span><span class="n">nd</span><span class="p">])</span> <span class="o">==</span> <span class="mi">0</span><span class="p">:</span>
+                <span class="bp">self</span><span class="o">.</span><span class="n">leaves</span><span class="o">.</span><span class="n">append</span><span class="p">(</span><span class="n">nd</span><span class="p">)</span>
+
+    <span class="k">def</span> <span class="nf">_find_bud</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">ncells_min</span><span class="p">):</span>
+<span class="w">        </span><span class="sd">&quot;&quot;&quot;Loop through all leaves and return the first occurence of a bud.</span>
+
+<span class="sd">        Parameters</span>
+<span class="sd">        ----------</span>
+<span class="sd">        ncells_min : int</span>
+<span class="sd">            Minimum number of cells of a leaf node.</span>
+
+<span class="sd">        Returns</span>
+<span class="sd">        -------</span>
+<span class="sd">        leaf : int</span>
+<span class="sd">            ID of the bud node.</span>
+<span class="sd">        &quot;&quot;&quot;</span>
+        <span class="k">for</span> <span class="n">leaf</span> <span class="ow">in</span> <span class="bp">self</span><span class="o">.</span><span class="n">leaves</span><span class="p">:</span>
+            <span class="n">ncells</span> <span class="o">=</span> <span class="nb">len</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">nodes</span><span class="p">[</span><span class="n">leaf</span><span class="p">])</span>
+            <span class="k">if</span> <span class="n">ncells</span> <span class="o">&lt;</span> <span class="n">ncells_min</span><span class="p">:</span>
+                <span class="k">return</span> <span class="n">leaf</span>
+        <span class="k">return</span> <span class="kc">None</span>
+
+    <span class="k">def</span> <span class="nf">_find_trunk</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+        <span class="c1"># TODO use set instead of np.unique</span>
+        <span class="n">trunk</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">unique</span><span class="p">(</span><span class="nb">list</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">ancestor</span><span class="o">.</span><span class="n">values</span><span class="p">()))</span>
+        <span class="k">if</span> <span class="nb">len</span><span class="p">(</span><span class="n">trunk</span><span class="p">)</span> <span class="o">!=</span> <span class="mi">1</span><span class="p">:</span>
+            <span class="k">raise</span> <span class="ne">Exception</span><span class="p">(</span><span class="s2">&quot;There are more than one trunk.&quot;</span>
+                            <span class="s2">&quot; Something must be wrong&quot;</span><span class="p">)</span>
+        <span class="k">else</span><span class="p">:</span>
+            <span class="bp">self</span><span class="o">.</span><span class="n">trunk</span> <span class="o">=</span> <span class="n">trunk</span><span class="p">[</span><span class="mi">0</span><span class="p">]</span></div>
+
+
+<span class="k">def</span> <span class="nf">filter_by_node</span><span class="p">(</span><span class="n">dat</span><span class="p">,</span> <span class="n">nodes</span><span class="o">=</span><span class="kc">None</span><span class="p">,</span> <span class="n">nodes_select</span><span class="o">=</span><span class="kc">None</span><span class="p">,</span> <span class="n">cells_select</span><span class="o">=</span><span class="kc">None</span><span class="p">,</span>
+                   <span class="n">fill_value</span><span class="o">=</span><span class="n">np</span><span class="o">.</span><span class="n">nan</span><span class="p">,</span> <span class="n">drop</span><span class="o">=</span><span class="kc">False</span><span class="p">):</span>
+<span class="w">    </span><span class="sd">&quot;&quot;&quot;Mask DataArray using FISO dictionary or the flattened indexes.</span>
+
+<span class="sd">    .. deprecated:: 1.0.0</span>
+<span class="sd">            This function will be removed in grid_dendro 1.0.0, it is</span>
+<span class="sd">            replaced by Dendrogram.filter_data method.</span>
+
+<span class="sd">    Parameters</span>
+<span class="sd">    ----------</span>
+<span class="sd">    dat : xarray.DataArray or numpy.ndarray</span>
+<span class="sd">        Input array to be filtered.</span>
+<span class="sd">    nodes : dict, optional</span>
+<span class="sd">        Dendrogram nodes dictionary.</span>
+<span class="sd">    nodes_select : int or sequence of ints, optional</span>
+<span class="sd">        Id of selected node(s).</span>
+<span class="sd">    cells_select : array, optional</span>
+<span class="sd">        Flat indices of selected cells. Overrides nodes and nodes_select.</span>
+<span class="sd">    fill_value : float, optional</span>
+<span class="sd">        Value to fill outside of the filtered region. Default is np.nan.</span>
+<span class="sd">    drop : bool, optional</span>
+<span class="sd">        If true, return flatten dat that only include selected cells.</span>
+
+<span class="sd">    Returns</span>
+<span class="sd">    -------</span>
+<span class="sd">    out : xarray.DataArray or numpy.ndarray</span>
+<span class="sd">        Filtered array matching the input array type</span>
+<span class="sd">    &quot;&quot;&quot;</span>
+    <span class="k">if</span> <span class="nb">isinstance</span><span class="p">(</span><span class="n">dat</span><span class="p">,</span> <span class="n">xr</span><span class="o">.</span><span class="n">DataArray</span><span class="p">):</span>
+        <span class="n">dtype</span> <span class="o">=</span> <span class="s1">&#39;xarray&#39;</span>
+        <span class="n">coords</span> <span class="o">=</span> <span class="n">dat</span><span class="o">.</span><span class="n">coords</span>
+        <span class="n">dims</span> <span class="o">=</span> <span class="n">dat</span><span class="o">.</span><span class="n">dims</span>
+        <span class="n">dat</span> <span class="o">=</span> <span class="n">dat</span><span class="o">.</span><span class="n">to_numpy</span><span class="p">()</span>
+    <span class="k">elif</span> <span class="nb">isinstance</span><span class="p">(</span><span class="n">dat</span><span class="p">,</span> <span class="n">np</span><span class="o">.</span><span class="n">ndarray</span><span class="p">):</span>
+        <span class="n">dtype</span> <span class="o">=</span> <span class="s1">&#39;numpy&#39;</span>
+    <span class="k">else</span><span class="p">:</span>
+        <span class="k">raise</span> <span class="ne">TypeError</span><span class="p">(</span><span class="s2">&quot;type </span><span class="si">{}</span><span class="s2"> is not supported&quot;</span><span class="o">.</span><span class="n">format</span><span class="p">(</span><span class="nb">type</span><span class="p">(</span><span class="n">dat</span><span class="p">)))</span>
+
+    <span class="c1"># retreive flat indices of selected cells</span>
+    <span class="k">if</span> <span class="n">nodes</span> <span class="ow">is</span> <span class="kc">None</span> <span class="ow">and</span> <span class="n">nodes_select</span> <span class="ow">is</span> <span class="kc">None</span> <span class="ow">and</span> <span class="n">cells_select</span> <span class="ow">is</span> <span class="kc">None</span><span class="p">:</span>
+        <span class="c1"># nothing to do</span>
+        <span class="k">return</span> <span class="n">dat</span>
+    <span class="k">elif</span> <span class="n">nodes</span> <span class="ow">is</span> <span class="ow">not</span> <span class="kc">None</span> <span class="ow">and</span> <span class="n">cells_select</span> <span class="ow">is</span> <span class="kc">None</span><span class="p">:</span>
+        <span class="n">cells_select</span> <span class="o">=</span> <span class="p">[]</span>
+        <span class="k">if</span> <span class="n">nodes_select</span> <span class="ow">is</span> <span class="kc">None</span><span class="p">:</span>
+            <span class="c1"># select all cells</span>
+            <span class="k">for</span> <span class="n">v</span> <span class="ow">in</span> <span class="n">nodes</span><span class="o">.</span><span class="n">values</span><span class="p">():</span>
+                <span class="n">cells_select</span> <span class="o">+=</span> <span class="nb">list</span><span class="p">(</span><span class="n">v</span><span class="p">)</span>
+        <span class="k">elif</span> <span class="nb">isinstance</span><span class="p">(</span><span class="n">nodes_select</span><span class="p">,</span> <span class="p">(</span><span class="nb">int</span><span class="p">,</span> <span class="n">np</span><span class="o">.</span><span class="n">int64</span><span class="p">,</span> <span class="n">np</span><span class="o">.</span><span class="n">int32</span><span class="p">)):</span>
+            <span class="n">cells_select</span> <span class="o">+=</span> <span class="n">nodes</span><span class="p">[</span><span class="n">nodes_select</span><span class="p">]</span>
+        <span class="k">else</span><span class="p">:</span>
+            <span class="k">for</span> <span class="n">node</span> <span class="ow">in</span> <span class="n">nodes_select</span><span class="p">:</span>
+                <span class="n">cells_select</span> <span class="o">+=</span> <span class="n">nodes</span><span class="p">[</span><span class="n">node</span><span class="p">]</span>
+
+    <span class="n">dat1d</span> <span class="o">=</span> <span class="n">dat</span><span class="o">.</span><span class="n">flatten</span><span class="p">()</span>
+    <span class="k">if</span> <span class="n">drop</span><span class="p">:</span>
+        <span class="n">out</span> <span class="o">=</span> <span class="n">dat1d</span><span class="p">[</span><span class="n">cells_select</span><span class="p">]</span>
+        <span class="k">return</span> <span class="n">out</span>
+    <span class="k">else</span><span class="p">:</span>
+        <span class="n">out</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">full</span><span class="p">(</span><span class="nb">len</span><span class="p">(</span><span class="n">dat1d</span><span class="p">),</span> <span class="n">fill_value</span><span class="p">)</span>
+        <span class="n">out</span><span class="p">[</span><span class="n">cells_select</span><span class="p">]</span> <span class="o">=</span> <span class="n">dat1d</span><span class="p">[</span><span class="n">cells_select</span><span class="p">]</span>
+        <span class="n">out</span> <span class="o">=</span> <span class="n">out</span><span class="o">.</span><span class="n">reshape</span><span class="p">(</span><span class="n">dat</span><span class="o">.</span><span class="n">shape</span><span class="p">)</span>
+        <span class="k">if</span> <span class="n">dtype</span> <span class="o">==</span> <span class="s1">&#39;xarray&#39;</span><span class="p">:</span>
+            <span class="n">out</span> <span class="o">=</span> <span class="n">xr</span><span class="o">.</span><span class="n">DataArray</span><span class="p">(</span><span class="n">data</span><span class="o">=</span><span class="n">out</span><span class="p">,</span> <span class="n">coords</span><span class="o">=</span><span class="n">coords</span><span class="p">,</span> <span class="n">dims</span><span class="o">=</span><span class="n">dims</span><span class="p">)</span>
+        <span class="k">return</span> <span class="n">out</span>
+</pre></div>
+
+                </article>
+              
+
+              
+              
+                <footer class="bd-footer-article">
+                  
+<div class="footer-article-items footer-article__inner">
+  
+    <div class="footer-article-item"><!-- Previous / next buttons -->
+<div class="prev-next-area">
+</div></div>
+  
+</div>
+
+                </footer>
+              
+            </div>
+            
+            
+              
+            
+          </div>
+          <footer class="bd-footer-content">
+            
+<div class="bd-footer-content__inner container">
+  
+  <div class="footer-item">
+    
+<p class="component-author">
+By Sanghyuk Moon
+</p>
+
+  </div>
+  
+  <div class="footer-item">
+    
+  <p class="copyright">
+    
+      © Copyright 2023.
+      <br/>
+    
+  </p>
+
+  </div>
+  
+  <div class="footer-item">
+    
+  </div>
+  
+  <div class="footer-item">
+    
+  </div>
+  
+</div>
+          </footer>
+        
+
+      </main>
+    </div>
+  </div>
+  
+  <!-- Scripts loaded after <body> so the DOM is not blocked -->
+  <script src="../../_static/scripts/bootstrap.js?digest=e353d410970836974a52"></script>
+<script src="../../_static/scripts/pydata-sphinx-theme.js?digest=e353d410970836974a52"></script>
+
+  <footer class="bd-footer">
+  </footer>
+  </body>
+</html>

@@ -3,7 +3,7 @@
 <!DOCTYPE html>
 
 
-<html lang="en" >
+<html >
 
   <head>
     <meta charset="utf-8" />
@@ -44,7 +44,6 @@
     <script data-url_root="./" id="documentation_options" src="_static/documentation_options.js"></script>
     <script src="_static/jquery.js"></script>
     <script src="_static/underscore.js"></script>
-    <script src="_static/_sphinx_javascript_frameworks_compat.js"></script>
     <script src="_static/doctools.js"></script>
     <script src="_static/clipboard.min.js"></script>
     <script src="_static/copybutton.js"></script>
@@ -67,7 +66,7 @@ const thebe_selector_output = ".output, .cell_output"
     <link rel="next" title="Installation" href="installation.html" />
     <link rel="prev" title="boundary" href="boundary.html" />
   <meta name="viewport" content="width=device-width, initial-scale=1"/>
-  <meta name="docsearch:language" content="en"/>
+  <meta name="docsearch:language" content="None"/>
   </head>
   
   
@@ -355,8 +354,77 @@ document.write(`
 <div id="searchbox"></div>
                 <article class="bd-article" role="main">
                   
-  <section id="energy">
-<h1>energy<a class="headerlink" href="#energy" title="Permalink to this heading">#</a></h1>
+  <section id="module-grid_dendro.energy">
+<span id="energy"></span><h1>energy<a class="headerlink" href="#module-grid_dendro.energy" title="Permalink to this headline">#</a></h1>
+<dl class="py function">
+<dt class="sig sig-object py" id="grid_dendro.energy.calculate_cumulative_energies">
+<span class="sig-prename descclassname"><span class="pre">grid_dendro.energy.</span></span><span class="sig-name descname"><span class="pre">calculate_cumulative_energies</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">gd</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">data</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">node</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="_modules/grid_dendro/energy.html#calculate_cumulative_energies"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#grid_dendro.energy.calculate_cumulative_energies" title="Permalink to this definition">#</a></dt>
+<dd><p>Calculate cumulative energies as a function of radius in a given node</p>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters</dt>
+<dd class="field-odd"><ul class="simple">
+<li><p><strong>gd</strong> (<a class="reference internal" href="dendrogram.html#grid_dendro.dendrogram.Dendrogram" title="grid_dendro.dendrogram.Dendrogram"><em>Dendrogram</em></a>) – : Dendrogram object</p></li>
+<li><p><strong>data</strong> (<em>dict</em>) – Dictionary containing hydro variables</p></li>
+<li><p><strong>node</strong> (<em>int</em>) – Selected GRID-dendro node</p></li>
+</ul>
+</dd>
+<dt class="field-even">Returns</dt>
+<dd class="field-even"><p><ul class="simple">
+<li><p><em>array</em> – Effective radii.</p></li>
+<li><p><em>dict</em> – thermal, kinetic, gravitational, and total energies
+integrated up to each radius.</p></li>
+</ul>
+</p>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="py function">
+<dt class="sig sig-object py" id="grid_dendro.energy.find_bound_objects">
+<span class="sig-prename descclassname"><span class="pre">grid_dendro.energy.</span></span><span class="sig-name descname"><span class="pre">find_bound_objects</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">gd</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">data</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">hbp</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">{}</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">hbr</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">{}</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">node</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="_modules/grid_dendro/energy.html#find_bound_objects"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#grid_dendro.energy.find_bound_objects" title="Permalink to this definition">#</a></dt>
+<dd><p>Finds HBP and HBR</p>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters</dt>
+<dd class="field-odd"><ul class="simple">
+<li><p><strong>gd</strong> (<a class="reference internal" href="dendrogram.html#grid_dendro.dendrogram.Dendrogram" title="grid_dendro.dendrogram.Dendrogram"><em>Dendrogram</em></a>) – GRID-dendro dendrogram object.</p></li>
+<li><p><strong>data</strong> (<em>dict</em>) – Dictionary containing fluid variables. Must contain followings:
+[‘rho’, ‘vel1’, ‘vel2’, ‘vel3’, ‘prs’, ‘phi’, ‘dvol’]</p></li>
+<li><p><strong>hbp</strong> (<em>dict</em><em>, </em><em>optional</em>) – Dictionary containing HBPs.
+Only used internally for recursive purpose.</p></li>
+<li><p><strong>hbr</strong> (<em>dict</em><em>, </em><em>optional</em>) – Dictionary containing HBRs.
+Only used internally for recursive purpose.</p></li>
+<li><p><strong>node</strong> (<em>int</em><em>, </em><em>optional</em>) – ID of the selected node.
+Only used internally for recursive purpose.</p></li>
+</ul>
+</dd>
+<dt class="field-even">Returns</dt>
+<dd class="field-even"><p><ul class="simple">
+<li><p><strong>hbp</strong> (<em>dict</em>) – Dictionary containing HBPs.</p></li>
+<li><p><strong>hbr</strong> (<em>dict</em>) – Dictionary containing HBRs.</p></li>
+</ul>
+</p>
+</dd>
+</dl>
+<p class="rubric">Examples</p>
+<div class="doctest highlight-default notranslate"><div class="highlight"><pre><span></span><span class="gp">&gt;&gt;&gt; </span><span class="kn">import</span> <span class="nn">pyathena</span> <span class="k">as</span> <span class="nn">pa</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="n">s</span> <span class="o">=</span> <span class="n">pa</span><span class="o">.</span><span class="n">LoadSim</span><span class="p">(</span><span class="s2">&quot;/scratch/smoon/M5J2P0N512&quot;</span><span class="p">)</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="n">ds</span> <span class="o">=</span> <span class="n">s</span><span class="o">.</span><span class="n">load_hdf5</span><span class="p">(</span><span class="mi">50</span><span class="p">,</span> <span class="n">load_method</span><span class="o">=</span><span class="s1">&#39;pyathena&#39;</span><span class="p">)</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="n">cs</span> <span class="o">=</span> <span class="mf">1.0</span> <span class="c1"># isothermal sound speed</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="n">gd</span> <span class="o">=</span> <span class="n">dendrogram</span><span class="o">.</span><span class="n">Dendrogram</span><span class="p">(</span><span class="n">ds</span><span class="o">.</span><span class="n">phigas</span><span class="o">.</span><span class="n">data</span><span class="p">)</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="n">gd</span><span class="o">.</span><span class="n">construct</span><span class="p">()</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="n">gd</span><span class="o">.</span><span class="n">prune</span><span class="p">()</span>  <span class="c1"># Remove buds</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="n">data</span> <span class="o">=</span> <span class="nb">dict</span><span class="p">(</span><span class="n">rho</span><span class="o">=</span><span class="n">ds</span><span class="o">.</span><span class="n">dens</span><span class="o">.</span><span class="n">data</span><span class="p">,</span>
+<span class="go">                vel1=(ds.mom1/ds.dens).data,</span>
+<span class="go">                vel2=(ds.mom2/ds.dens).data,</span>
+<span class="go">                vel3=(ds.mom3/ds.dens).data,</span>
+<span class="go">                prs=(cs**2*ds.dens).data,</span>
+<span class="go">                phi=ds.phigas.data,</span>
+<span class="go">                dvol=s.domain[&#39;dx&#39;].prod())</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="n">hbp</span><span class="p">,</span> <span class="n">hbr</span> <span class="o">=</span> <span class="n">find_bound_object</span><span class="p">(</span><span class="n">gd</span><span class="p">,</span> <span class="n">data</span><span class="p">)</span>
+</pre></div>
+</div>
+</dd></dl>
+
 </section>
 
     <script type="text/x-thebe-config">

@@ -3,7 +3,7 @@
 <!DOCTYPE html>
 
 
-<html lang="en" >
+<html >
 
   <head>
     <meta charset="utf-8" />
@@ -44,7 +44,6 @@
     <script data-url_root="./" id="documentation_options" src="_static/documentation_options.js"></script>
     <script src="_static/jquery.js"></script>
     <script src="_static/underscore.js"></script>
-    <script src="_static/_sphinx_javascript_frameworks_compat.js"></script>
     <script src="_static/doctools.js"></script>
     <script src="_static/clipboard.min.js"></script>
     <script src="_static/copybutton.js"></script>
@@ -67,7 +66,7 @@ const thebe_selector_output = ".output, .cell_output"
     <link rel="next" title="boundary" href="boundary.html" />
     <link rel="prev" title="GRID-Dendro – Gravitational Identification with Dendrogram" href="intro.html" />
   <meta name="viewport" content="width=device-width, initial-scale=1"/>
-  <meta name="docsearch:language" content="en"/>
+  <meta name="docsearch:language" content="None"/>
   </head>
   
   
@@ -356,7 +355,175 @@ document.write(`
                 <article class="bd-article" role="main">
                   
   <section id="dendrogram-class">
-<h1>Dendrogram class<a class="headerlink" href="#dendrogram-class" title="Permalink to this heading">#</a></h1>
+<h1>Dendrogram class<a class="headerlink" href="#dendrogram-class" title="Permalink to this headline">#</a></h1>
+<dl class="py class">
+<dt class="sig sig-object py" id="grid_dendro.dendrogram.Dendrogram">
+<em class="property"><span class="pre">class</span><span class="w"> </span></em><span class="sig-prename descclassname"><span class="pre">grid_dendro.dendrogram.</span></span><span class="sig-name descname"><span class="pre">Dendrogram</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">arr</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">boundary_flag</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">'periodic'</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="_modules/grid_dendro/dendrogram.html#Dendrogram"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#grid_dendro.dendrogram.Dendrogram" title="Permalink to this definition">#</a></dt>
+<dd><p>Dendrogram representing hierarchical structure in 3D data</p>
+<dl class="py attribute">
+<dt class="sig sig-object py" id="grid_dendro.dendrogram.Dendrogram.nodes">
+<span class="sig-name descname"><span class="pre">nodes</span></span><a class="headerlink" href="#grid_dendro.dendrogram.Dendrogram.nodes" title="Permalink to this definition">#</a></dt>
+<dd><p>Maps a node to flat indices of its member cells.
+{node: cells}</p>
+<dl class="field-list simple">
+<dt class="field-odd">Type</dt>
+<dd class="field-odd"><p>dict</p>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="py attribute">
+<dt class="sig sig-object py" id="grid_dendro.dendrogram.Dendrogram.parent">
+<span class="sig-name descname"><span class="pre">parent</span></span><a class="headerlink" href="#grid_dendro.dendrogram.Dendrogram.parent" title="Permalink to this definition">#</a></dt>
+<dd><p>Maps a node to its parent node.
+{node: node}</p>
+<dl class="field-list simple">
+<dt class="field-odd">Type</dt>
+<dd class="field-odd"><p>dict</p>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="py attribute">
+<dt class="sig sig-object py" id="grid_dendro.dendrogram.Dendrogram.children">
+<span class="sig-name descname"><span class="pre">children</span></span><a class="headerlink" href="#grid_dendro.dendrogram.Dendrogram.children" title="Permalink to this definition">#</a></dt>
+<dd><p>Maps a node to its child nodes.
+{node: list of nodes}</p>
+<dl class="field-list simple">
+<dt class="field-odd">Type</dt>
+<dd class="field-odd"><p>dict</p>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="py attribute">
+<dt class="sig sig-object py" id="grid_dendro.dendrogram.Dendrogram.ancestor">
+<span class="sig-name descname"><span class="pre">ancestor</span></span><a class="headerlink" href="#grid_dendro.dendrogram.Dendrogram.ancestor" title="Permalink to this definition">#</a></dt>
+<dd><p>Maps a node to its ancestor.
+{node: node}</p>
+<dl class="field-list simple">
+<dt class="field-odd">Type</dt>
+<dd class="field-odd"><p>dict</p>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="py attribute">
+<dt class="sig sig-object py" id="grid_dendro.dendrogram.Dendrogram.descendants">
+<span class="sig-name descname"><span class="pre">descendants</span></span><a class="headerlink" href="#grid_dendro.dendrogram.Dendrogram.descendants" title="Permalink to this definition">#</a></dt>
+<dd><p>Maps a node to its descendant nodes.
+{node: list of nodes}</p>
+<dl class="field-list simple">
+<dt class="field-odd">Type</dt>
+<dd class="field-odd"><p>dict</p>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="py attribute">
+<dt class="sig sig-object py" id="grid_dendro.dendrogram.Dendrogram.leaves">
+<span class="sig-name descname"><span class="pre">leaves</span></span><a class="headerlink" href="#grid_dendro.dendrogram.Dendrogram.leaves" title="Permalink to this definition">#</a></dt>
+<dd><p>List of nodes that do not have children.</p>
+<dl class="field-list simple">
+<dt class="field-odd">Type</dt>
+<dd class="field-odd"><p>list</p>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="py attribute">
+<dt class="sig sig-object py" id="grid_dendro.dendrogram.Dendrogram.trunk">
+<span class="sig-name descname"><span class="pre">trunk</span></span><a class="headerlink" href="#grid_dendro.dendrogram.Dendrogram.trunk" title="Permalink to this definition">#</a></dt>
+<dd><p>Id of the trunk node.</p>
+<dl class="field-list simple">
+<dt class="field-odd">Type</dt>
+<dd class="field-odd"><p>int</p>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="py attribute">
+<dt class="sig sig-object py" id="grid_dendro.dendrogram.Dendrogram.minima">
+<span class="sig-name descname"><span class="pre">minima</span></span><a class="headerlink" href="#grid_dendro.dendrogram.Dendrogram.minima" title="Permalink to this definition">#</a></dt>
+<dd><p>Flat indices at the local potential minima.</p>
+<dl class="field-list simple">
+<dt class="field-odd">Type</dt>
+<dd class="field-odd"><p>set</p>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="py method">
+<dt class="sig sig-object py" id="grid_dendro.dendrogram.Dendrogram.construct">
+<span class="sig-name descname"><span class="pre">construct</span></span><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="reference internal" href="_modules/grid_dendro/dendrogram.html#Dendrogram.construct"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#grid_dendro.dendrogram.Dendrogram.construct" title="Permalink to this definition">#</a></dt>
+<dd><p>Construct dendrogram</p>
+<p>Constructs dendrogram dictionaries: nodes, parent, children,
+ancestor, and descendants. Then finds leaf nodes and trunk node.</p>
+<p class="rubric">Notes</p>
+<p>Use int64 in a loop which seems to be faster in 64 bit system, and
+then cast to int32 or int64 depending on the size of the array
+after construction is done, in order to save memory. Similarly, use
+list instead of numpy array for efficient append operation, then
+cast to numpy array after construction is done to save memory.
+These memory optimization is only done to “nodes” and
+“cells_ordered”, which consume most of the memory.</p>
+<p class="rubric">Examples</p>
+<div class="doctest highlight-default notranslate"><div class="highlight"><pre><span></span><span class="gp">&gt;&gt;&gt; </span><span class="kn">import</span> <span class="nn">pyathena</span> <span class="k">as</span> <span class="nn">pa</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="n">s</span> <span class="o">=</span> <span class="n">pa</span><span class="o">.</span><span class="n">LoadSim</span><span class="p">(</span><span class="s2">&quot;/scratch/smoon/M5J2P0N512&quot;</span><span class="p">)</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="n">ds</span> <span class="o">=</span> <span class="n">s</span><span class="o">.</span><span class="n">load_hdf5</span><span class="p">(</span><span class="mi">50</span><span class="p">,</span> <span class="n">load_method</span><span class="o">=</span><span class="s1">&#39;pyathena&#39;</span><span class="p">)</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="n">gd</span> <span class="o">=</span> <span class="n">dendrogram</span><span class="o">.</span><span class="n">Dendrogram</span><span class="p">(</span><span class="n">ds</span><span class="o">.</span><span class="n">phigas</span><span class="o">.</span><span class="n">to_numpy</span><span class="p">())</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="n">gd</span><span class="o">.</span><span class="n">construct</span><span class="p">()</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="n">gd</span><span class="o">.</span><span class="n">prune</span><span class="p">()</span>  <span class="c1"># Remove buds</span>
+</pre></div>
+</div>
+</dd></dl>
+
+<dl class="py method">
+<dt class="sig sig-object py" id="grid_dendro.dendrogram.Dendrogram.filter_data">
+<span class="sig-name descname"><span class="pre">filter_data</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">dat</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">nodes</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">fill_value</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">nan</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">drop</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">False</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="_modules/grid_dendro/dendrogram.html#Dendrogram.filter_data"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#grid_dendro.dendrogram.Dendrogram.filter_data" title="Permalink to this definition">#</a></dt>
+<dd><p>Filter data by node</p>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters</dt>
+<dd class="field-odd"><ul class="simple">
+<li><p><strong>dat</strong> (<em>xarray.DataArray</em><em> or </em><em>numpy.ndarray</em>) – Input array to be filtered.</p></li>
+<li><p><strong>nodes</strong> (<em>int</em><em> or </em><em>array of ints</em>) – Selected nodes.</p></li>
+<li><p><strong>fill_value</strong> (<em>float</em><em>, </em><em>optional</em>) – The value to fill outside of the filtered region. Default to nan.</p></li>
+<li><p><strong>drop</strong> (<em>bool</em>) – If true, return faltten data that only include filtered cells.</p></li>
+</ul>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="py method">
+<dt class="sig sig-object py" id="grid_dendro.dendrogram.Dendrogram.get_all_descendant_cells">
+<span class="sig-name descname"><span class="pre">get_all_descendant_cells</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">node</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="_modules/grid_dendro/dendrogram.html#Dendrogram.get_all_descendant_cells"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#grid_dendro.dendrogram.Dendrogram.get_all_descendant_cells" title="Permalink to this definition">#</a></dt>
+<dd><p>Return all member cells of the node, including descendant nodes</p>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters</dt>
+<dd class="field-odd"><p><strong>node</strong> (<em>int</em>) – Id of a selected node.</p>
+</dd>
+<dt class="field-even">Returns</dt>
+<dd class="field-even"><p><strong>cells</strong> – Flattned indices of all member cells of this node.</p>
+</dd>
+<dt class="field-odd">Return type</dt>
+<dd class="field-odd"><p>array</p>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="py method">
+<dt class="sig sig-object py" id="grid_dendro.dendrogram.Dendrogram.prune">
+<span class="sig-name descname"><span class="pre">prune</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">ncells_min</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">27</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="_modules/grid_dendro/dendrogram.html#Dendrogram.prune"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#grid_dendro.dendrogram.Dendrogram.prune" title="Permalink to this definition">#</a></dt>
+<dd><p>Prune the buds by applying minimum number of cell criterion</p>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters</dt>
+<dd class="field-odd"><p><strong>ncells_min</strong> (<em>int</em><em>, </em><em>optional</em>) – Minimum number of cells of a leaf node.</p>
+</dd>
+</dl>
+</dd></dl>
+
+</dd></dl>
+
 </section>
 
     <script type="text/x-thebe-config">
