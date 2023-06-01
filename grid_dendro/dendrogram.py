@@ -55,36 +55,58 @@ class Dendrogram:
             raise ValueError(msg)
         arr_min_filtered = minimum_filter(arr, size=3, mode=filter_mode).flatten()
         arr = arr.flatten()
-        minima = (arr == arr_min_filtered).nonzero()[0]
+        self.minima = set((arr == arr_min_filtered).nonzero()[0])
 
         # Sort flat indices in an ascending order of arr.
-        cells_ordered = arr.argsort()
-        self.num_cells = len(cells_ordered)
+        self.cells_ordered = arr.argsort()
+        self.num_cells = len(self.cells_ordered)
 
-        # cast type based on the size of array
+        # Set data type based on the size of array
         if self.num_cells < 2**31:
-            dtype = np.int32
+            self._dtype = np.int32
         elif self.num_cells < 2**63:
-            dtype = np.int64
+            self._dtype = np.int64
         else:
             raise MemoryError("Input array size is too large")
-        self.minima = set(minima.astype(dtype))
-        self.cells_ordered = cells_ordered.astype(dtype)
-        self.dtype = dtype
 
     def construct(self):
-        """Construct dendrogram tree
+        """Construct dendrogram
 
-        Initialize nodes, parent, children, ancestor, descendants, and leaves
+        Constructs dendrogram dictionaries: nodes, parent, children,
+        ancestor, and descendants. Then finds leaf nodes and trunk node.
+
+        Notes
+        -----
+        Use int64 in a loop which seems to be faster in 64 bit system, and
+        then cast to int32 or int64 depending on the size of the array
+        after construction is done, in order to save memory. Similarly, use
+        list instead of numpy array for efficient append operation, then
+        cast to numpy array after construction is done to save memory.
+        These memory optimization is only done to "nodes" and
+        "cells_ordered", which consume most of the memory.
+
+        Examples
+        --------
+        >>> import pyathena as pa
+        >>> s = pa.LoadSim("/scratch/smoon/M5J2P0N512")
+        >>> ds = s.load_hdf5(50, load_method='pyathena')
+        >>> gd = dendrogram.Dendrogram(ds.phigas.to_numpy())
+        >>> gd.construct()
+        >>> gd.prune()  # Remove buds
         """
 
         # Initialize node, parent, children, descendants, and ancestor
         self.nodes = {nd: [nd] for nd in self.minima}
-        parent_array = np.full(self.num_cells, -1, dtype=int)
-        parent_array[list(self.minima)] = list(self.minima)
         self.children = {nd: [] for nd in self.minima}
         self.ancestor = {nd: nd for nd in self.minima}
         self.descendants = {nd: [] for nd in self.minima}
+
+        # parent_array is a numpy array that maps a cell to its "parent" node.
+        # When a cell is itself a node-generating point, than it is mapped to
+        # its parent node.
+        parent_array = np.full(self.num_cells, -1, dtype=int)
+        parent_array[list(self.minima)] = list(self.minima)
+
 
         # Load neighbor dictionary.
         my_neighbors = boundary.precompute_neighbor(self._arr_shape,
@@ -135,9 +157,16 @@ class Dendrogram:
                 if set(self.minima).issubset(set(self.descendants[cell])):
                     print("We have reached the trunk. Stop climbing up")
                     break
+
+        # Construct parent dictionary from parent_array
         self.parent = {}
-        for nd in self.nodes:
-            self.parent[nd] = parent_array[nd].astype(self.dtype)
+        for k, v in self.nodes.items():
+            # Cast to save memory
+            self.parent[k] = parent_array[k].astype(self._dtype)
+            self.nodes[k] = np.array(v).astype(self._dtype)
+        self.cells_ordered = self.cells_ordered.astype(self._dtype)
+
+        # Find leaves and trunk
         self._find_leaves()
         self._find_trunk()
 
@@ -362,6 +391,7 @@ class Dendrogram:
         return None
 
     def _find_trunk(self):
+        # TODO use set instead of np.unique
         trunk = np.unique(list(self.ancestor.values()))
         if len(trunk) != 1:
             raise Exception("There are more than one trunk."
