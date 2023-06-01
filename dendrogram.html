@@ -153,7 +153,7 @@ const thebe_selector_output = ".output, .cell_output"
 <ul class="current nav bd-sidenav">
 <li class="toctree-l1 current active"><a class="current reference internal" href="#">Dendrogram class</a></li>
 <li class="toctree-l1"><a class="reference internal" href="boundary.html">boundary</a></li>
-<li class="toctree-l1"><a class="reference internal" href="energy.html">Utility functions</a></li>
+<li class="toctree-l1"><a class="reference internal" href="energy.html">energy</a></li>
 </ul>
 <p aria-level="2" class="caption" role="heading"><span class="caption-text">Installation</span></p>
 <ul class="nav bd-sidenav">
@@ -375,12 +375,11 @@ document.write(`
 <dl class="py attribute">
 <dt class="sig sig-object py" id="grid_dendro.dendrogram.Dendrogram.parent">
 <span class="sig-name descname"><span class="pre">parent</span></span><a class="headerlink" href="#grid_dendro.dendrogram.Dendrogram.parent" title="Permalink to this definition">#</a></dt>
-<dd><p>Maps a flat index of a cell to its parent node. When a cell is a parent
-cell of a node, maps to the parent node of that node.
-{cell: node}</p>
+<dd><p>Maps a node to its parent node.
+{node: node}</p>
 <dl class="field-list simple">
 <dt class="field-odd">Type</dt>
-<dd class="field-odd"><p>array</p>
+<dd class="field-odd"><p>dict</p>
 </dd>
 </dl>
 </dd></dl>
@@ -424,10 +423,10 @@ cell of a node, maps to the parent node of that node.
 <dl class="py attribute">
 <dt class="sig sig-object py" id="grid_dendro.dendrogram.Dendrogram.leaves">
 <span class="sig-name descname"><span class="pre">leaves</span></span><a class="headerlink" href="#grid_dendro.dendrogram.Dendrogram.leaves" title="Permalink to this definition">#</a></dt>
-<dd><p>Subset of nodes that do not have children.</p>
+<dd><p>List of nodes that do not have children.</p>
 <dl class="field-list simple">
 <dt class="field-odd">Type</dt>
-<dd class="field-odd"><p>dict</p>
+<dd class="field-odd"><p>list</p>
 </dd>
 </dl>
 </dd></dl>
@@ -449,7 +448,7 @@ cell of a node, maps to the parent node of that node.
 <dd><p>Flat indices at the local potential minima.</p>
 <dl class="field-list simple">
 <dt class="field-odd">Type</dt>
-<dd class="field-odd"><p>array</p>
+<dd class="field-odd"><p>set</p>
 </dd>
 </dl>
 </dd></dl>
@@ -457,8 +456,26 @@ cell of a node, maps to the parent node of that node.
 <dl class="py method">
 <dt class="sig sig-object py" id="grid_dendro.dendrogram.Dendrogram.construct">
 <span class="sig-name descname"><span class="pre">construct</span></span><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="reference internal" href="_modules/grid_dendro/dendrogram.html#Dendrogram.construct"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#grid_dendro.dendrogram.Dendrogram.construct" title="Permalink to this definition">#</a></dt>
-<dd><p>Construct dendrogram tree</p>
-<p>Initialize nodes, parent, children, ancestor, descendants, and leaves</p>
+<dd><p>Construct dendrogram</p>
+<p>Constructs dendrogram dictionaries: nodes, parent, children,
+ancestor, and descendants. Then finds leaf nodes and trunk node.</p>
+<p class="rubric">Notes</p>
+<p>Use int64 in a loop which seems to be faster in 64 bit system, and
+then cast to int32 or int64 depending on the size of the array
+after construction is done, in order to save memory. Similarly, use
+list instead of numpy array for efficient append operation, then
+cast to numpy array after construction is done to save memory.
+These memory optimization is only done to “nodes” and
+“cells_ordered”, which consume most of the memory.</p>
+<p class="rubric">Examples</p>
+<div class="doctest highlight-default notranslate"><div class="highlight"><pre><span></span><span class="gp">&gt;&gt;&gt; </span><span class="kn">import</span> <span class="nn">pyathena</span> <span class="k">as</span> <span class="nn">pa</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="n">s</span> <span class="o">=</span> <span class="n">pa</span><span class="o">.</span><span class="n">LoadSim</span><span class="p">(</span><span class="s2">&quot;/scratch/smoon/M5J2P0N512&quot;</span><span class="p">)</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="n">ds</span> <span class="o">=</span> <span class="n">s</span><span class="o">.</span><span class="n">load_hdf5</span><span class="p">(</span><span class="mi">50</span><span class="p">,</span> <span class="n">load_method</span><span class="o">=</span><span class="s1">&#39;pyathena&#39;</span><span class="p">)</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="n">gd</span> <span class="o">=</span> <span class="n">dendrogram</span><span class="o">.</span><span class="n">Dendrogram</span><span class="p">(</span><span class="n">ds</span><span class="o">.</span><span class="n">phigas</span><span class="o">.</span><span class="n">to_numpy</span><span class="p">())</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="n">gd</span><span class="o">.</span><span class="n">construct</span><span class="p">()</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="n">gd</span><span class="o">.</span><span class="n">prune</span><span class="p">()</span>  <span class="c1"># Remove buds</span>
+</pre></div>
+</div>
 </dd></dl>
 
 <dl class="py method">
@@ -481,6 +498,17 @@ cell of a node, maps to the parent node of that node.
 <dt class="sig sig-object py" id="grid_dendro.dendrogram.Dendrogram.get_all_descendant_cells">
 <span class="sig-name descname"><span class="pre">get_all_descendant_cells</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">node</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="_modules/grid_dendro/dendrogram.html#Dendrogram.get_all_descendant_cells"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#grid_dendro.dendrogram.Dendrogram.get_all_descendant_cells" title="Permalink to this definition">#</a></dt>
 <dd><p>Return all member cells of the node, including descendant nodes</p>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters</dt>
+<dd class="field-odd"><p><strong>node</strong> (<em>int</em>) – Id of a selected node.</p>
+</dd>
+<dt class="field-even">Returns</dt>
+<dd class="field-even"><p><strong>cells</strong> – Flattned indices of all member cells of this node.</p>
+</dd>
+<dt class="field-odd">Return type</dt>
+<dd class="field-odd"><p>array</p>
+</dd>
+</dl>
 </dd></dl>
 
 <dl class="py method">

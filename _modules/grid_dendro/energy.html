@@ -150,7 +150,7 @@ const thebe_selector_output = ".output, .cell_output"
 <ul class="nav bd-sidenav">
 <li class="toctree-l1"><a class="reference internal" href="../../dendrogram.html">Dendrogram class</a></li>
 <li class="toctree-l1"><a class="reference internal" href="../../boundary.html">boundary</a></li>
-<li class="toctree-l1"><a class="reference internal" href="../../energy.html">Utility functions</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../energy.html">energy</a></li>
 </ul>
 <p aria-level="2" class="caption" role="heading"><span class="caption-text">Installation</span></p>
 <ul class="nav bd-sidenav">
@@ -382,9 +382,53 @@ document.write(`
     <span class="k">return</span> <span class="n">reff</span><span class="p">,</span> <span class="n">energies</span></div>
 
 
-<span class="k">def</span> <span class="nf">find_hbr</span><span class="p">(</span><span class="n">data</span><span class="p">,</span> <span class="n">node</span><span class="p">,</span> <span class="n">hbp</span><span class="p">,</span> <span class="n">hbr</span><span class="p">,</span> <span class="n">gd</span><span class="o">=</span><span class="kc">None</span><span class="p">):</span>
-    <span class="k">if</span> <span class="n">gd</span> <span class="ow">is</span> <span class="kc">None</span><span class="p">:</span>
-        <span class="n">gd</span> <span class="o">=</span> <span class="n">dendrogram</span><span class="o">.</span><span class="n">Dendrogram</span><span class="p">(</span><span class="n">data</span><span class="p">[</span><span class="s1">&#39;phi&#39;</span><span class="p">])</span>
+<div class="viewcode-block" id="find_bound_objects"><a class="viewcode-back" href="../../energy.html#grid_dendro.energy.find_bound_objects">[docs]</a><span class="k">def</span> <span class="nf">find_bound_objects</span><span class="p">(</span><span class="n">gd</span><span class="p">,</span> <span class="n">data</span><span class="p">,</span> <span class="n">hbp</span><span class="o">=</span><span class="p">{},</span> <span class="n">hbr</span><span class="o">=</span><span class="p">{},</span> <span class="n">node</span><span class="o">=</span><span class="kc">None</span><span class="p">):</span>
+<span class="w">    </span><span class="sd">&quot;&quot;&quot;Finds HBP and HBR</span>
+
+<span class="sd">    Parameters</span>
+<span class="sd">    ----------</span>
+<span class="sd">    gd : Dendrogram</span>
+<span class="sd">        GRID-dendro dendrogram object.</span>
+<span class="sd">    data : dict</span>
+<span class="sd">        Dictionary containing fluid variables. Must contain followings:</span>
+<span class="sd">        [&#39;rho&#39;, &#39;vel1&#39;, &#39;vel2&#39;, &#39;vel3&#39;, &#39;prs&#39;, &#39;phi&#39;, &#39;dvol&#39;]</span>
+<span class="sd">    hbp : dict, optional</span>
+<span class="sd">        Dictionary containing HBPs.</span>
+<span class="sd">        Only used internally for recursive purpose.</span>
+<span class="sd">    hbr : dict, optional</span>
+<span class="sd">        Dictionary containing HBRs.</span>
+<span class="sd">        Only used internally for recursive purpose.</span>
+<span class="sd">    node : int, optional</span>
+<span class="sd">        ID of the selected node.</span>
+<span class="sd">        Only used internally for recursive purpose.</span>
+
+<span class="sd">    Returns</span>
+<span class="sd">    -------</span>
+<span class="sd">    hbp : dict</span>
+<span class="sd">        Dictionary containing HBPs.</span>
+<span class="sd">    hbr : dict</span>
+<span class="sd">        Dictionary containing HBRs.</span>
+
+<span class="sd">    Examples</span>
+<span class="sd">    --------</span>
+<span class="sd">    &gt;&gt;&gt; import pyathena as pa</span>
+<span class="sd">    &gt;&gt;&gt; s = pa.LoadSim(&quot;/scratch/smoon/M5J2P0N512&quot;)</span>
+<span class="sd">    &gt;&gt;&gt; ds = s.load_hdf5(50, load_method=&#39;pyathena&#39;)</span>
+<span class="sd">    &gt;&gt;&gt; cs = 1.0 # isothermal sound speed</span>
+<span class="sd">    &gt;&gt;&gt; gd = dendrogram.Dendrogram(ds.phigas.data)</span>
+<span class="sd">    &gt;&gt;&gt; gd.construct()</span>
+<span class="sd">    &gt;&gt;&gt; gd.prune()  # Remove buds</span>
+<span class="sd">    &gt;&gt;&gt; data = dict(rho=ds.dens.data,</span>
+<span class="sd">                    vel1=(ds.mom1/ds.dens).data,</span>
+<span class="sd">                    vel2=(ds.mom2/ds.dens).data,</span>
+<span class="sd">                    vel3=(ds.mom3/ds.dens).data,</span>
+<span class="sd">                    prs=(cs**2*ds.dens).data,</span>
+<span class="sd">                    phi=ds.phigas.data,</span>
+<span class="sd">                    dvol=s.domain[&#39;dx&#39;].prod())</span>
+<span class="sd">    &gt;&gt;&gt; hbp, hbr = find_bound_object(gd, data)</span>
+<span class="sd">    &quot;&quot;&quot;</span>
+    <span class="k">if</span> <span class="n">node</span> <span class="ow">is</span> <span class="kc">None</span><span class="p">:</span>
+        <span class="n">node</span> <span class="o">=</span> <span class="n">gd</span><span class="o">.</span><span class="n">trunk</span>
 
     <span class="n">phi1d</span> <span class="o">=</span> <span class="n">data</span><span class="p">[</span><span class="s1">&#39;phi&#39;</span><span class="p">]</span><span class="o">.</span><span class="n">flatten</span><span class="p">()</span>  <span class="c1"># this is expensive</span>
     <span class="n">phi_node</span> <span class="o">=</span> <span class="n">phi1d</span><span class="p">[</span><span class="n">node</span><span class="p">]</span>
@@ -397,10 +441,11 @@ document.write(`
             <span class="n">hbr</span><span class="p">[</span><span class="n">node</span><span class="p">]</span> <span class="o">=</span> <span class="n">cells_bound</span>
         <span class="k">else</span><span class="p">:</span>
             <span class="k">for</span> <span class="n">nd</span> <span class="ow">in</span> <span class="n">gd</span><span class="o">.</span><span class="n">children</span><span class="p">[</span><span class="n">node</span><span class="p">]:</span>
-                <span class="n">find_hbr</span><span class="p">(</span><span class="n">data</span><span class="p">,</span> <span class="n">nd</span><span class="p">,</span> <span class="n">hbp</span><span class="p">,</span> <span class="n">hbr</span><span class="p">,</span> <span class="n">gd</span><span class="p">)</span>
+                <span class="n">hbp</span><span class="p">,</span> <span class="n">hbr</span> <span class="o">=</span> <span class="n">find_hbr</span><span class="p">(</span><span class="n">gd</span><span class="p">,</span> <span class="n">data</span><span class="p">,</span> <span class="n">hbp</span><span class="p">,</span> <span class="n">hbr</span><span class="p">,</span> <span class="n">nd</span><span class="p">)</span>
     <span class="k">else</span><span class="p">:</span>
         <span class="k">for</span> <span class="n">nd</span> <span class="ow">in</span> <span class="n">gd</span><span class="o">.</span><span class="n">children</span><span class="p">[</span><span class="n">node</span><span class="p">]:</span>
-            <span class="n">find_hbr</span><span class="p">(</span><span class="n">data</span><span class="p">,</span> <span class="n">nd</span><span class="p">,</span> <span class="n">hbp</span><span class="p">,</span> <span class="n">hbr</span><span class="p">,</span> <span class="n">gd</span><span class="p">)</span>
+            <span class="n">hbp</span><span class="p">,</span> <span class="n">hbr</span> <span class="o">=</span> <span class="n">find_hbr</span><span class="p">(</span><span class="n">gd</span><span class="p">,</span> <span class="n">data</span><span class="p">,</span> <span class="n">hbp</span><span class="p">,</span> <span class="n">hbr</span><span class="p">,</span> <span class="n">nd</span><span class="p">)</span>
+    <span class="k">return</span> <span class="n">hbp</span><span class="p">,</span> <span class="n">hbr</span></div>
 
 
 <span class="k">def</span> <span class="nf">find_bound_cells</span><span class="p">(</span><span class="n">data</span><span class="p">,</span> <span class="n">node</span><span class="p">,</span> <span class="n">gd</span><span class="o">=</span><span class="kc">None</span><span class="p">):</span>
