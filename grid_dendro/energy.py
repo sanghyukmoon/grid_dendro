@@ -85,7 +85,7 @@ def find_bound_objects(gd, data, hbp={}, hbr={}, node=None):
         GRID-dendro dendrogram object.
     data : dict
         Dictionary containing fluid variables. Must contain followings:
-        ['rho', 'vel1', 'vel2', 'vel3', 'prs', 'phi', 'dvol']
+        ['rho', 'vel1', 'vel2', 'vel3', 'prs', 'phi']
     hbp : dict, optional
         Dictionary containing HBPs.
         Only used internally for recursive purpose.
@@ -117,8 +117,7 @@ def find_bound_objects(gd, data, hbp={}, hbr={}, node=None):
                     vel2=(ds.mom2/ds.dens).data,
                     vel3=(ds.mom3/ds.dens).data,
                     prs=(cs**2*ds.dens).data,
-                    phi=ds.phigas.data,
-                    dvol=s.domain['dx'].prod())
+                    phi=ds.phigas.data)
     >>> hbp, hbr = find_bound_object(gd, data)
     """
     if node is None:
@@ -135,16 +134,19 @@ def find_bound_objects(gd, data, hbp={}, hbr={}, node=None):
             hbr[node] = cells_bound
         else:
             for nd in gd.children[node]:
-                hbp, hbr = find_hbr(gd, data, hbp, hbr, nd)
+                hbp, hbr = find_bound_objects(gd, data, hbp, hbr, nd)
     else:
         for nd in gd.children[node]:
-            hbp, hbr = find_hbr(gd, data, hbp, hbr, nd)
+            hbp, hbr = find_bound_objects(gd, data, hbp, hbr, nd)
     return hbp, hbr
 
 
 def find_bound_cells(data, node, gd=None):
     if gd is None:
         gd = dendrogram.Dendrogram(data['phi'])
+
+    if 'dvol' not in data:
+        data['dvol'] = 1
 
     reff, engs = calculate_cumulative_energies(gd, data, node)
     idx_bound = np.where(engs['etot'] < 0)[0]
