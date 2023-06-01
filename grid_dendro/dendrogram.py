@@ -443,6 +443,10 @@ def filter_by_node(dat, nodes=None, nodes_select=None, cells_select=None,
                    fill_value=np.nan, drop=False):
     """Mask DataArray using FISO dictionary or the flattened indexes.
 
+    .. deprecated:: 1.0.0
+            This function will be removed in grid_dendro 1.0.0, it is
+            replaced by Dendrogram.filter_data method.
+
     Parameters
     ----------
     dat : xarray.DataArray or numpy.ndarray
