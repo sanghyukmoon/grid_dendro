@@ -1,2 +1,5 @@
 jupyter-book
 docutils==0.17.1
+numpy
+scipy
+xarray
