@@ -268,7 +268,7 @@ class Dendrogram:
         else:
             cells = []
             for node in nodes:
-                cells += self.get_all_descendant_cells(node)
+                cells += list(self.get_all_descendant_cells(node))
 
         dat1d = dat.flatten()
         if drop:

@@ -76,9 +76,53 @@ def calculate_cumulative_energies(gd, data, node):
     return reff, energies
 
 
-def find_hbr(data, node, hbp, hbr, gd=None):
-    if gd is None:
-        gd = dendrogram.Dendrogram(data['phi'])
+def find_bound_objects(gd, data, hbp={}, hbr={}, node=None):
+    """Finds HBP and HBR
+
+    Parameters
+    ----------
+    gd : Dendrogram
+        GRID-dendro dendrogram object.
+    data : dict
+        Dictionary containing fluid variables. Must contain followings:
+        ['rho', 'vel1', 'vel2', 'vel3', 'prs', 'phi', 'dvol']
+    hbp : dict, optional
+        Dictionary containing HBPs.
+        Only used internally for recursive purpose.
+    hbr : dict, optional
+        Dictionary containing HBRs.
+        Only used internally for recursive purpose.
+    node : int, optional
+        ID of the selected node.
+        Only used internally for recursive purpose.
+
+    Returns
+    -------
+    hbp : dict
+        Dictionary containing HBPs.
+    hbr : dict
+        Dictionary containing HBRs.
+
+    Examples
+    --------
+    >>> import pyathena as pa
+    >>> s = pa.LoadSim("/scratch/smoon/M5J2P0N512")
+    >>> ds = s.load_hdf5(50, load_method='pyathena')
+    >>> cs = 1.0 # isothermal sound speed
+    >>> gd = dendrogram.Dendrogram(ds.phigas.data)
+    >>> gd.construct()
+    >>> gd.prune()  # Remove buds
+    >>> data = dict(rho=ds.dens.data,
+                    vel1=(ds.mom1/ds.dens).data,
+                    vel2=(ds.mom2/ds.dens).data,
+                    vel3=(ds.mom3/ds.dens).data,
+                    prs=(cs**2*ds.dens).data,
+                    phi=ds.phigas.data,
+                    dvol=s.domain['dx'].prod())
+    >>> hbp, hbr = find_bound_object(gd, data)
+    """
+    if node is None:
+        node = gd.trunk
 
     phi1d = data['phi'].flatten()  # this is expensive
     phi_node = phi1d[node]
@@ -91,10 +135,11 @@ def find_hbr(data, node, hbp, hbr, gd=None):
             hbr[node] = cells_bound
         else:
             for nd in gd.children[node]:
-                find_hbr(data, nd, hbp, hbr, gd)
+                hbp, hbr = find_hbr(gd, data, hbp, hbr, nd)
     else:
         for nd in gd.children[node]:
-            find_hbr(data, nd, hbp, hbr, gd)
+            hbp, hbr = find_hbr(gd, data, hbp, hbr, nd)
+    return hbp, hbr
 
 
 def find_bound_cells(data, node, gd=None):
