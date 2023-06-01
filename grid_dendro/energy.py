@@ -7,7 +7,7 @@ def calculate_cumulative_energies(gd, data, node):
 
     Parameters
     ----------
-    gd : grid_dendro.Dendrogram
+    gd : Dendrogram
         : Dendrogram object
     data : dict
         Dictionary containing hydro variables
