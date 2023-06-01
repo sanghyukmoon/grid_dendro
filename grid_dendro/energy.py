@@ -76,7 +76,7 @@ def calculate_cumulative_energies(gd, data, node):
     return reff, energies
 
 
-def find_bound_objects(gd, data, hbp={}, hbr={}, node=None):
+def find_bound_objects(gd, data, hbp=None, hbr=None, node=None, phi1d=None):
     """Finds HBP and HBR
 
     Parameters
@@ -94,6 +94,9 @@ def find_bound_objects(gd, data, hbp={}, hbr={}, node=None):
         Only used internally for recursive purpose.
     node : int, optional
         ID of the selected node.
+        Only used internally for recursive purpose.
+    phi1d : array, optional
+        Flattend gravitational potential.
         Only used internally for recursive purpose.
 
     Returns
@@ -122,44 +125,46 @@ def find_bound_objects(gd, data, hbp={}, hbr={}, node=None):
     """
     if node is None:
         node = gd.trunk
+    if hbp is None:
+        hbp = {}
+    if hbr is None:
+        hbr = {}
+    if phi1d is None:
+        phi1d = data['phi'].flatten()
 
-    phi1d = data['phi'].flatten()  # this is expensive
     phi_node = phi1d[node]
     cells = gd.get_all_descendant_cells(node)
-    cells_bound = find_bound_cells(data, node, gd)
-    if len(cells_bound) > 0:
+    cells_bound = find_bound_cells(gd, data, node)
+    if cells_bound is not None:
         phi_hbr = phi1d[cells_bound[-1]]
         if phi_hbr > phi_node:
             hbp[node] = cells
             hbr[node] = cells_bound
         else:
             for nd in gd.children[node]:
-                hbp, hbr = find_bound_objects(gd, data, hbp, hbr, nd)
+                hbp, hbr = find_bound_objects(gd, data, hbp, hbr, nd, phi1d)
     else:
         for nd in gd.children[node]:
-            hbp, hbr = find_bound_objects(gd, data, hbp, hbr, nd)
+            hbp, hbr = find_bound_objects(gd, data, hbp, hbr, nd, phi1d)
     return hbp, hbr
 
 
-def find_bound_cells(data, node, gd=None):
-    if gd is None:
-        gd = dendrogram.Dendrogram(data['phi'])
-
+def find_bound_cells(gd, data, node):
     if 'dvol' not in data:
         data['dvol'] = 1
 
     reff, engs = calculate_cumulative_energies(gd, data, node)
-    idx_bound = np.where(engs['etot'] < 0)[0]
+    idx_bound = (engs['etot'] < 0).nonzero()[0]
     if len(idx_bound) < 1:
-        return []
+        return None
     else:
         idx_bound = idx_bound[-1]
 
     phi = gd.filter_data(data['phi'], node, drop=True)
     idx_ordered = phi.argsort()
     cells = gd.get_all_descendant_cells(node)
-    cells_bound = np.array(cells)[idx_ordered][:idx_bound + 1]
-    return list(cells_bound)
+    cells_bound = cells[idx_ordered][:idx_bound + 1]
+    return cells_bound
 
 
 # def calculate_cum_energies_old(ds, nodes, node, mode='HBR',
