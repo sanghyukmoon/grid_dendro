@@ -53,7 +53,8 @@ class Dendrogram:
         else:
             msg = f"Boundary flag {self.boundary_flag} is not supported"
             raise ValueError(msg)
-        arr_min_filtered = minimum_filter(arr, size=3, mode=filter_mode).flatten()
+        arr_min_filtered = minimum_filter(arr, size=3, mode=filter_mode
+                                          ).flatten()
         arr = arr.flatten()
         self.minima = set((arr == arr_min_filtered).nonzero()[0])
 
@@ -106,7 +107,6 @@ class Dendrogram:
         # its parent node.
         parent_array = np.full(self.num_cells, -1, dtype=int)
         parent_array[list(self.minima)] = list(self.minima)
-
 
         # Load neighbor dictionary.
         my_neighbors = boundary.precompute_neighbor(self._arr_shape,
@@ -285,8 +285,6 @@ class Dendrogram:
     def _cut_bud(self, bud):
         """Remove bud node and return its member cells
 
-        TODO: this can be generalized.
-
         Parameters
         ----------
         bud : int
@@ -358,7 +356,17 @@ class Dendrogram:
         """Remove a knag that can results from subsume operation.
 
         Knag is a node that have only one child. Knag forms when buds are
-        subsumed into a branch (or a longest bud when there are only buds).
+        subsumed into a branch (or into a longest bud when there are only
+        buds).
+
+        Parameters
+        ----------
+        knag : int
+            Id of a selected node.
+
+        See Also
+        --------
+        _cut_bud
         """
         if len(self.children[knag]) != 1:
             raise ValueError("This is not a knag.")

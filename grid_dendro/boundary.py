@@ -38,17 +38,20 @@ def precompute_neighbor(shape, boundary_flag, corner=True):
     ----------
     shape : tuple
         shape of the input data
-    boundary_flag: str
-        Flag for boundary condition. Affects how to set neighbors of the edge cells.
+    boundary_flag : str
+        Flag for boundary condition. Affects how to set neighbors of the
+        edge cells.
     corner : Boolean, optional
-        If true, the corner cells are counted as neighbors (26 neighbors in total)
+        If true, the corner cells are counted as neighbors
+        (26 neighbors in total)
 
     Returns
     -------
     pcn : pcnDict
         This is a pseudo-array of the shape (Ncells, N_neighbors), such that
         pcn[1][0] is the flattened index of the (-1,-1,-1) neighbor of the
-        (k,j,i) = (0,0,1) cell, which is (k,j,i) = (-1, -1, 0) = (Nz-1, Ny-1, 0)
+        (k,j,i) = (0,0,1) cell, which is
+        (k,j,i) = (-1, -1, 0) = (Nz-1, Ny-1, 0)
         for periodic BC. See docstring of get_offsets for the ordering of
         neighbor directions.
         The actual data is stored in memory only along the boundary points
@@ -83,9 +86,10 @@ def _get_offsets(dim, corner=True):
     Parameters
     ----------
     dim : int
-        dimension of the input data
+        dimension of the input data.
     corner : Boolean, optional
-        If true, the corner cells are counted as neighbors (26 neighbors in total)
+        If true, the corner cells are counted as neighbors
+        (26 neighbors in total).
 
     Returns
     -------
