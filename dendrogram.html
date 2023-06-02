@@ -483,7 +483,9 @@ These memory optimization is only done to “nodes” and
 <dl class="py method">
 <dt class="sig sig-object py" id="grid_dendro.dendrogram.Dendrogram.filter_data">
 <span class="sig-name descname"><span class="pre">filter_data</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">dat</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">nodes</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">fill_value</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">nan</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">drop</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">False</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="_modules/grid_dendro/dendrogram.html#Dendrogram.filter_data"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#grid_dendro.dendrogram.Dendrogram.filter_data" title="Permalink to this definition">#</a></dt>
-<dd><p>Filter data by node</p>
+<dd><p>Filter data by node, including all descendant nodes.</p>
+<p>Get all member cells of the nodes and their descendants and return
+the masked data.</p>
 <dl class="field-list simple">
 <dt class="field-odd">Parameters</dt>
 <dd class="field-odd"><ul class="simple">
@@ -493,7 +495,17 @@ These memory optimization is only done to “nodes” and
 <li><p><strong>drop</strong> (<em>bool</em>) – If true, return faltten data that only include filtered cells.</p></li>
 </ul>
 </dd>
+<dt class="field-even">Returns</dt>
+<dd class="field-even"><p><strong>out</strong> – Filtered array matching the input array type</p>
+</dd>
+<dt class="field-odd">Return type</dt>
+<dd class="field-odd"><p>xarray.DataArray or numpy.ndarray</p>
+</dd>
 </dl>
+<div class="admonition seealso">
+<p class="admonition-title">See also</p>
+<p><code class="xref py py-obj docutils literal notranslate"><span class="pre">dendrogram.filter_by_dict</span></code></p>
+</div>
 </dd></dl>
 
 <dl class="py method">
@@ -527,20 +539,17 @@ These memory optimization is only done to “nodes” and
 </dd></dl>
 
 <dl class="py function">
-<dt class="sig sig-object py" id="grid_dendro.dendrogram.filter_by_node">
-<span class="sig-prename descclassname"><span class="pre">grid_dendro.dendrogram.</span></span><span class="sig-name descname"><span class="pre">filter_by_node</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">dat</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">nodes</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">nodes_select</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">cells_select</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">fill_value</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">nan</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">drop</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">False</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="_modules/grid_dendro/dendrogram.html#filter_by_node"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#grid_dendro.dendrogram.filter_by_node" title="Permalink to this definition">#</a></dt>
-<dd><p>Mask DataArray using FISO dictionary or the flattened indexes.</p>
-<div class="deprecated">
-<p><span class="versionmodified deprecated">Deprecated since version 1.0.0: </span>This function will be removed in grid_dendro 1.0.0, it is
-replaced by Dendrogram.filter_data method.</p>
-</div>
+<dt class="sig sig-object py" id="grid_dendro.dendrogram.filter_by_dict">
+<span class="sig-prename descclassname"><span class="pre">grid_dendro.dendrogram.</span></span><span class="sig-name descname"><span class="pre">filter_by_dict</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">dat</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">node_dict</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">cells</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">fill_value</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">nan</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">drop</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">False</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="_modules/grid_dendro/dendrogram.html#filter_by_dict"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#grid_dendro.dendrogram.filter_by_dict" title="Permalink to this definition">#</a></dt>
+<dd><p>Filter data by node dictionary or array of cell indices.</p>
+<p>This is a stand-alone filtering function that offers more flexibility
+to Dendrogram.filter_data method.</p>
 <dl class="field-list simple">
 <dt class="field-odd">Parameters</dt>
 <dd class="field-odd"><ul class="simple">
 <li><p><strong>dat</strong> (<em>xarray.DataArray</em><em> or </em><em>numpy.ndarray</em>) – Input array to be filtered.</p></li>
-<li><p><strong>nodes</strong> (<em>dict</em><em>, </em><em>optional</em>) – Dendrogram nodes dictionary.</p></li>
-<li><p><strong>nodes_select</strong> (<em>int</em><em> or </em><em>sequence of ints</em><em>, </em><em>optional</em>) – Id of selected node(s).</p></li>
-<li><p><strong>cells_select</strong> (<em>array</em><em>, </em><em>optional</em>) – Flat indices of selected cells. Overrides nodes and nodes_select.</p></li>
+<li><p><strong>node_dict</strong> (<em>dict</em><em>, </em><em>optional</em>) – Dictionary that maps node id to flat indices of member cells.</p></li>
+<li><p><strong>cells</strong> (<em>array</em><em>, </em><em>optional</em>) – Flat indices of selected cells. Overrides node_dict.</p></li>
 <li><p><strong>fill_value</strong> (<em>float</em><em>, </em><em>optional</em>) – Value to fill outside of the filtered region. Default is np.nan.</p></li>
 <li><p><strong>drop</strong> (<em>bool</em><em>, </em><em>optional</em>) – If true, return flatten dat that only include selected cells.</p></li>
 </ul>
@@ -552,6 +561,10 @@ replaced by Dendrogram.filter_data method.</p>
 <dd class="field-odd"><p>xarray.DataArray or numpy.ndarray</p>
 </dd>
 </dl>
+<div class="admonition seealso">
+<p class="admonition-title">See also</p>
+<p><a class="reference internal" href="#grid_dendro.dendrogram.Dendrogram.filter_data" title="grid_dendro.dendrogram.Dendrogram.filter_data"><code class="xref py py-obj docutils literal notranslate"><span class="pre">Dendrogram.filter_data</span></code></a></p>
+</div>
 </dd></dl>
 
 </section>

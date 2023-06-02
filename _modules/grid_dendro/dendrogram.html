@@ -546,7 +546,10 @@ document.write(`
         <span class="k">return</span> <span class="n">cells</span></div>
 
 <div class="viewcode-block" id="Dendrogram.filter_data"><a class="viewcode-back" href="../../dendrogram.html#grid_dendro.dendrogram.Dendrogram.filter_data">[docs]</a>    <span class="k">def</span> <span class="nf">filter_data</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">dat</span><span class="p">,</span> <span class="n">nodes</span><span class="p">,</span> <span class="n">fill_value</span><span class="o">=</span><span class="n">np</span><span class="o">.</span><span class="n">nan</span><span class="p">,</span> <span class="n">drop</span><span class="o">=</span><span class="kc">False</span><span class="p">):</span>
-<span class="w">        </span><span class="sd">&quot;&quot;&quot;Filter data by node</span>
+<span class="w">        </span><span class="sd">&quot;&quot;&quot;Filter data by node, including all descendant nodes.</span>
+
+<span class="sd">        Get all member cells of the nodes and their descendants and return</span>
+<span class="sd">        the masked data.</span>
 
 <span class="sd">        Parameters</span>
 <span class="sd">        ----------</span>
@@ -558,6 +561,15 @@ document.write(`
 <span class="sd">            The value to fill outside of the filtered region. Default to nan.</span>
 <span class="sd">        drop : bool</span>
 <span class="sd">            If true, return faltten data that only include filtered cells.</span>
+
+<span class="sd">        Returns</span>
+<span class="sd">        -------</span>
+<span class="sd">        out : xarray.DataArray or numpy.ndarray</span>
+<span class="sd">            Filtered array matching the input array type</span>
+
+<span class="sd">        See Also</span>
+<span class="sd">        --------</span>
+<span class="sd">        dendrogram.filter_by_dict</span>
 <span class="sd">        &quot;&quot;&quot;</span>
         <span class="k">if</span> <span class="nb">isinstance</span><span class="p">(</span><span class="n">dat</span><span class="p">,</span> <span class="n">xr</span><span class="o">.</span><span class="n">DataArray</span><span class="p">):</span>
             <span class="n">dtype</span> <span class="o">=</span> <span class="s1">&#39;xarray&#39;</span>
@@ -746,24 +758,21 @@ document.write(`
             <span class="bp">self</span><span class="o">.</span><span class="n">trunk</span> <span class="o">=</span> <span class="n">trunk</span><span class="p">[</span><span class="mi">0</span><span class="p">]</span></div>
 
 
-<div class="viewcode-block" id="filter_by_node"><a class="viewcode-back" href="../../dendrogram.html#grid_dendro.dendrogram.filter_by_node">[docs]</a><span class="k">def</span> <span class="nf">filter_by_node</span><span class="p">(</span><span class="n">dat</span><span class="p">,</span> <span class="n">nodes</span><span class="o">=</span><span class="kc">None</span><span class="p">,</span> <span class="n">nodes_select</span><span class="o">=</span><span class="kc">None</span><span class="p">,</span> <span class="n">cells_select</span><span class="o">=</span><span class="kc">None</span><span class="p">,</span>
+<div class="viewcode-block" id="filter_by_dict"><a class="viewcode-back" href="../../dendrogram.html#grid_dendro.dendrogram.filter_by_dict">[docs]</a><span class="k">def</span> <span class="nf">filter_by_dict</span><span class="p">(</span><span class="n">dat</span><span class="p">,</span> <span class="n">node_dict</span><span class="o">=</span><span class="kc">None</span><span class="p">,</span> <span class="n">cells</span><span class="o">=</span><span class="kc">None</span><span class="p">,</span>
                    <span class="n">fill_value</span><span class="o">=</span><span class="n">np</span><span class="o">.</span><span class="n">nan</span><span class="p">,</span> <span class="n">drop</span><span class="o">=</span><span class="kc">False</span><span class="p">):</span>
-<span class="w">    </span><span class="sd">&quot;&quot;&quot;Mask DataArray using FISO dictionary or the flattened indexes.</span>
+<span class="w">    </span><span class="sd">&quot;&quot;&quot;Filter data by node dictionary or array of cell indices.</span>
 
-<span class="sd">    .. deprecated:: 1.0.0</span>
-<span class="sd">            This function will be removed in grid_dendro 1.0.0, it is</span>
-<span class="sd">            replaced by Dendrogram.filter_data method.</span>
+<span class="sd">    This is a stand-alone filtering function that offers more flexibility</span>
+<span class="sd">    to Dendrogram.filter_data method.</span>
 
 <span class="sd">    Parameters</span>
 <span class="sd">    ----------</span>
 <span class="sd">    dat : xarray.DataArray or numpy.ndarray</span>
 <span class="sd">        Input array to be filtered.</span>
-<span class="sd">    nodes : dict, optional</span>
-<span class="sd">        Dendrogram nodes dictionary.</span>
-<span class="sd">    nodes_select : int or sequence of ints, optional</span>
-<span class="sd">        Id of selected node(s).</span>
-<span class="sd">    cells_select : array, optional</span>
-<span class="sd">        Flat indices of selected cells. Overrides nodes and nodes_select.</span>
+<span class="sd">    node_dict : dict, optional</span>
+<span class="sd">        Dictionary that maps node id to flat indices of member cells.</span>
+<span class="sd">    cells : array, optional</span>
+<span class="sd">        Flat indices of selected cells. Overrides node_dict.</span>
 <span class="sd">    fill_value : float, optional</span>
 <span class="sd">        Value to fill outside of the filtered region. Default is np.nan.</span>
 <span class="sd">    drop : bool, optional</span>
@@ -773,6 +782,10 @@ document.write(`
 <span class="sd">    -------</span>
 <span class="sd">    out : xarray.DataArray or numpy.ndarray</span>
 <span class="sd">        Filtered array matching the input array type</span>
+
+<span class="sd">    See Also</span>
+<span class="sd">    --------</span>
+<span class="sd">    Dendrogram.filter_data</span>
 <span class="sd">    &quot;&quot;&quot;</span>
     <span class="k">if</span> <span class="nb">isinstance</span><span class="p">(</span><span class="n">dat</span><span class="p">,</span> <span class="n">xr</span><span class="o">.</span><span class="n">DataArray</span><span class="p">):</span>
         <span class="n">dtype</span> <span class="o">=</span> <span class="s1">&#39;xarray&#39;</span>
@@ -785,28 +798,19 @@ document.write(`
         <span class="k">raise</span> <span class="ne">TypeError</span><span class="p">(</span><span class="s2">&quot;type </span><span class="si">{}</span><span class="s2"> is not supported&quot;</span><span class="o">.</span><span class="n">format</span><span class="p">(</span><span class="nb">type</span><span class="p">(</span><span class="n">dat</span><span class="p">)))</span>
 
     <span class="c1"># retreive flat indices of selected cells</span>
-    <span class="k">if</span> <span class="n">nodes</span> <span class="ow">is</span> <span class="kc">None</span> <span class="ow">and</span> <span class="n">nodes_select</span> <span class="ow">is</span> <span class="kc">None</span> <span class="ow">and</span> <span class="n">cells_select</span> <span class="ow">is</span> <span class="kc">None</span><span class="p">:</span>
-        <span class="c1"># nothing to do</span>
-        <span class="k">return</span> <span class="n">dat</span>
-    <span class="k">elif</span> <span class="n">nodes</span> <span class="ow">is</span> <span class="ow">not</span> <span class="kc">None</span> <span class="ow">and</span> <span class="n">cells_select</span> <span class="ow">is</span> <span class="kc">None</span><span class="p">:</span>
-        <span class="n">cells_select</span> <span class="o">=</span> <span class="p">[]</span>
-        <span class="k">if</span> <span class="n">nodes_select</span> <span class="ow">is</span> <span class="kc">None</span><span class="p">:</span>
-            <span class="c1"># select all cells</span>
-            <span class="k">for</span> <span class="n">v</span> <span class="ow">in</span> <span class="n">nodes</span><span class="o">.</span><span class="n">values</span><span class="p">():</span>
-                <span class="n">cells_select</span> <span class="o">+=</span> <span class="nb">list</span><span class="p">(</span><span class="n">v</span><span class="p">)</span>
-        <span class="k">elif</span> <span class="nb">isinstance</span><span class="p">(</span><span class="n">nodes_select</span><span class="p">,</span> <span class="p">(</span><span class="nb">int</span><span class="p">,</span> <span class="n">np</span><span class="o">.</span><span class="n">int64</span><span class="p">,</span> <span class="n">np</span><span class="o">.</span><span class="n">int32</span><span class="p">)):</span>
-            <span class="n">cells_select</span> <span class="o">+=</span> <span class="n">nodes</span><span class="p">[</span><span class="n">nodes_select</span><span class="p">]</span>
-        <span class="k">else</span><span class="p">:</span>
-            <span class="k">for</span> <span class="n">node</span> <span class="ow">in</span> <span class="n">nodes_select</span><span class="p">:</span>
-                <span class="n">cells_select</span> <span class="o">+=</span> <span class="n">nodes</span><span class="p">[</span><span class="n">node</span><span class="p">]</span>
+    <span class="k">if</span> <span class="n">cells</span> <span class="ow">is</span> <span class="kc">None</span><span class="p">:</span>
+        <span class="n">cells</span> <span class="o">=</span> <span class="p">[]</span>
+        <span class="c1"># select all cells</span>
+        <span class="k">for</span> <span class="n">v</span> <span class="ow">in</span> <span class="n">node_dict</span><span class="o">.</span><span class="n">values</span><span class="p">():</span>
+            <span class="n">cells</span> <span class="o">+=</span> <span class="nb">list</span><span class="p">(</span><span class="n">v</span><span class="p">)</span>
 
     <span class="n">dat1d</span> <span class="o">=</span> <span class="n">dat</span><span class="o">.</span><span class="n">flatten</span><span class="p">()</span>
     <span class="k">if</span> <span class="n">drop</span><span class="p">:</span>
-        <span class="n">out</span> <span class="o">=</span> <span class="n">dat1d</span><span class="p">[</span><span class="n">cells_select</span><span class="p">]</span>
+        <span class="n">out</span> <span class="o">=</span> <span class="n">dat1d</span><span class="p">[</span><span class="n">cells</span><span class="p">]</span>
         <span class="k">return</span> <span class="n">out</span>
     <span class="k">else</span><span class="p">:</span>
         <span class="n">out</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">full</span><span class="p">(</span><span class="nb">len</span><span class="p">(</span><span class="n">dat1d</span><span class="p">),</span> <span class="n">fill_value</span><span class="p">)</span>
-        <span class="n">out</span><span class="p">[</span><span class="n">cells_select</span><span class="p">]</span> <span class="o">=</span> <span class="n">dat1d</span><span class="p">[</span><span class="n">cells_select</span><span class="p">]</span>
+        <span class="n">out</span><span class="p">[</span><span class="n">cells</span><span class="p">]</span> <span class="o">=</span> <span class="n">dat1d</span><span class="p">[</span><span class="n">cells</span><span class="p">]</span>
         <span class="n">out</span> <span class="o">=</span> <span class="n">out</span><span class="o">.</span><span class="n">reshape</span><span class="p">(</span><span class="n">dat</span><span class="o">.</span><span class="n">shape</span><span class="p">)</span>
         <span class="k">if</span> <span class="n">dtype</span> <span class="o">==</span> <span class="s1">&#39;xarray&#39;</span><span class="p">:</span>
             <span class="n">out</span> <span class="o">=</span> <span class="n">xr</span><span class="o">.</span><span class="n">DataArray</span><span class="p">(</span><span class="n">data</span><span class="o">=</span><span class="n">out</span><span class="p">,</span> <span class="n">coords</span><span class="o">=</span><span class="n">coords</span><span class="p">,</span> <span class="n">dims</span><span class="o">=</span><span class="n">dims</span><span class="p">)</span>

@@ -428,7 +428,7 @@ document.write(`
 
 <span class="k">def</span> <span class="nf">_boundary_i_bcn</span><span class="p">(</span><span class="n">shape</span><span class="p">,</span> <span class="n">dtype</span><span class="p">,</span> <span class="n">offsets</span><span class="p">,</span> <span class="n">corner</span><span class="p">,</span> <span class="n">boundary_flag</span><span class="p">):</span>
     <span class="c1"># returns boundary indices and boundary&#39;s neighbor indices.</span>
-    <span class="n">boundary_indices</span> <span class="o">=</span> <span class="n">_gbi</span><span class="p">(</span><span class="n">shape</span><span class="p">,</span> <span class="n">dtype</span><span class="p">)</span>
+    <span class="n">boundary_indices</span> <span class="o">=</span> <span class="n">_get_boundary_indices</span><span class="p">(</span><span class="n">shape</span><span class="p">,</span> <span class="n">dtype</span><span class="p">)</span>
     <span class="n">boundary_coords</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">array</span><span class="p">(</span><span class="n">np</span><span class="o">.</span><span class="n">unravel_index</span><span class="p">(</span><span class="n">boundary_indices</span><span class="p">,</span> <span class="n">shape</span><span class="p">),</span>
                                <span class="n">dtype</span><span class="o">=</span><span class="n">dtype</span><span class="p">)</span>
     <span class="n">bpcn</span> <span class="o">=</span> <span class="n">_boundary_pcn</span><span class="p">(</span><span class="n">boundary_coords</span><span class="p">,</span> <span class="n">offsets</span><span class="p">,</span> <span class="n">shape</span><span class="p">,</span> <span class="n">corner</span><span class="p">,</span>
@@ -448,7 +448,7 @@ document.write(`
     <span class="k">return</span> <span class="n">output</span>
 
 
-<span class="k">def</span> <span class="nf">_gbi</span><span class="p">(</span><span class="n">shape</span><span class="p">,</span> <span class="n">dtype</span><span class="p">):</span>
+<span class="k">def</span> <span class="nf">_get_boundary_indices</span><span class="p">(</span><span class="n">shape</span><span class="p">,</span> <span class="n">dtype</span><span class="p">):</span>
 <span class="w">    </span><span class="sd">&quot;&quot;&quot;get boundary indices from shape&quot;&quot;&quot;</span>
     <span class="n">shape</span> <span class="o">=</span> <span class="nb">list</span><span class="p">(</span><span class="n">shape</span><span class="p">)</span>
     <span class="n">bi</span> <span class="o">=</span> <span class="p">[]</span>
