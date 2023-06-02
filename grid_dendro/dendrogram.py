@@ -34,7 +34,7 @@ class Dendrogram:
         Flat indices at the local potential minima.
     """
 
-    def __init__(self, arr, boundary_flag='periodic'):
+    def __init__(self, arr, boundary_flag='periodic', verbose=True):
         """Read data and find local miniima
 
         Parameters
@@ -46,6 +46,7 @@ class Dendrogram:
         """
         self._arr_shape = arr.shape
         self._boundary_flag = boundary_flag
+        self._verbose = verbose
 
         # Create leaf nodes by finding all local minima.
         if self._boundary_flag == 'periodic':
@@ -112,9 +113,9 @@ class Dendrogram:
         my_neighbors = boundary.precompute_neighbor(self._arr_shape,
                                                     self._boundary_flag,
                                                     corner=True)
-
-        print("Start climbing up the tree from the leaf nodes.\t"
-              f"Number of nodes = {len(self.nodes)}")
+        if self._verbose:
+            print("Start climbing up the tree from the leaf nodes.\t"
+                  f"Number of nodes = {len(self.nodes)}")
         # Climb up the potential and construct dendrogram.
         for cell in iter(self.cells_ordered):
             if cell in self.minima:
@@ -152,10 +153,12 @@ class Dendrogram:
                     # This node becomes a new ancestor of all its
                     # descendants
                     self.ancestor[child] = cell
-                print("Added a new node at the critical point.\t\t"
-                      f"Number of nodes = {len(self.nodes)}")
+                if self._verbose:
+                    print("Added a new node at the critical point.\t\t"
+                          f"Number of nodes = {len(self.nodes)}")
                 if set(self.minima).issubset(set(self.descendants[cell])):
-                    print("We have reached the trunk. Stop climbing up")
+                    if self._verbose:
+                        print("We have reached the trunk. Stop climbing up")
                     break
 
         # Construct parent dictionary from parent_array
@@ -189,15 +192,18 @@ class Dendrogram:
             if len(sibling_branches) >= 2:
                 # There are at least two branches at this node.
                 # Simply cut the buds.
-                print("There are at least two branches. Simply cut the buds")
+                if self._verbose:
+                    print("There are at least two branches. Simply cut the buds")
                 for bud in sibling_buds:
-                    print(f"Cutting the bud {bud}")
+                    if self._verbose:
+                        print(f"Cutting the bud {bud}")
                     self._cut_bud(bud)
             elif len(sibling_branches) == 1:
                 # There are only one branch.
                 # Subsume buds to the branch and remove the resulting knag.
                 branch = sibling_branches.pop()
-                print(f"Subsume buds {sibling_buds} into a branch {branch}")
+                if self._verbose:
+                    print(f"Subsume buds {sibling_buds} into a branch {branch}")
                 self._subsume_buds(sibling_buds, branch)
             else:
                 # Subsume short buds to the longest bud and remove the knag.
@@ -211,9 +217,10 @@ class Dendrogram:
                         longest_bud = nd
                         rank_min = rank
                 shorter_buds.remove(longest_bud)
-                print("There are only buds; "
-                      "merge shorter buds {} to longest bud {}".format(
-                       shorter_buds, longest_bud))
+                if self._verbose:
+                    print("There are only buds; "
+                          "merge shorter buds {} to longest bud {}".format(
+                               shorter_buds, longest_bud))
                 self._subsume_buds(shorter_buds, longest_bud)
 
             self._find_leaves()
