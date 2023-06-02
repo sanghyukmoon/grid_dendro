@@ -121,7 +121,7 @@ def _get_offsets(dim, corner=True):
 
 def _boundary_i_bcn(shape, dtype, offsets, corner, boundary_flag):
     # returns boundary indices and boundary's neighbor indices.
-    boundary_indices = _gbi(shape, dtype)
+    boundary_indices = _get_boundary_indices(shape, dtype)
     boundary_coords = np.array(np.unravel_index(boundary_indices, shape),
                                dtype=dtype)
     bpcn = _boundary_pcn(boundary_coords, offsets, shape, corner,
@@ -141,7 +141,7 @@ def _boundary_pcn(coords, offsets, shape, corner, boundary_flag):
     return output
 
 
-def _gbi(shape, dtype):
+def _get_boundary_indices(shape, dtype):
     """get boundary indices from shape"""
     shape = list(shape)
     bi = []

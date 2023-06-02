@@ -1,5 +1,4 @@
 import numpy as np
-from grid_dendro import dendrogram
 
 
 def calculate_cumulative_energies(gd, data, node):

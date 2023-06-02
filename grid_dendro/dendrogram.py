@@ -239,7 +239,10 @@ class Dendrogram:
         return cells
 
     def filter_data(self, dat, nodes, fill_value=np.nan, drop=False):
-        """Filter data by node
+        """Filter data by node, including all descendant nodes.
+
+        Get all member cells of the nodes and their descendants and return
+        the masked data.
 
         Parameters
         ----------
@@ -251,6 +254,15 @@ class Dendrogram:
             The value to fill outside of the filtered region. Default to nan.
         drop : bool
             If true, return faltten data that only include filtered cells.
+
+        Returns
+        -------
+        out : xarray.DataArray or numpy.ndarray
+            Filtered array matching the input array type
+
+        See Also
+        --------
+        dendrogram.filter_by_dict
         """
         if isinstance(dat, xr.DataArray):
             dtype = 'xarray'
@@ -439,24 +451,21 @@ class Dendrogram:
             self.trunk = trunk[0]
 
 
-def filter_by_node(dat, nodes=None, nodes_select=None, cells_select=None,
+def filter_by_dict(dat, node_dict=None, cells=None,
                    fill_value=np.nan, drop=False):
-    """Mask DataArray using FISO dictionary or the flattened indexes.
+    """Filter data by node dictionary or array of cell indices.
 
-    .. deprecated:: 1.0.0
-            This function will be removed in grid_dendro 1.0.0, it is
-            replaced by Dendrogram.filter_data method.
+    This is a stand-alone filtering function that offers more flexibility
+    to Dendrogram.filter_data method.
 
     Parameters
     ----------
     dat : xarray.DataArray or numpy.ndarray
         Input array to be filtered.
-    nodes : dict, optional
-        Dendrogram nodes dictionary.
-    nodes_select : int or sequence of ints, optional
-        Id of selected node(s).
-    cells_select : array, optional
-        Flat indices of selected cells. Overrides nodes and nodes_select.
+    node_dict : dict, optional
+        Dictionary that maps node id to flat indices of member cells.
+    cells : array, optional
+        Flat indices of selected cells. Overrides node_dict.
     fill_value : float, optional
         Value to fill outside of the filtered region. Default is np.nan.
     drop : bool, optional
@@ -466,6 +475,10 @@ def filter_by_node(dat, nodes=None, nodes_select=None, cells_select=None,
     -------
     out : xarray.DataArray or numpy.ndarray
         Filtered array matching the input array type
+
+    See Also
+    --------
+    Dendrogram.filter_data
     """
     if isinstance(dat, xr.DataArray):
         dtype = 'xarray'
@@ -478,28 +491,19 @@ def filter_by_node(dat, nodes=None, nodes_select=None, cells_select=None,
         raise TypeError("type {} is not supported".format(type(dat)))
 
     # retreive flat indices of selected cells
-    if nodes is None and nodes_select is None and cells_select is None:
-        # nothing to do
-        return dat
-    elif nodes is not None and cells_select is None:
-        cells_select = []
-        if nodes_select is None:
-            # select all cells
-            for v in nodes.values():
-                cells_select += list(v)
-        elif isinstance(nodes_select, (int, np.int64, np.int32)):
-            cells_select += nodes[nodes_select]
-        else:
-            for node in nodes_select:
-                cells_select += nodes[node]
+    if cells is None:
+        cells = []
+        # select all cells
+        for v in node_dict.values():
+            cells += list(v)
 
     dat1d = dat.flatten()
     if drop:
-        out = dat1d[cells_select]
+        out = dat1d[cells]
         return out
     else:
         out = np.full(len(dat1d), fill_value)
-        out[cells_select] = dat1d[cells_select]
+        out[cells] = dat1d[cells]
         out = out.reshape(dat.shape)
         if dtype == 'xarray':
             out = xr.DataArray(data=out, coords=coords, dims=dims)
