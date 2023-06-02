@@ -345,7 +345,7 @@ document.write(`
 <span class="sd">        Flat indices at the local potential minima.</span>
 <span class="sd">    &quot;&quot;&quot;</span>
 
-    <span class="k">def</span> <span class="fm">__init__</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">arr</span><span class="p">,</span> <span class="n">boundary_flag</span><span class="o">=</span><span class="s1">&#39;periodic&#39;</span><span class="p">):</span>
+    <span class="k">def</span> <span class="fm">__init__</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">arr</span><span class="p">,</span> <span class="n">boundary_flag</span><span class="o">=</span><span class="s1">&#39;periodic&#39;</span><span class="p">,</span> <span class="n">verbose</span><span class="o">=</span><span class="kc">True</span><span class="p">):</span>
 <span class="w">        </span><span class="sd">&quot;&quot;&quot;Read data and find local miniima</span>
 
 <span class="sd">        Parameters</span>
@@ -357,6 +357,7 @@ document.write(`
 <span class="sd">        &quot;&quot;&quot;</span>
         <span class="bp">self</span><span class="o">.</span><span class="n">_arr_shape</span> <span class="o">=</span> <span class="n">arr</span><span class="o">.</span><span class="n">shape</span>
         <span class="bp">self</span><span class="o">.</span><span class="n">_boundary_flag</span> <span class="o">=</span> <span class="n">boundary_flag</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">_verbose</span> <span class="o">=</span> <span class="n">verbose</span>
 
         <span class="c1"># Create leaf nodes by finding all local minima.</span>
         <span class="k">if</span> <span class="bp">self</span><span class="o">.</span><span class="n">_boundary_flag</span> <span class="o">==</span> <span class="s1">&#39;periodic&#39;</span><span class="p">:</span>
@@ -423,9 +424,9 @@ document.write(`
         <span class="n">my_neighbors</span> <span class="o">=</span> <span class="n">boundary</span><span class="o">.</span><span class="n">precompute_neighbor</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">_arr_shape</span><span class="p">,</span>
                                                     <span class="bp">self</span><span class="o">.</span><span class="n">_boundary_flag</span><span class="p">,</span>
                                                     <span class="n">corner</span><span class="o">=</span><span class="kc">True</span><span class="p">)</span>
-
-        <span class="nb">print</span><span class="p">(</span><span class="s2">&quot;Start climbing up the tree from the leaf nodes.</span><span class="se">\t</span><span class="s2">&quot;</span>
-              <span class="sa">f</span><span class="s2">&quot;Number of nodes = </span><span class="si">{</span><span class="nb">len</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">nodes</span><span class="p">)</span><span class="si">}</span><span class="s2">&quot;</span><span class="p">)</span>
+        <span class="k">if</span> <span class="bp">self</span><span class="o">.</span><span class="n">_verbose</span><span class="p">:</span>
+            <span class="nb">print</span><span class="p">(</span><span class="s2">&quot;Start climbing up the tree from the leaf nodes.</span><span class="se">\t</span><span class="s2">&quot;</span>
+                  <span class="sa">f</span><span class="s2">&quot;Number of nodes = </span><span class="si">{</span><span class="nb">len</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">nodes</span><span class="p">)</span><span class="si">}</span><span class="s2">&quot;</span><span class="p">)</span>
         <span class="c1"># Climb up the potential and construct dendrogram.</span>
         <span class="k">for</span> <span class="n">cell</span> <span class="ow">in</span> <span class="nb">iter</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">cells_ordered</span><span class="p">):</span>
             <span class="k">if</span> <span class="n">cell</span> <span class="ow">in</span> <span class="bp">self</span><span class="o">.</span><span class="n">minima</span><span class="p">:</span>
@@ -463,10 +464,12 @@ document.write(`
                     <span class="c1"># This node becomes a new ancestor of all its</span>
                     <span class="c1"># descendants</span>
                     <span class="bp">self</span><span class="o">.</span><span class="n">ancestor</span><span class="p">[</span><span class="n">child</span><span class="p">]</span> <span class="o">=</span> <span class="n">cell</span>
-                <span class="nb">print</span><span class="p">(</span><span class="s2">&quot;Added a new node at the critical point.</span><span class="se">\t\t</span><span class="s2">&quot;</span>
-                      <span class="sa">f</span><span class="s2">&quot;Number of nodes = </span><span class="si">{</span><span class="nb">len</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">nodes</span><span class="p">)</span><span class="si">}</span><span class="s2">&quot;</span><span class="p">)</span>
+                <span class="k">if</span> <span class="bp">self</span><span class="o">.</span><span class="n">_verbose</span><span class="p">:</span>
+                    <span class="nb">print</span><span class="p">(</span><span class="s2">&quot;Added a new node at the critical point.</span><span class="se">\t\t</span><span class="s2">&quot;</span>
+                          <span class="sa">f</span><span class="s2">&quot;Number of nodes = </span><span class="si">{</span><span class="nb">len</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">nodes</span><span class="p">)</span><span class="si">}</span><span class="s2">&quot;</span><span class="p">)</span>
                 <span class="k">if</span> <span class="nb">set</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">minima</span><span class="p">)</span><span class="o">.</span><span class="n">issubset</span><span class="p">(</span><span class="nb">set</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">descendants</span><span class="p">[</span><span class="n">cell</span><span class="p">])):</span>
-                    <span class="nb">print</span><span class="p">(</span><span class="s2">&quot;We have reached the trunk. Stop climbing up&quot;</span><span class="p">)</span>
+                    <span class="k">if</span> <span class="bp">self</span><span class="o">.</span><span class="n">_verbose</span><span class="p">:</span>
+                        <span class="nb">print</span><span class="p">(</span><span class="s2">&quot;We have reached the trunk. Stop climbing up&quot;</span><span class="p">)</span>
                     <span class="k">break</span>
 
         <span class="c1"># Construct parent dictionary from parent_array</span>
@@ -500,15 +503,18 @@ document.write(`
             <span class="k">if</span> <span class="nb">len</span><span class="p">(</span><span class="n">sibling_branches</span><span class="p">)</span> <span class="o">&gt;=</span> <span class="mi">2</span><span class="p">:</span>
                 <span class="c1"># There are at least two branches at this node.</span>
                 <span class="c1"># Simply cut the buds.</span>
-                <span class="nb">print</span><span class="p">(</span><span class="s2">&quot;There are at least two branches. Simply cut the buds&quot;</span><span class="p">)</span>
+                <span class="k">if</span> <span class="bp">self</span><span class="o">.</span><span class="n">_verbose</span><span class="p">:</span>
+                    <span class="nb">print</span><span class="p">(</span><span class="s2">&quot;There are at least two branches. Simply cut the buds&quot;</span><span class="p">)</span>
                 <span class="k">for</span> <span class="n">bud</span> <span class="ow">in</span> <span class="n">sibling_buds</span><span class="p">:</span>
-                    <span class="nb">print</span><span class="p">(</span><span class="sa">f</span><span class="s2">&quot;Cutting the bud </span><span class="si">{</span><span class="n">bud</span><span class="si">}</span><span class="s2">&quot;</span><span class="p">)</span>
+                    <span class="k">if</span> <span class="bp">self</span><span class="o">.</span><span class="n">_verbose</span><span class="p">:</span>
+                        <span class="nb">print</span><span class="p">(</span><span class="sa">f</span><span class="s2">&quot;Cutting the bud </span><span class="si">{</span><span class="n">bud</span><span class="si">}</span><span class="s2">&quot;</span><span class="p">)</span>
                     <span class="bp">self</span><span class="o">.</span><span class="n">_cut_bud</span><span class="p">(</span><span class="n">bud</span><span class="p">)</span>
             <span class="k">elif</span> <span class="nb">len</span><span class="p">(</span><span class="n">sibling_branches</span><span class="p">)</span> <span class="o">==</span> <span class="mi">1</span><span class="p">:</span>
                 <span class="c1"># There are only one branch.</span>
                 <span class="c1"># Subsume buds to the branch and remove the resulting knag.</span>
                 <span class="n">branch</span> <span class="o">=</span> <span class="n">sibling_branches</span><span class="o">.</span><span class="n">pop</span><span class="p">()</span>
-                <span class="nb">print</span><span class="p">(</span><span class="sa">f</span><span class="s2">&quot;Subsume buds </span><span class="si">{</span><span class="n">sibling_buds</span><span class="si">}</span><span class="s2"> into a branch </span><span class="si">{</span><span class="n">branch</span><span class="si">}</span><span class="s2">&quot;</span><span class="p">)</span>
+                <span class="k">if</span> <span class="bp">self</span><span class="o">.</span><span class="n">_verbose</span><span class="p">:</span>
+                    <span class="nb">print</span><span class="p">(</span><span class="sa">f</span><span class="s2">&quot;Subsume buds </span><span class="si">{</span><span class="n">sibling_buds</span><span class="si">}</span><span class="s2"> into a branch </span><span class="si">{</span><span class="n">branch</span><span class="si">}</span><span class="s2">&quot;</span><span class="p">)</span>
                 <span class="bp">self</span><span class="o">.</span><span class="n">_subsume_buds</span><span class="p">(</span><span class="n">sibling_buds</span><span class="p">,</span> <span class="n">branch</span><span class="p">)</span>
             <span class="k">else</span><span class="p">:</span>
                 <span class="c1"># Subsume short buds to the longest bud and remove the knag.</span>
@@ -522,9 +528,10 @@ document.write(`
                         <span class="n">longest_bud</span> <span class="o">=</span> <span class="n">nd</span>
                         <span class="n">rank_min</span> <span class="o">=</span> <span class="n">rank</span>
                 <span class="n">shorter_buds</span><span class="o">.</span><span class="n">remove</span><span class="p">(</span><span class="n">longest_bud</span><span class="p">)</span>
-                <span class="nb">print</span><span class="p">(</span><span class="s2">&quot;There are only buds; &quot;</span>
-                      <span class="s2">&quot;merge shorter buds </span><span class="si">{}</span><span class="s2"> to longest bud </span><span class="si">{}</span><span class="s2">&quot;</span><span class="o">.</span><span class="n">format</span><span class="p">(</span>
-                       <span class="n">shorter_buds</span><span class="p">,</span> <span class="n">longest_bud</span><span class="p">))</span>
+                <span class="k">if</span> <span class="bp">self</span><span class="o">.</span><span class="n">_verbose</span><span class="p">:</span>
+                    <span class="nb">print</span><span class="p">(</span><span class="s2">&quot;There are only buds; &quot;</span>
+                          <span class="s2">&quot;merge shorter buds </span><span class="si">{}</span><span class="s2"> to longest bud </span><span class="si">{}</span><span class="s2">&quot;</span><span class="o">.</span><span class="n">format</span><span class="p">(</span>
+                               <span class="n">shorter_buds</span><span class="p">,</span> <span class="n">longest_bud</span><span class="p">))</span>
                 <span class="bp">self</span><span class="o">.</span><span class="n">_subsume_buds</span><span class="p">(</span><span class="n">shorter_buds</span><span class="p">,</span> <span class="n">longest_bud</span><span class="p">)</span>
 
             <span class="bp">self</span><span class="o">.</span><span class="n">_find_leaves</span><span class="p">()</span>
