@@ -31,7 +31,7 @@ jobs:
     # Build the book
     - name: Build the book
       run: |
-        PYTHONPATH=./ jupyter-book build docs
+        PYTHONPATH=./ jupyter-book build docs --all
 
     # Push the book's HTML to github-pages
     - name: GitHub Pages action

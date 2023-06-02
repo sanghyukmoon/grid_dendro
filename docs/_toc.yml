@@ -4,12 +4,15 @@
 format: jb-book
 root: intro
 parts:
+  - caption: Installation
+    chapters:
+    - file: installation
+    - file: bookbuild
+  - caption: Usage
+    chapters:
+    - file: usage
   - caption: API References
     chapters:
     - file: dendrogram
     - file: boundary
     - file: energy
-  - caption: Installation
-    chapters:
-    - file: installation
-    - file: bookbuild
