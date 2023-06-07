@@ -7,18 +7,18 @@ def calculate_cumulative_energies(gd, data, node):
     Parameters
     ----------
     gd : Dendrogram
-        : Dendrogram object
+        : Dendrogram object.
     data : dict
-        Dictionary containing hydro variables
+        Dictionary containing fluid variables.
     node : int
-        Selected GRID-dendro node
+        Selected GRID-dendro node.
 
     Returns
     -------
     array
         Effective radii.
     dict
-        thermal, kinetic, gravitational, and total energies
+        thermal, kinetic, magnetic, gravitational, and total energies
         integrated up to each radius.
     """
 
@@ -63,15 +63,21 @@ def calculate_cumulative_energies(gd, data, node):
     # Gravitational energy
     egrv = (prims['rho']*(prims['phi'] - phimax)*dvol).cumsum()
 
+    # Magnetic energy
+    if 'bprs' in prims:
+        emag = (prims['bprs']*dvol).cumsum()
+    else:
+        emag = np.zeros(len(egrv))
+
     # Total energy
-    etot = ekin + ethm + egrv
+    etot = ekin + ethm + emag + egrv
 
     # Effective radius
     Ncells = len(prims['rho'])
     vol = np.full(Ncells, dvol).cumsum()
     reff = (vol / (4.*np.pi/3.))**(1./3.)
 
-    energies = dict(ekin=ekin, ethm=ethm, egrv=egrv, etot=etot)
+    energies = dict(ekin=ekin, ethm=ethm, emag=emag, egrv=egrv, etot=etot)
     return reff, energies
 
 
