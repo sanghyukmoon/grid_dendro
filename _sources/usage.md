@@ -10,8 +10,12 @@
 >>> basedir = "/tigress/sm69/public_html/files/grid_dendro_example_data/R8_2pc_rst"
 >>> ds = pa.read_vtk(f"{basedir}/R8_2pc_rst.0390.vtk")
 >>> ds_grav_pp = pa.read_vtk(f"{basedir}/R8_2pc_rst.0390.Phi.vtk")
->>> dat = ds.get_field(['density', 'velocity', 'pressure'])
+>>> dat = ds.get_field(['density', 'velocity', 'pressure', 'cell_centered_B'])
 >>> dat['gravitational_potential'] = ds_grav_pp.get_field('Phi').Phi
+>>> dat['magnetic_pressure'] = 0.5*(dat.cell_centered_B1**2
+>>>                                 + dat.cell_centered_B2**2
+>>>                                 + dat.cell_centered_B3**2)
+>>> dat = dat.drop(['cell_centered_B1', 'cell_centered_B2', 'cell_centered_B3'])
 >>>
 >>> # Construct dendrogram and prune
 >>> gd = dendrogram.Dendrogram(dat.gravitational_potential.data)
@@ -19,12 +23,13 @@
 >>> gd.prune(ncells_min=27)  # Remove buds by applying minimum cell criterion
 >>>
 >>> # Find HBP and HBR
->>> data = dict(rho=dat.density.data,
->>>             vel1=dat.velocity1.data,
->>>             vel2=dat.velocity2.data,
->>>             vel3=dat.velocity3.data,
->>>             prs=dat.pressure.data,
->>>             phi=dat.gravitational_potential.data)
+>>> data = dict(rho=dat.density.data.flatten(),
+>>>             vel1=dat.velocity1.data.flatten(),
+>>>             vel2=dat.velocity2.data.flatten(),
+>>>             vel3=dat.velocity3.data.flatten(),
+>>>             bprs=dat.magnetic_pressure.data.flatten(),
+>>>             prs=dat.pressure.data.flatten(),
+>>>             phi=dat.gravitational_potential.data.flatten())
 >>> hbp, hbr = energy.find_bound_objects(gd, data)
 >>>
 >>> # Plot results
