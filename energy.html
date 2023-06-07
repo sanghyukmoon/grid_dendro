@@ -385,21 +385,19 @@ integrated up to each radius.</p></li>
 
 <dl class="py function">
 <dt class="sig sig-object py" id="grid_dendro.energy.find_bound_objects">
-<span class="sig-prename descclassname"><span class="pre">grid_dendro.energy.</span></span><span class="sig-name descname"><span class="pre">find_bound_objects</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">gd</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">data</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">hbp</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">hbr</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">node</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">phi1d</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="_modules/grid_dendro/energy.html#find_bound_objects"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#grid_dendro.energy.find_bound_objects" title="Permalink to this definition">#</a></dt>
+<span class="sig-prename descclassname"><span class="pre">grid_dendro.energy.</span></span><span class="sig-name descname"><span class="pre">find_bound_objects</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">gd</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">data</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">hbp</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">hbr</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">node</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="_modules/grid_dendro/energy.html#find_bound_objects"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#grid_dendro.energy.find_bound_objects" title="Permalink to this definition">#</a></dt>
 <dd><p>Finds HBP and HBR</p>
 <dl class="field-list simple">
 <dt class="field-odd">Parameters</dt>
 <dd class="field-odd"><ul class="simple">
 <li><p><strong>gd</strong> (<a class="reference internal" href="dendrogram.html#grid_dendro.dendrogram.Dendrogram" title="grid_dendro.dendrogram.Dendrogram"><em>Dendrogram</em></a>) – GRID-dendro dendrogram object.</p></li>
-<li><p><strong>data</strong> (<em>dict</em>) – Dictionary containing fluid variables. Must contain followings:
-[‘rho’, ‘vel1’, ‘vel2’, ‘vel3’, ‘prs’, ‘phi’]</p></li>
+<li><p><strong>data</strong> (<em>dict</em>) – Dictionary containing 1-D flattend fluid variables.
+Must contain [‘rho’, ‘vel1’, ‘vel2’, ‘vel3’, ‘prs’, ‘phi’]</p></li>
 <li><p><strong>hbp</strong> (<em>dict</em><em>, </em><em>optional</em>) – Dictionary containing HBPs.
 Only used internally for recursive purpose.</p></li>
 <li><p><strong>hbr</strong> (<em>dict</em><em>, </em><em>optional</em>) – Dictionary containing HBRs.
 Only used internally for recursive purpose.</p></li>
 <li><p><strong>node</strong> (<em>int</em><em>, </em><em>optional</em>) – ID of the selected node.
-Only used internally for recursive purpose.</p></li>
-<li><p><strong>phi1d</strong> (<em>array</em><em>, </em><em>optional</em>) – Flattend gravitational potential.
 Only used internally for recursive purpose.</p></li>
 </ul>
 </dd>
@@ -419,12 +417,12 @@ Only used internally for recursive purpose.</p></li>
 <span class="gp">&gt;&gt;&gt; </span><span class="n">gd</span> <span class="o">=</span> <span class="n">dendrogram</span><span class="o">.</span><span class="n">Dendrogram</span><span class="p">(</span><span class="n">ds</span><span class="o">.</span><span class="n">phigas</span><span class="o">.</span><span class="n">data</span><span class="p">)</span>
 <span class="gp">&gt;&gt;&gt; </span><span class="n">gd</span><span class="o">.</span><span class="n">construct</span><span class="p">()</span>
 <span class="gp">&gt;&gt;&gt; </span><span class="n">gd</span><span class="o">.</span><span class="n">prune</span><span class="p">()</span>  <span class="c1"># Remove buds</span>
-<span class="gp">&gt;&gt;&gt; </span><span class="n">data</span> <span class="o">=</span> <span class="nb">dict</span><span class="p">(</span><span class="n">rho</span><span class="o">=</span><span class="n">ds</span><span class="o">.</span><span class="n">dens</span><span class="o">.</span><span class="n">data</span><span class="p">,</span>
-<span class="go">                vel1=(ds.mom1/ds.dens).data,</span>
-<span class="go">                vel2=(ds.mom2/ds.dens).data,</span>
-<span class="go">                vel3=(ds.mom3/ds.dens).data,</span>
-<span class="go">                prs=(cs**2*ds.dens).data,</span>
-<span class="go">                phi=ds.phigas.data)</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="n">data</span> <span class="o">=</span> <span class="nb">dict</span><span class="p">(</span><span class="n">rho</span><span class="o">=</span><span class="n">ds</span><span class="o">.</span><span class="n">dens</span><span class="o">.</span><span class="n">data</span><span class="o">.</span><span class="n">flatten</span><span class="p">(),</span>
+<span class="go">                vel1=(ds.mom1/ds.dens).data.flatten(),</span>
+<span class="go">                vel2=(ds.mom2/ds.dens).data.flatten(),</span>
+<span class="go">                vel3=(ds.mom3/ds.dens).data.flatten(),</span>
+<span class="go">                prs=(cs**2*ds.dens).data.flatten(),</span>
+<span class="go">                phi=ds.phigas.data.flatten())</span>
 <span class="gp">&gt;&gt;&gt; </span><span class="n">hbp</span><span class="p">,</span> <span class="n">hbr</span> <span class="o">=</span> <span class="n">find_bound_object</span><span class="p">(</span><span class="n">gd</span><span class="p">,</span> <span class="n">data</span><span class="p">)</span>
 </pre></div>
 </div>

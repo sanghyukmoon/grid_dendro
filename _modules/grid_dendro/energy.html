@@ -339,7 +339,7 @@ document.write(`
         <span class="n">msg</span> <span class="o">=</span> <span class="s2">&quot;data must contain the following variables: </span><span class="si">{}</span><span class="s2">&quot;</span><span class="o">.</span><span class="n">format</span><span class="p">(</span><span class="n">req_var</span><span class="p">)</span>
         <span class="k">raise</span> <span class="ne">ValueError</span><span class="p">(</span><span class="n">msg</span><span class="p">)</span>
 
-    <span class="c1"># Flatten variables</span>
+    <span class="c1"># Filter data by node</span>
     <span class="n">prims</span> <span class="o">=</span> <span class="p">{</span><span class="n">k</span><span class="p">:</span> <span class="n">gd</span><span class="o">.</span><span class="n">filter_data</span><span class="p">(</span><span class="n">v</span><span class="p">,</span> <span class="n">node</span><span class="p">,</span> <span class="n">drop</span><span class="o">=</span><span class="kc">True</span><span class="p">)</span>
              <span class="k">for</span> <span class="n">k</span><span class="p">,</span> <span class="n">v</span> <span class="ow">in</span> <span class="n">data</span><span class="o">.</span><span class="n">items</span><span class="p">()</span> <span class="k">if</span> <span class="n">k</span> <span class="o">!=</span> <span class="s1">&#39;dvol&#39;</span><span class="p">}</span>
     <span class="n">dvol</span> <span class="o">=</span> <span class="n">data</span><span class="p">[</span><span class="s1">&#39;dvol&#39;</span><span class="p">]</span>
@@ -392,7 +392,7 @@ document.write(`
     <span class="k">return</span> <span class="n">reff</span><span class="p">,</span> <span class="n">energies</span></div>
 
 
-<div class="viewcode-block" id="find_bound_objects"><a class="viewcode-back" href="../../energy.html#grid_dendro.energy.find_bound_objects">[docs]</a><span class="k">def</span> <span class="nf">find_bound_objects</span><span class="p">(</span><span class="n">gd</span><span class="p">,</span> <span class="n">data</span><span class="p">,</span> <span class="n">hbp</span><span class="o">=</span><span class="kc">None</span><span class="p">,</span> <span class="n">hbr</span><span class="o">=</span><span class="kc">None</span><span class="p">,</span> <span class="n">node</span><span class="o">=</span><span class="kc">None</span><span class="p">,</span> <span class="n">phi1d</span><span class="o">=</span><span class="kc">None</span><span class="p">):</span>
+<div class="viewcode-block" id="find_bound_objects"><a class="viewcode-back" href="../../energy.html#grid_dendro.energy.find_bound_objects">[docs]</a><span class="k">def</span> <span class="nf">find_bound_objects</span><span class="p">(</span><span class="n">gd</span><span class="p">,</span> <span class="n">data</span><span class="p">,</span> <span class="n">hbp</span><span class="o">=</span><span class="kc">None</span><span class="p">,</span> <span class="n">hbr</span><span class="o">=</span><span class="kc">None</span><span class="p">,</span> <span class="n">node</span><span class="o">=</span><span class="kc">None</span><span class="p">):</span>
 <span class="w">    </span><span class="sd">&quot;&quot;&quot;Finds HBP and HBR</span>
 
 <span class="sd">    Parameters</span>
@@ -400,8 +400,8 @@ document.write(`
 <span class="sd">    gd : Dendrogram</span>
 <span class="sd">        GRID-dendro dendrogram object.</span>
 <span class="sd">    data : dict</span>
-<span class="sd">        Dictionary containing fluid variables. Must contain followings:</span>
-<span class="sd">        [&#39;rho&#39;, &#39;vel1&#39;, &#39;vel2&#39;, &#39;vel3&#39;, &#39;prs&#39;, &#39;phi&#39;]</span>
+<span class="sd">        Dictionary containing 1-D flattend fluid variables.</span>
+<span class="sd">        Must contain [&#39;rho&#39;, &#39;vel1&#39;, &#39;vel2&#39;, &#39;vel3&#39;, &#39;prs&#39;, &#39;phi&#39;]</span>
 <span class="sd">    hbp : dict, optional</span>
 <span class="sd">        Dictionary containing HBPs.</span>
 <span class="sd">        Only used internally for recursive purpose.</span>
@@ -410,9 +410,6 @@ document.write(`
 <span class="sd">        Only used internally for recursive purpose.</span>
 <span class="sd">    node : int, optional</span>
 <span class="sd">        ID of the selected node.</span>
-<span class="sd">        Only used internally for recursive purpose.</span>
-<span class="sd">    phi1d : array, optional</span>
-<span class="sd">        Flattend gravitational potential.</span>
 <span class="sd">        Only used internally for recursive purpose.</span>
 
 <span class="sd">    Returns</span>
@@ -431,12 +428,12 @@ document.write(`
 <span class="sd">    &gt;&gt;&gt; gd = dendrogram.Dendrogram(ds.phigas.data)</span>
 <span class="sd">    &gt;&gt;&gt; gd.construct()</span>
 <span class="sd">    &gt;&gt;&gt; gd.prune()  # Remove buds</span>
-<span class="sd">    &gt;&gt;&gt; data = dict(rho=ds.dens.data,</span>
-<span class="sd">                    vel1=(ds.mom1/ds.dens).data,</span>
-<span class="sd">                    vel2=(ds.mom2/ds.dens).data,</span>
-<span class="sd">                    vel3=(ds.mom3/ds.dens).data,</span>
-<span class="sd">                    prs=(cs**2*ds.dens).data,</span>
-<span class="sd">                    phi=ds.phigas.data)</span>
+<span class="sd">    &gt;&gt;&gt; data = dict(rho=ds.dens.data.flatten(),</span>
+<span class="sd">                    vel1=(ds.mom1/ds.dens).data.flatten(),</span>
+<span class="sd">                    vel2=(ds.mom2/ds.dens).data.flatten(),</span>
+<span class="sd">                    vel3=(ds.mom3/ds.dens).data.flatten(),</span>
+<span class="sd">                    prs=(cs**2*ds.dens).data.flatten(),</span>
+<span class="sd">                    phi=ds.phigas.data.flatten())</span>
 <span class="sd">    &gt;&gt;&gt; hbp, hbr = find_bound_object(gd, data)</span>
 <span class="sd">    &quot;&quot;&quot;</span>
     <span class="k">if</span> <span class="n">node</span> <span class="ow">is</span> <span class="kc">None</span><span class="p">:</span>
@@ -445,23 +442,21 @@ document.write(`
         <span class="n">hbp</span> <span class="o">=</span> <span class="p">{}</span>
     <span class="k">if</span> <span class="n">hbr</span> <span class="ow">is</span> <span class="kc">None</span><span class="p">:</span>
         <span class="n">hbr</span> <span class="o">=</span> <span class="p">{}</span>
-    <span class="k">if</span> <span class="n">phi1d</span> <span class="ow">is</span> <span class="kc">None</span><span class="p">:</span>
-        <span class="n">phi1d</span> <span class="o">=</span> <span class="n">data</span><span class="p">[</span><span class="s1">&#39;phi&#39;</span><span class="p">]</span><span class="o">.</span><span class="n">flatten</span><span class="p">()</span>
 
-    <span class="n">phi_node</span> <span class="o">=</span> <span class="n">phi1d</span><span class="p">[</span><span class="n">node</span><span class="p">]</span>
+    <span class="n">phi_node</span> <span class="o">=</span> <span class="n">data</span><span class="p">[</span><span class="s1">&#39;phi&#39;</span><span class="p">][</span><span class="n">node</span><span class="p">]</span>
     <span class="n">cells</span> <span class="o">=</span> <span class="n">gd</span><span class="o">.</span><span class="n">get_all_descendant_cells</span><span class="p">(</span><span class="n">node</span><span class="p">)</span>
     <span class="n">cells_bound</span> <span class="o">=</span> <span class="n">find_bound_cells</span><span class="p">(</span><span class="n">gd</span><span class="p">,</span> <span class="n">data</span><span class="p">,</span> <span class="n">node</span><span class="p">)</span>
     <span class="k">if</span> <span class="n">cells_bound</span> <span class="ow">is</span> <span class="ow">not</span> <span class="kc">None</span><span class="p">:</span>
-        <span class="n">phi_hbr</span> <span class="o">=</span> <span class="n">phi1d</span><span class="p">[</span><span class="n">cells_bound</span><span class="p">[</span><span class="o">-</span><span class="mi">1</span><span class="p">]]</span>
+        <span class="n">phi_hbr</span> <span class="o">=</span> <span class="n">data</span><span class="p">[</span><span class="s1">&#39;phi&#39;</span><span class="p">][</span><span class="n">cells_bound</span><span class="p">[</span><span class="o">-</span><span class="mi">1</span><span class="p">]]</span>
         <span class="k">if</span> <span class="n">phi_hbr</span> <span class="o">&gt;</span> <span class="n">phi_node</span><span class="p">:</span>
             <span class="n">hbp</span><span class="p">[</span><span class="n">node</span><span class="p">]</span> <span class="o">=</span> <span class="n">cells</span>
             <span class="n">hbr</span><span class="p">[</span><span class="n">node</span><span class="p">]</span> <span class="o">=</span> <span class="n">cells_bound</span>
         <span class="k">else</span><span class="p">:</span>
             <span class="k">for</span> <span class="n">nd</span> <span class="ow">in</span> <span class="n">gd</span><span class="o">.</span><span class="n">children</span><span class="p">[</span><span class="n">node</span><span class="p">]:</span>
-                <span class="n">hbp</span><span class="p">,</span> <span class="n">hbr</span> <span class="o">=</span> <span class="n">find_bound_objects</span><span class="p">(</span><span class="n">gd</span><span class="p">,</span> <span class="n">data</span><span class="p">,</span> <span class="n">hbp</span><span class="p">,</span> <span class="n">hbr</span><span class="p">,</span> <span class="n">nd</span><span class="p">,</span> <span class="n">phi1d</span><span class="p">)</span>
+                <span class="n">hbp</span><span class="p">,</span> <span class="n">hbr</span> <span class="o">=</span> <span class="n">find_bound_objects</span><span class="p">(</span><span class="n">gd</span><span class="p">,</span> <span class="n">data</span><span class="p">,</span> <span class="n">hbp</span><span class="p">,</span> <span class="n">hbr</span><span class="p">,</span> <span class="n">nd</span><span class="p">)</span>
     <span class="k">else</span><span class="p">:</span>
         <span class="k">for</span> <span class="n">nd</span> <span class="ow">in</span> <span class="n">gd</span><span class="o">.</span><span class="n">children</span><span class="p">[</span><span class="n">node</span><span class="p">]:</span>
-            <span class="n">hbp</span><span class="p">,</span> <span class="n">hbr</span> <span class="o">=</span> <span class="n">find_bound_objects</span><span class="p">(</span><span class="n">gd</span><span class="p">,</span> <span class="n">data</span><span class="p">,</span> <span class="n">hbp</span><span class="p">,</span> <span class="n">hbr</span><span class="p">,</span> <span class="n">nd</span><span class="p">,</span> <span class="n">phi1d</span><span class="p">)</span>
+            <span class="n">hbp</span><span class="p">,</span> <span class="n">hbr</span> <span class="o">=</span> <span class="n">find_bound_objects</span><span class="p">(</span><span class="n">gd</span><span class="p">,</span> <span class="n">data</span><span class="p">,</span> <span class="n">hbp</span><span class="p">,</span> <span class="n">hbr</span><span class="p">,</span> <span class="n">nd</span><span class="p">)</span>
     <span class="k">return</span> <span class="n">hbp</span><span class="p">,</span> <span class="n">hbr</span></div>
 
 
@@ -476,7 +471,7 @@ document.write(`
     <span class="k">else</span><span class="p">:</span>
         <span class="n">idx_bound</span> <span class="o">=</span> <span class="n">idx_bound</span><span class="p">[</span><span class="o">-</span><span class="mi">1</span><span class="p">]</span>
 
-    <span class="n">phi</span> <span class="o">=</span> <span class="n">gd</span><span class="o">.</span><span class="n">filter_data</span><span class="p">(</span><span class="n">data</span><span class="p">[</span><span class="s1">&#39;phi&#39;</span><span class="p">],</span> <span class="n">node</span><span class="p">,</span> <span class="n">drop</span><span class="o">=</span><span class="kc">True</span><span class="p">)</span>
+    <span class="n">phi</span> <span class="o">=</span> <span class="n">gd</span><span class="o">.</span><span class="n">filter_data</span><span class="p">(</span><span class="n">data</span><span class="p">[</span><span class="s1">&#39;phi&#39;</span><span class="p">],</span> <span class="n">node</span><span class="p">)</span>
     <span class="n">idx_ordered</span> <span class="o">=</span> <span class="n">phi</span><span class="o">.</span><span class="n">argsort</span><span class="p">()</span>
     <span class="n">cells</span> <span class="o">=</span> <span class="n">gd</span><span class="o">.</span><span class="n">get_all_descendant_cells</span><span class="p">(</span><span class="n">node</span><span class="p">)</span>
     <span class="n">cells_bound</span> <span class="o">=</span> <span class="n">cells</span><span class="p">[</span><span class="n">idx_ordered</span><span class="p">][:</span><span class="n">idx_bound</span> <span class="o">+</span> <span class="mi">1</span><span class="p">]</span>
