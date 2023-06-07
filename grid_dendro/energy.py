@@ -28,7 +28,7 @@ def calculate_cumulative_energies(gd, data, node):
         msg = "data must contain the following variables: {}".format(req_var)
         raise ValueError(msg)
 
-    # Flatten variables
+    # Filter data by node
     prims = {k: gd.filter_data(v, node, drop=True)
              for k, v in data.items() if k != 'dvol'}
     dvol = data['dvol']
@@ -81,7 +81,7 @@ def calculate_cumulative_energies(gd, data, node):
     return reff, energies
 
 
-def find_bound_objects(gd, data, hbp=None, hbr=None, node=None, phi1d=None):
+def find_bound_objects(gd, data, hbp=None, hbr=None, node=None):
     """Finds HBP and HBR
 
     Parameters
@@ -89,8 +89,8 @@ def find_bound_objects(gd, data, hbp=None, hbr=None, node=None, phi1d=None):
     gd : Dendrogram
         GRID-dendro dendrogram object.
     data : dict
-        Dictionary containing fluid variables. Must contain followings:
-        ['rho', 'vel1', 'vel2', 'vel3', 'prs', 'phi']
+        Dictionary containing 1-D flattend fluid variables.
+        Must contain ['rho', 'vel1', 'vel2', 'vel3', 'prs', 'phi']
     hbp : dict, optional
         Dictionary containing HBPs.
         Only used internally for recursive purpose.
@@ -99,9 +99,6 @@ def find_bound_objects(gd, data, hbp=None, hbr=None, node=None, phi1d=None):
         Only used internally for recursive purpose.
     node : int, optional
         ID of the selected node.
-        Only used internally for recursive purpose.
-    phi1d : array, optional
-        Flattend gravitational potential.
         Only used internally for recursive purpose.
 
     Returns
@@ -120,12 +117,12 @@ def find_bound_objects(gd, data, hbp=None, hbr=None, node=None, phi1d=None):
     >>> gd = dendrogram.Dendrogram(ds.phigas.data)
     >>> gd.construct()
     >>> gd.prune()  # Remove buds
-    >>> data = dict(rho=ds.dens.data,
-                    vel1=(ds.mom1/ds.dens).data,
-                    vel2=(ds.mom2/ds.dens).data,
-                    vel3=(ds.mom3/ds.dens).data,
-                    prs=(cs**2*ds.dens).data,
-                    phi=ds.phigas.data)
+    >>> data = dict(rho=ds.dens.data.flatten(),
+                    vel1=(ds.mom1/ds.dens).data.flatten(),
+                    vel2=(ds.mom2/ds.dens).data.flatten(),
+                    vel3=(ds.mom3/ds.dens).data.flatten(),
+                    prs=(cs**2*ds.dens).data.flatten(),
+                    phi=ds.phigas.data.flatten())
     >>> hbp, hbr = find_bound_object(gd, data)
     """
     if node is None:
@@ -134,23 +131,21 @@ def find_bound_objects(gd, data, hbp=None, hbr=None, node=None, phi1d=None):
         hbp = {}
     if hbr is None:
         hbr = {}
-    if phi1d is None:
-        phi1d = data['phi'].flatten()
 
-    phi_node = phi1d[node]
+    phi_node = data['phi'][node]
     cells = gd.get_all_descendant_cells(node)
     cells_bound = find_bound_cells(gd, data, node)
     if cells_bound is not None:
-        phi_hbr = phi1d[cells_bound[-1]]
+        phi_hbr = data['phi'][cells_bound[-1]]
         if phi_hbr > phi_node:
             hbp[node] = cells
             hbr[node] = cells_bound
         else:
             for nd in gd.children[node]:
-                hbp, hbr = find_bound_objects(gd, data, hbp, hbr, nd, phi1d)
+                hbp, hbr = find_bound_objects(gd, data, hbp, hbr, nd)
     else:
         for nd in gd.children[node]:
-            hbp, hbr = find_bound_objects(gd, data, hbp, hbr, nd, phi1d)
+            hbp, hbr = find_bound_objects(gd, data, hbp, hbr, nd)
     return hbp, hbr
 
 
@@ -165,7 +160,7 @@ def find_bound_cells(gd, data, node):
     else:
         idx_bound = idx_bound[-1]
 
-    phi = gd.filter_data(data['phi'], node, drop=True)
+    phi = gd.filter_data(data['phi'], node)
     idx_ordered = phi.argsort()
     cells = gd.get_all_descendant_cells(node)
     cells_bound = cells[idx_ordered][:idx_bound + 1]
