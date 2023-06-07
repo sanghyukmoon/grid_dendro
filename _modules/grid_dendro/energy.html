@@ -318,18 +318,18 @@ document.write(`
 <span class="sd">    Parameters</span>
 <span class="sd">    ----------</span>
 <span class="sd">    gd : Dendrogram</span>
-<span class="sd">        : Dendrogram object</span>
+<span class="sd">        : Dendrogram object.</span>
 <span class="sd">    data : dict</span>
-<span class="sd">        Dictionary containing hydro variables</span>
+<span class="sd">        Dictionary containing fluid variables.</span>
 <span class="sd">    node : int</span>
-<span class="sd">        Selected GRID-dendro node</span>
+<span class="sd">        Selected GRID-dendro node.</span>
 
 <span class="sd">    Returns</span>
 <span class="sd">    -------</span>
 <span class="sd">    array</span>
 <span class="sd">        Effective radii.</span>
 <span class="sd">    dict</span>
-<span class="sd">        thermal, kinetic, gravitational, and total energies</span>
+<span class="sd">        thermal, kinetic, magnetic, gravitational, and total energies</span>
 <span class="sd">        integrated up to each radius.</span>
 <span class="sd">    &quot;&quot;&quot;</span>
 
@@ -374,15 +374,21 @@ document.write(`
     <span class="c1"># Gravitational energy</span>
     <span class="n">egrv</span> <span class="o">=</span> <span class="p">(</span><span class="n">prims</span><span class="p">[</span><span class="s1">&#39;rho&#39;</span><span class="p">]</span><span class="o">*</span><span class="p">(</span><span class="n">prims</span><span class="p">[</span><span class="s1">&#39;phi&#39;</span><span class="p">]</span> <span class="o">-</span> <span class="n">phimax</span><span class="p">)</span><span class="o">*</span><span class="n">dvol</span><span class="p">)</span><span class="o">.</span><span class="n">cumsum</span><span class="p">()</span>
 
+    <span class="c1"># Magnetic energy</span>
+    <span class="k">if</span> <span class="s1">&#39;bprs&#39;</span> <span class="ow">in</span> <span class="n">prims</span><span class="p">:</span>
+        <span class="n">emag</span> <span class="o">=</span> <span class="p">(</span><span class="n">prims</span><span class="p">[</span><span class="s1">&#39;bprs&#39;</span><span class="p">]</span><span class="o">*</span><span class="n">dvol</span><span class="p">)</span><span class="o">.</span><span class="n">cumsum</span><span class="p">()</span>
+    <span class="k">else</span><span class="p">:</span>
+        <span class="n">emag</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">zeros</span><span class="p">(</span><span class="nb">len</span><span class="p">(</span><span class="n">egrv</span><span class="p">))</span>
+
     <span class="c1"># Total energy</span>
-    <span class="n">etot</span> <span class="o">=</span> <span class="n">ekin</span> <span class="o">+</span> <span class="n">ethm</span> <span class="o">+</span> <span class="n">egrv</span>
+    <span class="n">etot</span> <span class="o">=</span> <span class="n">ekin</span> <span class="o">+</span> <span class="n">ethm</span> <span class="o">+</span> <span class="n">emag</span> <span class="o">+</span> <span class="n">egrv</span>
 
     <span class="c1"># Effective radius</span>
     <span class="n">Ncells</span> <span class="o">=</span> <span class="nb">len</span><span class="p">(</span><span class="n">prims</span><span class="p">[</span><span class="s1">&#39;rho&#39;</span><span class="p">])</span>
     <span class="n">vol</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">full</span><span class="p">(</span><span class="n">Ncells</span><span class="p">,</span> <span class="n">dvol</span><span class="p">)</span><span class="o">.</span><span class="n">cumsum</span><span class="p">()</span>
     <span class="n">reff</span> <span class="o">=</span> <span class="p">(</span><span class="n">vol</span> <span class="o">/</span> <span class="p">(</span><span class="mf">4.</span><span class="o">*</span><span class="n">np</span><span class="o">.</span><span class="n">pi</span><span class="o">/</span><span class="mf">3.</span><span class="p">))</span><span class="o">**</span><span class="p">(</span><span class="mf">1.</span><span class="o">/</span><span class="mf">3.</span><span class="p">)</span>
 
-    <span class="n">energies</span> <span class="o">=</span> <span class="nb">dict</span><span class="p">(</span><span class="n">ekin</span><span class="o">=</span><span class="n">ekin</span><span class="p">,</span> <span class="n">ethm</span><span class="o">=</span><span class="n">ethm</span><span class="p">,</span> <span class="n">egrv</span><span class="o">=</span><span class="n">egrv</span><span class="p">,</span> <span class="n">etot</span><span class="o">=</span><span class="n">etot</span><span class="p">)</span>
+    <span class="n">energies</span> <span class="o">=</span> <span class="nb">dict</span><span class="p">(</span><span class="n">ekin</span><span class="o">=</span><span class="n">ekin</span><span class="p">,</span> <span class="n">ethm</span><span class="o">=</span><span class="n">ethm</span><span class="p">,</span> <span class="n">emag</span><span class="o">=</span><span class="n">emag</span><span class="p">,</span> <span class="n">egrv</span><span class="o">=</span><span class="n">egrv</span><span class="p">,</span> <span class="n">etot</span><span class="o">=</span><span class="n">etot</span><span class="p">)</span>
     <span class="k">return</span> <span class="n">reff</span><span class="p">,</span> <span class="n">energies</span></div>
 
 
