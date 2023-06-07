@@ -270,6 +270,13 @@ class Dendrogram:
         See Also
         --------
         dendrogram.filter_by_dict
+
+        Notes
+        -----
+        If `dat` is already 1-D flattend array, return 1-D array that only
+        contains filtered region. Otherwise, return as the original shape
+        and data type unless `drop`=True.
+
         """
         if isinstance(dat, xr.DataArray):
             dtype = 'xarray'
@@ -289,17 +296,24 @@ class Dendrogram:
             for node in nodes:
                 cells += list(self.get_all_descendant_cells(node))
 
-        dat1d = dat.flatten()
-        if drop:
-            out = dat1d[cells]
+        shape = dat.shape
+        dim = len(shape)
+        if dim == 1:
+            # If dat is already flattend, return filtered 1d array
+            out = dat[cells]
             return out
         else:
-            out = np.full(len(dat1d), fill_value)
-            out[cells] = dat1d[cells]
-            out = out.reshape(dat.shape)
-            if dtype == 'xarray':
-                out = xr.DataArray(data=out, coords=coords, dims=dims)
-            return out
+            dat = dat.flatten()
+            if drop:
+                out = dat[cells]
+                return out
+            else:
+                out = np.full(len(dat), fill_value)
+                out[cells] = dat[cells]
+                out = out.reshape(shape)
+                if dtype == 'xarray':
+                    out = xr.DataArray(data=out, coords=coords, dims=dims)
+                return out
 
     def _cut_bud(self, bud):
         """Remove bud node and return its member cells
