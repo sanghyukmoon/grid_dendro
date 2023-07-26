@@ -619,7 +619,7 @@ document.write(`
                 <span class="n">out</span> <span class="o">=</span> <span class="n">dat</span><span class="p">[</span><span class="n">cells</span><span class="p">]</span>
                 <span class="k">return</span> <span class="n">out</span>
             <span class="k">else</span><span class="p">:</span>
-                <span class="n">out</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">full</span><span class="p">(</span><span class="nb">len</span><span class="p">(</span><span class="n">dat</span><span class="p">),</span> <span class="n">fill_value</span><span class="p">)</span>
+                <span class="n">out</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">full</span><span class="p">(</span><span class="nb">len</span><span class="p">(</span><span class="n">dat</span><span class="p">),</span> <span class="n">fill_value</span><span class="p">,</span> <span class="n">dtype</span><span class="o">=</span><span class="n">dat</span><span class="o">.</span><span class="n">dtype</span><span class="p">)</span>
                 <span class="n">out</span><span class="p">[</span><span class="n">cells</span><span class="p">]</span> <span class="o">=</span> <span class="n">dat</span><span class="p">[</span><span class="n">cells</span><span class="p">]</span>
                 <span class="n">out</span> <span class="o">=</span> <span class="n">out</span><span class="o">.</span><span class="n">reshape</span><span class="p">(</span><span class="n">shape</span><span class="p">)</span>
                 <span class="k">if</span> <span class="n">dtype</span> <span class="o">==</span> <span class="s1">&#39;xarray&#39;</span><span class="p">:</span>
