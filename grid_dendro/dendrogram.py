@@ -308,7 +308,7 @@ class Dendrogram:
                 out = dat[cells]
                 return out
             else:
-                out = np.full(len(dat), fill_value)
+                out = np.full(len(dat), fill_value, dtype=dat.dtype)
                 out[cells] = dat[cells]
                 out = out.reshape(shape)
                 if dtype == 'xarray':
