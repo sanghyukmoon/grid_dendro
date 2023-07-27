@@ -626,6 +626,25 @@ document.write(`
                     <span class="n">out</span> <span class="o">=</span> <span class="n">xr</span><span class="o">.</span><span class="n">DataArray</span><span class="p">(</span><span class="n">data</span><span class="o">=</span><span class="n">out</span><span class="p">,</span> <span class="n">coords</span><span class="o">=</span><span class="n">coords</span><span class="p">,</span> <span class="n">dims</span><span class="o">=</span><span class="n">dims</span><span class="p">)</span>
                 <span class="k">return</span> <span class="n">out</span></div>
 
+<div class="viewcode-block" id="Dendrogram.reindex"><a class="viewcode-back" href="../../dendrogram.html#grid_dendro.dendrogram.Dendrogram.reindex">[docs]</a>    <span class="k">def</span> <span class="nf">reindex</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">start_indices</span><span class="p">,</span> <span class="n">shape</span><span class="p">):</span>
+<span class="w">        </span><span class="sd">&quot;&quot;&quot;Transform global indices to local indices</span>
+
+<span class="sd">        When only a part of the entire domain is loaded, the indices of the cell</span>
+<span class="sd">        becomes different from the global indices. This function do the</span>
+<span class="sd">        required reindexing. The node IDs are not transformed. Assumes the</span>
+<span class="sd">        index ordering is (k, j, i).</span>
+
+<span class="sd">        Parameters</span>
+<span class="sd">        ----------</span>
+<span class="sd">        start_indices : array</span>
+<span class="sd">            (ks, js, is) of the local domain</span>
+<span class="sd">        shape : array</span>
+<span class="sd">            (nz, ny, nx) of the local domain</span>
+<span class="sd">        &quot;&quot;&quot;</span>
+        <span class="k">for</span> <span class="n">k</span><span class="p">,</span> <span class="n">v</span> <span class="ow">in</span> <span class="bp">self</span><span class="o">.</span><span class="n">nodes</span><span class="o">.</span><span class="n">items</span><span class="p">():</span>
+            <span class="n">local_indices</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">unravel_index</span><span class="p">(</span><span class="n">v</span><span class="p">,</span> <span class="bp">self</span><span class="o">.</span><span class="n">_arr_shape</span><span class="p">)</span> <span class="o">-</span> <span class="n">start_indices</span><span class="p">[:,</span><span class="kc">None</span><span class="p">]</span>
+            <span class="bp">self</span><span class="o">.</span><span class="n">nodes</span><span class="p">[</span><span class="n">k</span><span class="p">]</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">unique</span><span class="p">(</span><span class="n">np</span><span class="o">.</span><span class="n">ravel_multi_index</span><span class="p">(</span><span class="n">local_indices</span><span class="p">,</span> <span class="n">shape</span><span class="p">,</span> <span class="n">mode</span><span class="o">=</span><span class="s1">&#39;clip&#39;</span><span class="p">))</span></div>
+
     <span class="k">def</span> <span class="nf">_cut_bud</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">bud</span><span class="p">):</span>
 <span class="w">        </span><span class="sd">&quot;&quot;&quot;Remove bud node and return its member cells</span>
 
