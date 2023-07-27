@@ -315,6 +315,25 @@ class Dendrogram:
                     out = xr.DataArray(data=out, coords=coords, dims=dims)
                 return out
 
+    def reindex(self, start_indices, shape):
+        """Transform global indices to local indices
+
+        When only a part of the entire domain is loaded, the indices of the cell
+        becomes different from the global indices. This function do the
+        required reindexing. The node IDs are not transformed. Assumes the
+        index ordering is (k, j, i).
+
+        Parameters
+        ----------
+        start_indices : array
+            (ks, js, is) of the local domain
+        shape : array
+            (nz, ny, nx) of the local domain
+        """
+        for k, v in self.nodes.items():
+            local_indices = np.unravel_index(v, self._arr_shape) - start_indices[:,None]
+            self.nodes[k] = np.unique(np.ravel_multi_index(local_indices, shape, mode='clip'))
+
     def _cut_bud(self, bud):
         """Remove bud node and return its member cells
 
