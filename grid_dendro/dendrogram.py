@@ -245,6 +245,23 @@ class Dendrogram:
             cells = np.concatenate((cells, self.nodes[nd]))
         return cells
 
+    def len(self, node):
+        """
+        Returns the number of cells in a node (including descendants)
+
+        Parameters
+        ----------
+        node : int
+            Id of a selected node.
+
+        Returns
+        -------
+        int
+            Number of cells in this node
+        """
+        return len(self.get_all_descendant_cells(node))
+
+
     def filter_data(self, dat, nodes, fill_value=np.nan, drop=False):
         """Filter data by node, including all descendant nodes.
 
