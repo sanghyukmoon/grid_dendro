@@ -274,6 +274,8 @@ class Dendrogram:
         int
             ID of my sibling node
         """
+        if node == self.trunk:
+            raise ValueError("Trunk has no sibling")
         parent = self.parent[node]
         sibling = self.children[parent].copy()
         sibling.remove(node)
