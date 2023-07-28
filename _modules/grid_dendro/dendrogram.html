@@ -563,7 +563,7 @@ document.write(`
 <span class="sd">        Parameters</span>
 <span class="sd">        ----------</span>
 <span class="sd">        node : int</span>
-<span class="sd">            Id of a selected node.</span>
+<span class="sd">            ID of a selected node.</span>
 
 <span class="sd">        Returns</span>
 <span class="sd">        -------</span>
@@ -572,6 +572,23 @@ document.write(`
 <span class="sd">        &quot;&quot;&quot;</span>
         <span class="k">return</span> <span class="nb">len</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">get_all_descendant_cells</span><span class="p">(</span><span class="n">node</span><span class="p">))</span></div>
 
+<div class="viewcode-block" id="Dendrogram.sibling"><a class="viewcode-back" href="../../dendrogram.html#grid_dendro.dendrogram.Dendrogram.sibling">[docs]</a>    <span class="k">def</span> <span class="nf">sibling</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">node</span><span class="p">):</span>
+<span class="w">        </span><span class="sd">&quot;&quot;&quot;Returns my sibling</span>
+
+<span class="sd">        Parameter</span>
+<span class="sd">        ---------</span>
+<span class="sd">        node : int</span>
+<span class="sd">            ID of a selected node.</span>
+
+<span class="sd">        Returns</span>
+<span class="sd">        -------</span>
+<span class="sd">        int</span>
+<span class="sd">            ID of my sibling node</span>
+<span class="sd">        &quot;&quot;&quot;</span>
+        <span class="n">parent</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">parent</span><span class="p">[</span><span class="n">node</span><span class="p">]</span>
+        <span class="n">sibling</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">children</span><span class="p">[</span><span class="n">parent</span><span class="p">]</span><span class="o">.</span><span class="n">copy</span><span class="p">()</span>
+        <span class="n">sibling</span><span class="o">.</span><span class="n">remove</span><span class="p">(</span><span class="n">node</span><span class="p">)</span>
+        <span class="k">return</span> <span class="n">sibling</span><span class="p">[</span><span class="mi">0</span><span class="p">]</span></div>
 
 <div class="viewcode-block" id="Dendrogram.filter_data"><a class="viewcode-back" href="../../dendrogram.html#grid_dendro.dendrogram.Dendrogram.filter_data">[docs]</a>    <span class="k">def</span> <span class="nf">filter_data</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">dat</span><span class="p">,</span> <span class="n">nodes</span><span class="p">,</span> <span class="n">fill_value</span><span class="o">=</span><span class="n">np</span><span class="o">.</span><span class="n">nan</span><span class="p">,</span> <span class="n">drop</span><span class="o">=</span><span class="kc">False</span><span class="p">):</span>
 <span class="w">        </span><span class="sd">&quot;&quot;&quot;Filter data by node, including all descendant nodes.</span>
