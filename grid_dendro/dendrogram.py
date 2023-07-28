@@ -252,7 +252,7 @@ class Dendrogram:
         Parameters
         ----------
         node : int
-            Id of a selected node.
+            ID of a selected node.
 
         Returns
         -------
@@ -261,6 +261,23 @@ class Dendrogram:
         """
         return len(self.get_all_descendant_cells(node))
 
+    def sibling(self, node):
+        """Returns my sibling
+
+        Parameter
+        ---------
+        node : int
+            ID of a selected node.
+
+        Returns
+        -------
+        int
+            ID of my sibling node
+        """
+        parent = self.parent[node]
+        sibling = self.children[parent].copy()
+        sibling.remove(node)
+        return sibling[0]
 
     def filter_data(self, dat, nodes, fill_value=np.nan, drop=False):
         """Filter data by node, including all descendant nodes.
