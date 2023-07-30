@@ -259,7 +259,10 @@ class Dendrogram:
         int
             Number of cells in this node
         """
-        return len(self.get_all_descendant_cells(node))
+        ncells = len(self.nodes[node])
+        for nd in self.children[node]:
+            ncells += self.len(nd)
+        return ncells
 
     def sibling(self, node):
         """Returns my sibling
