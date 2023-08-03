@@ -373,6 +373,30 @@ class Dendrogram:
             local_indices = np.unravel_index(v, self._arr_shape) - start_indices[:,None]
             self.nodes[k] = np.unique(np.ravel_multi_index(local_indices, shape, mode='clip'))
 
+    def find_minimum(self, node):
+        """Find leaf that is at the potential minimum in this node
+
+        If node is already a leaf, return itself.
+
+        Parameters
+        ----------
+        node : int
+            ID of the node.
+
+        Returns
+        -------
+        leaf : int
+            ID of the leaf node.
+        """
+        if node in self.leaves:
+            return node
+
+        enc_leaves = list(set(self.descendants[node]).intersection(self.leaves))
+        ranks = [np.where(self.cells_ordered == nd)[0][0] for nd in enc_leaves]
+        leaf = enc_leaves[np.argmin(ranks)]
+        return leaf
+
+
     def _cut_bud(self, bud):
         """Remove bud node and return its member cells
 
