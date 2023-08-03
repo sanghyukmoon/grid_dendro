@@ -570,7 +570,10 @@ document.write(`
 <span class="sd">        int</span>
 <span class="sd">            Number of cells in this node</span>
 <span class="sd">        &quot;&quot;&quot;</span>
-        <span class="k">return</span> <span class="nb">len</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">get_all_descendant_cells</span><span class="p">(</span><span class="n">node</span><span class="p">))</span></div>
+        <span class="n">ncells</span> <span class="o">=</span> <span class="nb">len</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">nodes</span><span class="p">[</span><span class="n">node</span><span class="p">])</span>
+        <span class="k">for</span> <span class="n">nd</span> <span class="ow">in</span> <span class="bp">self</span><span class="o">.</span><span class="n">children</span><span class="p">[</span><span class="n">node</span><span class="p">]:</span>
+            <span class="n">ncells</span> <span class="o">+=</span> <span class="bp">self</span><span class="o">.</span><span class="n">len</span><span class="p">(</span><span class="n">nd</span><span class="p">)</span>
+        <span class="k">return</span> <span class="n">ncells</span></div>
 
 <div class="viewcode-block" id="Dendrogram.sibling"><a class="viewcode-back" href="../../dendrogram.html#grid_dendro.dendrogram.Dendrogram.sibling">[docs]</a>    <span class="k">def</span> <span class="nf">sibling</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">node</span><span class="p">):</span>
 <span class="w">        </span><span class="sd">&quot;&quot;&quot;Returns my sibling</span>
@@ -680,6 +683,30 @@ document.write(`
         <span class="k">for</span> <span class="n">k</span><span class="p">,</span> <span class="n">v</span> <span class="ow">in</span> <span class="bp">self</span><span class="o">.</span><span class="n">nodes</span><span class="o">.</span><span class="n">items</span><span class="p">():</span>
             <span class="n">local_indices</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">unravel_index</span><span class="p">(</span><span class="n">v</span><span class="p">,</span> <span class="bp">self</span><span class="o">.</span><span class="n">_arr_shape</span><span class="p">)</span> <span class="o">-</span> <span class="n">start_indices</span><span class="p">[:,</span><span class="kc">None</span><span class="p">]</span>
             <span class="bp">self</span><span class="o">.</span><span class="n">nodes</span><span class="p">[</span><span class="n">k</span><span class="p">]</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">unique</span><span class="p">(</span><span class="n">np</span><span class="o">.</span><span class="n">ravel_multi_index</span><span class="p">(</span><span class="n">local_indices</span><span class="p">,</span> <span class="n">shape</span><span class="p">,</span> <span class="n">mode</span><span class="o">=</span><span class="s1">&#39;clip&#39;</span><span class="p">))</span></div>
+
+<div class="viewcode-block" id="Dendrogram.find_minimum"><a class="viewcode-back" href="../../dendrogram.html#grid_dendro.dendrogram.Dendrogram.find_minimum">[docs]</a>    <span class="k">def</span> <span class="nf">find_minimum</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">node</span><span class="p">):</span>
+<span class="w">        </span><span class="sd">&quot;&quot;&quot;Find leaf that is at the potential minimum in this node</span>
+
+<span class="sd">        If node is already a leaf, return itself.</span>
+
+<span class="sd">        Parameters</span>
+<span class="sd">        ----------</span>
+<span class="sd">        node : int</span>
+<span class="sd">            ID of the node.</span>
+
+<span class="sd">        Returns</span>
+<span class="sd">        -------</span>
+<span class="sd">        leaf : int</span>
+<span class="sd">            ID of the leaf node.</span>
+<span class="sd">        &quot;&quot;&quot;</span>
+        <span class="k">if</span> <span class="n">node</span> <span class="ow">in</span> <span class="bp">self</span><span class="o">.</span><span class="n">leaves</span><span class="p">:</span>
+            <span class="k">return</span> <span class="n">node</span>
+
+        <span class="n">enc_leaves</span> <span class="o">=</span> <span class="nb">list</span><span class="p">(</span><span class="nb">set</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">descendants</span><span class="p">[</span><span class="n">node</span><span class="p">])</span><span class="o">.</span><span class="n">intersection</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">leaves</span><span class="p">))</span>
+        <span class="n">ranks</span> <span class="o">=</span> <span class="p">[</span><span class="n">np</span><span class="o">.</span><span class="n">where</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">cells_ordered</span> <span class="o">==</span> <span class="n">nd</span><span class="p">)[</span><span class="mi">0</span><span class="p">][</span><span class="mi">0</span><span class="p">]</span> <span class="k">for</span> <span class="n">nd</span> <span class="ow">in</span> <span class="n">enc_leaves</span><span class="p">]</span>
+        <span class="n">leaf</span> <span class="o">=</span> <span class="n">enc_leaves</span><span class="p">[</span><span class="n">np</span><span class="o">.</span><span class="n">argmin</span><span class="p">(</span><span class="n">ranks</span><span class="p">)]</span>
+        <span class="k">return</span> <span class="n">leaf</span></div>
+
 
     <span class="k">def</span> <span class="nf">_cut_bud</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">bud</span><span class="p">):</span>
 <span class="w">        </span><span class="sd">&quot;&quot;&quot;Remove bud node and return its member cells</span>

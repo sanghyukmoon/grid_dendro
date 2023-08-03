@@ -517,6 +517,24 @@ and data type unless <a href="#id1"><span class="problematic" id="id2">`</span><
 </dd></dl>
 
 <dl class="py method">
+<dt class="sig sig-object py" id="grid_dendro.dendrogram.Dendrogram.find_minimum">
+<span class="sig-name descname"><span class="pre">find_minimum</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">node</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="_modules/grid_dendro/dendrogram.html#Dendrogram.find_minimum"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#grid_dendro.dendrogram.Dendrogram.find_minimum" title="Permalink to this definition">#</a></dt>
+<dd><p>Find leaf that is at the potential minimum in this node</p>
+<p>If node is already a leaf, return itself.</p>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters</dt>
+<dd class="field-odd"><p><strong>node</strong> (<em>int</em>) – ID of the node.</p>
+</dd>
+<dt class="field-even">Returns</dt>
+<dd class="field-even"><p><strong>leaf</strong> – ID of the leaf node.</p>
+</dd>
+<dt class="field-odd">Return type</dt>
+<dd class="field-odd"><p>int</p>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="py method">
 <dt class="sig sig-object py" id="grid_dendro.dendrogram.Dendrogram.get_all_descendant_cells">
 <span class="sig-name descname"><span class="pre">get_all_descendant_cells</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">node</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="_modules/grid_dendro/dendrogram.html#Dendrogram.get_all_descendant_cells"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#grid_dendro.dendrogram.Dendrogram.get_all_descendant_cells" title="Permalink to this definition">#</a></dt>
 <dd><p>Return all member cells of the node, including descendant nodes</p>
