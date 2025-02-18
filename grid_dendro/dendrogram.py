@@ -354,24 +354,60 @@ class Dendrogram:
                     out = xr.DataArray(data=out, coords=coords, dims=dims)
                 return out
 
-    def reindex(self, start_indices, shape):
-        """Transform global indices to local indices
+    def reindex(self, start_indices, target_shape, direction='forward'):
+        """Transform global indices to local indices and vice versa.
 
         When only a part of the entire domain is loaded, the indices of the cell
         becomes different from the global indices. This function do the
-        required reindexing. The node IDs are not transformed. Assumes the
-        index ordering is (k, j, i).
+        required reindexing. Assumes the index ordering is (k, j, i).
+
+        When direction='forward', the transform is from global to local. In this case,
+        the node IDs are not transformed and only the values are transformed. The use
+        case is to filter the partially loaded data using the full dendrogram.
+
+        When direction='backward', the trasnform is from local to global. This is
+        useful when a dendrogram is constructed using the local data cube. Both the
+        key and values (i.e., node IDs and cell indices) are transformed in this case.
 
         Parameters
         ----------
-        start_indices : array
+        start_indices : numpy.ndarray
             (ks, js, is) of the local domain
-        shape : array
+        target_shape : numpy.ndarray
             (nz, ny, nx) of the local domain
         """
-        for k, v in self.nodes.items():
-            local_indices = np.unravel_index(v, self._arr_shape) - start_indices[:,None]
-            self.nodes[k] = np.unique(np.ravel_multi_index(local_indices, shape, mode='clip'))
+        if direction == 'forward':
+            for k, v in self.nodes.items():
+                local_indices = np.unravel_index(v, self._arr_shape, order='C') - start_indices[:,None]
+                self.nodes[k] = np.unique(np.ravel_multi_index(local_indices, target_shape, mode='clip'))
+            # TODO reindex children, parent, ancestor, descendants
+
+        if direction == 'backward':
+            # Reindex nodes
+            new_keys = dict()
+            for k, v in self.nodes.items():
+                global_indices = np.unravel_index(v, self._arr_shape, order='C') + start_indices[:,None]
+                global_indices = global_indices % target_shape[:,None]
+                self.nodes[k] = np.ravel_multi_index(global_indices, target_shape, mode='raise')
+                # Transform keys
+                global_indices = np.unravel_index(k, self._arr_shape, order='C') + start_indices
+                global_indices = global_indices % target_shape
+                new_keys[k] = np.ravel_multi_index(global_indices, target_shape, mode='raise')
+            self.nodes = {new_keys[k]: v for k, v in self.nodes.items()}
+
+            # Reindex children
+            new_keys = dict()
+            for k, v in self.children.items():
+                if len(v) != 0:
+                    global_indices = np.unravel_index(np.array(v), self._arr_shape, order='C') + start_indices[:,None]
+                    global_indices = global_indices % target_shape[:,None]
+                    self.children[k] = list(np.ravel_multi_index(global_indices, target_shape, mode='raise'))
+                # Transform keys
+                global_indices = np.unravel_index(k, self._arr_shape, order='C') + start_indices
+                global_indices = global_indices % target_shape
+                new_keys[k] = np.ravel_multi_index(global_indices, target_shape, mode='raise')
+            self.children = {new_keys[k]: v for k, v in self.children.items()}
+            # TODO: Reindex parent, ancestor, descendants
 
     def find_minimum(self, node):
         """Find leaf that is at the potential minimum in this node
