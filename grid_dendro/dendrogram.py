@@ -47,6 +47,7 @@ class Dendrogram:
         self._arr_shape = arr.shape
         self._boundary_flag = boundary_flag
         self._verbose = verbose
+        self._fully_constructed = False
 
         # Create leaf nodes by finding all local minima.
         if self._boundary_flag == 'periodic':
@@ -71,7 +72,7 @@ class Dendrogram:
         else:
             raise MemoryError("Input array size is too large")
 
-    def construct(self):
+    def construct(self, early_termination=None):
         """Construct dendrogram
 
         Constructs dendrogram dictionaries: nodes, parent, children,
@@ -116,6 +117,7 @@ class Dendrogram:
             print("Start climbing up the tree from the leaf nodes.\t"
                   f"Number of nodes = {len(self.nodes)}")
         # Climb up the potential and construct dendrogram.
+        counter = 0
         for cell in iter(self.cells_ordered):
             if cell in self.minima:
                 # Performance critical to have type(self.minima) = set for
@@ -159,6 +161,11 @@ class Dendrogram:
                     if self._verbose:
                         print("We have reached the trunk. Stop climbing up")
                     break
+                counter += 1
+                if counter == early_termination:
+                    if self._verbose:
+                        print("Terminating early.")
+                    break
 
         # Construct parent dictionary from parent_array
         self.parent = {}
@@ -167,6 +174,11 @@ class Dendrogram:
             self.parent[k] = parent_array[k].astype(self._dtype)
             self.nodes[k] = np.array(v).astype(self._dtype)
         self.cells_ordered = self.cells_ordered.astype(self._dtype)
+        # NOTE: The above cast is done posteriori to save memory.
+        # it seems that using native int results in better performance
+        # (maybe because int64 better fits in 64bit system).
+
+        self._fully_constructed = True if early_termination is None else False
 
         # Find leaves and trunk
         self._find_leaves()
@@ -605,6 +617,9 @@ class Dendrogram:
         return None
 
     def _find_trunk(self):
+        if not self._fully_constructed:
+            self.trunk = None
+            return
         # TODO use set instead of np.unique
         trunk = np.unique(list(self.ancestor.values()))
         if len(trunk) != 1:
