@@ -383,6 +383,8 @@ class Dendrogram:
                 local_indices = (np.unravel_index(v, self._arr_shape, order='C')
                                  - start_indices[:, None])
                 self.nodes[k] = np.unique(
+                    # TODO Rather than below, we should explicitly remove
+                    # out-of-bound indices.
                     np.ravel_multi_index(
                         local_indices, target_shape, mode='clip', order='C'
                     ).astype(self._dtype)
