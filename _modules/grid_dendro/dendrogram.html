@@ -387,6 +387,7 @@ document.write(`
         <span class="bp">self</span><span class="o">.</span><span class="n">_arr_shape</span> <span class="o">=</span> <span class="n">arr</span><span class="o">.</span><span class="n">shape</span>
         <span class="bp">self</span><span class="o">.</span><span class="n">_boundary_flag</span> <span class="o">=</span> <span class="n">boundary_flag</span>
         <span class="bp">self</span><span class="o">.</span><span class="n">_verbose</span> <span class="o">=</span> <span class="n">verbose</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">_fully_constructed</span> <span class="o">=</span> <span class="kc">False</span>
 
         <span class="c1"># Create leaf nodes by finding all local minima.</span>
         <span class="k">if</span> <span class="bp">self</span><span class="o">.</span><span class="n">_boundary_flag</span> <span class="o">==</span> <span class="s1">&#39;periodic&#39;</span><span class="p">:</span>
@@ -411,7 +412,7 @@ document.write(`
         <span class="k">else</span><span class="p">:</span>
             <span class="k">raise</span> <span class="ne">MemoryError</span><span class="p">(</span><span class="s2">&quot;Input array size is too large&quot;</span><span class="p">)</span>
 
-<div class="viewcode-block" id="Dendrogram.construct"><a class="viewcode-back" href="../../dendrogram.html#grid_dendro.dendrogram.Dendrogram.construct">[docs]</a>    <span class="k">def</span><span class="w"> </span><span class="nf">construct</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+<div class="viewcode-block" id="Dendrogram.construct"><a class="viewcode-back" href="../../dendrogram.html#grid_dendro.dendrogram.Dendrogram.construct">[docs]</a>    <span class="k">def</span><span class="w"> </span><span class="nf">construct</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">early_termination</span><span class="o">=</span><span class="kc">None</span><span class="p">):</span>
 <span class="w">        </span><span class="sd">&quot;&quot;&quot;Construct dendrogram</span>
 
 <span class="sd">        Constructs dendrogram dictionaries: nodes, parent, children,</span>
@@ -456,6 +457,7 @@ document.write(`
             <span class="nb">print</span><span class="p">(</span><span class="s2">&quot;Start climbing up the tree from the leaf nodes.</span><span class="se">\t</span><span class="s2">&quot;</span>
                   <span class="sa">f</span><span class="s2">&quot;Number of nodes = </span><span class="si">{</span><span class="nb">len</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">nodes</span><span class="p">)</span><span class="si">}</span><span class="s2">&quot;</span><span class="p">)</span>
         <span class="c1"># Climb up the potential and construct dendrogram.</span>
+        <span class="n">counter</span> <span class="o">=</span> <span class="mi">0</span>
         <span class="k">for</span> <span class="n">cell</span> <span class="ow">in</span> <span class="nb">iter</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">cells_ordered</span><span class="p">):</span>
             <span class="k">if</span> <span class="n">cell</span> <span class="ow">in</span> <span class="bp">self</span><span class="o">.</span><span class="n">minima</span><span class="p">:</span>
                 <span class="c1"># Performance critical to have type(self.minima) = set for</span>
@@ -499,6 +501,11 @@ document.write(`
                     <span class="k">if</span> <span class="bp">self</span><span class="o">.</span><span class="n">_verbose</span><span class="p">:</span>
                         <span class="nb">print</span><span class="p">(</span><span class="s2">&quot;We have reached the trunk. Stop climbing up&quot;</span><span class="p">)</span>
                     <span class="k">break</span>
+                <span class="n">counter</span> <span class="o">+=</span> <span class="mi">1</span>
+                <span class="k">if</span> <span class="n">counter</span> <span class="o">==</span> <span class="n">early_termination</span><span class="p">:</span>
+                    <span class="k">if</span> <span class="bp">self</span><span class="o">.</span><span class="n">_verbose</span><span class="p">:</span>
+                        <span class="nb">print</span><span class="p">(</span><span class="s2">&quot;Terminating early.&quot;</span><span class="p">)</span>
+                    <span class="k">break</span>
 
         <span class="c1"># Construct parent dictionary from parent_array</span>
         <span class="bp">self</span><span class="o">.</span><span class="n">parent</span> <span class="o">=</span> <span class="p">{}</span>
@@ -507,6 +514,11 @@ document.write(`
             <span class="bp">self</span><span class="o">.</span><span class="n">parent</span><span class="p">[</span><span class="n">k</span><span class="p">]</span> <span class="o">=</span> <span class="n">parent_array</span><span class="p">[</span><span class="n">k</span><span class="p">]</span><span class="o">.</span><span class="n">astype</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">_dtype</span><span class="p">)</span>
             <span class="bp">self</span><span class="o">.</span><span class="n">nodes</span><span class="p">[</span><span class="n">k</span><span class="p">]</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">array</span><span class="p">(</span><span class="n">v</span><span class="p">)</span><span class="o">.</span><span class="n">astype</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">_dtype</span><span class="p">)</span>
         <span class="bp">self</span><span class="o">.</span><span class="n">cells_ordered</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">cells_ordered</span><span class="o">.</span><span class="n">astype</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">_dtype</span><span class="p">)</span>
+        <span class="c1"># NOTE: The above cast is done posteriori to save memory.</span>
+        <span class="c1"># it seems that using native int results in better performance</span>
+        <span class="c1"># (maybe because int64 better fits in 64bit system).</span>
+
+        <span class="bp">self</span><span class="o">.</span><span class="n">_fully_constructed</span> <span class="o">=</span> <span class="kc">True</span> <span class="k">if</span> <span class="n">early_termination</span> <span class="ow">is</span> <span class="kc">None</span> <span class="k">else</span> <span class="kc">False</span>
 
         <span class="c1"># Find leaves and trunk</span>
         <span class="bp">self</span><span class="o">.</span><span class="n">_find_leaves</span><span class="p">()</span>
@@ -945,13 +957,16 @@ document.write(`
         <span class="k">return</span> <span class="kc">None</span>
 
     <span class="k">def</span><span class="w"> </span><span class="nf">_find_trunk</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+        <span class="k">if</span> <span class="ow">not</span> <span class="bp">self</span><span class="o">.</span><span class="n">_fully_constructed</span><span class="p">:</span>
+            <span class="bp">self</span><span class="o">.</span><span class="n">trunk</span> <span class="o">=</span> <span class="kc">None</span>
+            <span class="k">return</span>
         <span class="c1"># TODO use set instead of np.unique</span>
-        <span class="n">trunk</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">unique</span><span class="p">(</span><span class="nb">list</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">ancestor</span><span class="o">.</span><span class="n">values</span><span class="p">()))</span>
+        <span class="n">trunk</span> <span class="o">=</span> <span class="nb">set</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">ancestor</span><span class="o">.</span><span class="n">values</span><span class="p">())</span>
         <span class="k">if</span> <span class="nb">len</span><span class="p">(</span><span class="n">trunk</span><span class="p">)</span> <span class="o">!=</span> <span class="mi">1</span><span class="p">:</span>
             <span class="k">raise</span> <span class="ne">Exception</span><span class="p">(</span><span class="s2">&quot;There are more than one trunk.&quot;</span>
                             <span class="s2">&quot; Something must be wrong&quot;</span><span class="p">)</span>
         <span class="k">else</span><span class="p">:</span>
-            <span class="bp">self</span><span class="o">.</span><span class="n">trunk</span> <span class="o">=</span> <span class="n">trunk</span><span class="p">[</span><span class="mi">0</span><span class="p">]</span></div>
+            <span class="bp">self</span><span class="o">.</span><span class="n">trunk</span> <span class="o">=</span> <span class="n">trunk</span><span class="o">.</span><span class="n">pop</span><span class="p">()</span></div>
 
 
 <div class="viewcode-block" id="filter_by_dict"><a class="viewcode-back" href="../../dendrogram.html#grid_dendro.dendrogram.filter_by_dict">[docs]</a><span class="k">def</span><span class="w"> </span><span class="nf">filter_by_dict</span><span class="p">(</span><span class="n">dat</span><span class="p">,</span> <span class="n">node_dict</span><span class="o">=</span><span class="kc">None</span><span class="p">,</span> <span class="n">cells</span><span class="o">=</span><span class="kc">None</span><span class="p">,</span>
