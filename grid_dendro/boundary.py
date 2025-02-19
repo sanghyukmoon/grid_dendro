@@ -90,6 +90,14 @@ def precompute_neighbor(shape, boundary_flag, corner=True):
 
     # Caution: allow out-of-bound index for performance.
     class pcnDict(dict):
+        """Dictionary mapping from the cell index to the indices of its neighbors
+
+        pcn = pcnDict()
+        pcn[k] returns the neighbor indices of the k-th cell.
+        If k fall on the boundary, it finds the precomputed neighbor indices
+        nghbr_idx from the dictionary. Otherwise, it computes the neighbor
+        indices on-the-fly by k + displacements.
+        """
         def __getitem__(self, index):
             return self.get(index, index+displacements)
     pcn = pcnDict(zip(bndry_idx, nghbr_idx))
