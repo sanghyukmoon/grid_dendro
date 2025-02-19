@@ -80,10 +80,12 @@ def precompute_neighbor(shape, boundary_flag, corner=True):
     else:
         raise Exception("unknown boundary mode")
     nghbr_idx = bndry_idx_3d[:, :, None] + offset[:, None, :]
-    nghbr_idx = np.ravel_multi_index(nghbr_idx, shape, mode=mode)
+    nghbr_idx = np.ravel_multi_index(nghbr_idx, shape, mode=mode).astype(dtype)
 
-    displacements = (np.ravel_multi_index(np.array([1, 1, 1])[:,None] + offset, shape, mode=mode)
-     - np.ravel_multi_index(np.array([1, 1, 1]), shape, mode=mode))
+    p0 = np.array([1, 1, 1])
+    displacements = (np.ravel_multi_index(p0[:,None] + offset, shape, mode=mode
+                                          ).astype(dtype)
+                     - np.ravel_multi_index(p0, shape, mode=mode).astype(dtype))
 
     # Caution: allow out-of-bound index for performance.
     class pcnDict(dict):
@@ -163,7 +165,7 @@ def _get_boundary_indices(shape, dtype):
             # dimensions with desired shape nzs
             ndnis[j] = dni[j][tuple(selj)] + nzs
         ndnis[i] = 0
-        bi += list(np.ravel_multi_index(ndnis, shape).flatten())
+        bi += list(np.ravel_multi_index(ndnis, shape).astype(dtype).flatten())
         ndnis[i] = shape[i]-1
-        bi += list(np.ravel_multi_index(ndnis, shape).flatten())
+        bi += list(np.ravel_multi_index(ndnis, shape).astype(dtype).flatten())
     return bi
