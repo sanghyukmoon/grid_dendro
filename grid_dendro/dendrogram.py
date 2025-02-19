@@ -621,12 +621,12 @@ class Dendrogram:
             self.trunk = None
             return
         # TODO use set instead of np.unique
-        trunk = np.unique(list(self.ancestor.values()))
+        trunk = set(self.ancestor.values())
         if len(trunk) != 1:
             raise Exception("There are more than one trunk."
                             " Something must be wrong")
         else:
-            self.trunk = trunk[0]
+            self.trunk = trunk.pop()
 
 
 def filter_by_dict(dat, node_dict=None, cells=None,
