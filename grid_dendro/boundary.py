@@ -30,83 +30,71 @@ def get_edge_cells(cells, pcn):
     return edge_cells
 
 
-def precompute_neighbor(shape, boundary_flag, corner=True):
-    """Precompute neighbor indices
+class precompute_neighbor(dict):
+    """Dictionary mapping from the cell index to the indices of its neighbors
+
+    The object acts like a pseudo-array of the shape (Ncells, N_neighbors),
+    such that obj[k] returns the neighbor indices of the k-th cell.
+    If k fall on the boundary, it finds the precomputed neighbor indices
+    (nghbr_idx) from the dictionary. Otherwise, it computes the neighbor
+    indices on-the-fly by k + displacements.
+
+    Caution: allow out-of-bound index for performance.
+
+    Examples
+    --------
+    pcn = pcnDict()
+    pcn[1][0] is the flattened index of the (-1,-1,-1) neighbor of the
+    (k,j,i) = (0,0,1) cell, which is
+    (k,j,i) = (-1, -1, 0) = (Nz-1, Ny-1, 0)
+    for periodic BC. See docstring of get_offsets for the ordering of
+    neighbor directions.
 
     Parameters
     ----------
-    shape : tuple
+    shape : array-like
         shape of the input data
-    boundary_flag : str
+    boundary_flag : str, {'periodic', 'outflow'}
         Flag for boundary condition. Affects how to set neighbors of the
         edge cells.
-    corner : Boolean, optional
+    corner : Boolean, default: True
         If true, the corner cells are counted as neighbors
         (26 neighbors in total)
-
-    Returns
-    -------
-    pcn : pcnDict
-        This is a pseudo-array of the shape (Ncells, N_neighbors), such that
-        pcn[1][0] is the flattened index of the (-1,-1,-1) neighbor of the
-        (k,j,i) = (0,0,1) cell, which is
-        (k,j,i) = (-1, -1, 0) = (Nz-1, Ny-1, 0)
-        for periodic BC. See docstring of get_offsets for the ordering of
-        neighbor directions.
-        The actual data is stored in memory only along the boundary points
-        (e.g., i=0, j=32, k=32 for 64^3 mesh), such that the dictionary
-        returns the value bpcn when given a key bi; otherwise, it computes
-        the neighbor indices on-the-fly, by index+displacements.
     """
+    def __init__(self, shape, boundary_flag, corner=True):
+        if boundary_flag == 'periodic':
+            mode = 'wrap'
+        elif boundary_flag == 'outflow':
+            mode = 'clip'
+        else:
+            raise Exception("unknown boundary mode")
 
-    # memory efficient version of pcn, by precomputing only the boundary,
-    # computing interior points on the fly.
-    Ncells = np.prod(shape)
-    # Save on memory when applicable
-    if Ncells < 2**31:
-        dtype = np.int32
-    else:
-        dtype = np.int64
-    offset = _get_offsets(len(shape), corner)
+        num_cells = np.prod(shape)
+        # Save on memory when applicable
+        if num_cells < 2**31:
+            dtype = np.int32
+        else:
+            dtype = np.int64
+        offset = _get_offsets(len(shape), corner)
 
-    # Calculate flattened indices of boundary cells
-    bndry_idx = _get_boundary_indices(shape, dtype)
-    bndry_idx_3d = np.array(np.unravel_index(bndry_idx, shape), dtype=dtype)
+        # Calculate flattened indices of boundary cells
+        bndry_idx = _get_boundary_indices(shape, dtype)
+        bndry_idx_3d = np.array(np.unravel_index(bndry_idx, shape), dtype=dtype)
 
-    # shape of bpcn = [N_boundary_cells, N_neighbors(=26 for corner=True)]
-    if boundary_flag == 'periodic':
-        mode = 'wrap'
-    elif boundary_flag == 'outflow':
-        mode = 'clip'
-    else:
-        raise Exception("unknown boundary mode")
-    nghbr_idx = bndry_idx_3d[:, :, None] + offset[:, None, :]
-    nghbr_idx = np.ravel_multi_index(nghbr_idx, shape, mode=mode, order='C').astype(dtype)
+        # shape of nghbr_idx = [N_boundary_cells, N_neighbors(=26 for corner=True)]
+        nghbr_idx = bndry_idx_3d[:, :, None] + offset[:, None, :]
+        nghbr_idx = np.ravel_multi_index(nghbr_idx, shape, mode=mode, order='C').astype(dtype)
 
-    p0 = np.array([1, 1, 1])
-    displacements = (np.ravel_multi_index(p0[:,None] + offset, shape, mode='raise',
-                                          order='C').astype(dtype)
-                     - np.ravel_multi_index(p0, shape, mode='raise',
-                                            order='C').astype(dtype))
+        p0 = np.array([1, 1, 1])
+        self.displacements = (np.ravel_multi_index(p0[:,None] + offset, shape, mode='raise',
+                                                   order='C').astype(dtype)
+                              - np.ravel_multi_index(p0, shape, mode='raise',
+                                                     order='C').astype(dtype))
 
-    # Caution: allow out-of-bound index for performance.
-    class pcnDict(dict):
-        """Dictionary mapping from the cell index to the indices of its neighbors
+        super().__init__(zip(bndry_idx, nghbr_idx))
 
-        Examples
-        --------
-        pcn = pcnDict()
-        pcn[k] returns the neighbor indices of the k-th cell.
-        If k fall on the boundary, it finds the precomputed neighbor indices
-        (nghbr_idx) from the dictionary. Otherwise, it computes the neighbor
-        indices on-the-fly by k + displacements.
-        """
-        def __missing__(self, key):
-            return self.get(key, key + displacements)
-    pcn = pcnDict(zip(bndry_idx, nghbr_idx))
-
-    return pcn
-
+    def __missing__(self, key):
+        return self.get(key, key + self.displacements)
 
 def _get_offsets(dim, corner=True):
     """Compute 1-D flattened array offsets corresponding to neighbors
