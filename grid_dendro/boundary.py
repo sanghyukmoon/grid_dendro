@@ -1,7 +1,5 @@
-from itertools import product
+import itertools
 import numpy as np
-
-# TODO(SMOON): refactoring is required
 
 
 def get_edge_cells(cells, pcn):
@@ -69,14 +67,29 @@ def precompute_neighbor(shape, boundary_flag, corner=True):
     else:
         dtype = np.int64
     offset = _get_offsets(len(shape), corner)
-    bi, bpcn = _boundary_i_bcn(shape, dtype, offset, corner, boundary_flag)
-    displacements = _compute_displacement(shape, corner)
+
+    # Calculate flattened indices of boundary cells
+    bndry_idx = _get_boundary_indices(shape, dtype)
+    bndry_idx_3d = np.array(np.unravel_index(bndry_idx, shape), dtype=dtype)
+
+    # shape of bpcn = [N_boundary_cells, N_neighbors(=26 for corner=True)]
+    if boundary_flag == 'periodic':
+        mode = 'wrap'
+    elif boundary_flag == 'outflow':
+        mode = 'clip'
+    else:
+        raise Exception("unknown boundary mode")
+    nghbr_idx = bndry_idx_3d[:, :, None] + offset[:, None, :]
+    nghbr_idx = np.ravel_multi_index(nghbr_idx, shape, mode=mode)
+
+    displacements = (np.ravel_multi_index(np.array([1, 1, 1])[:,None] + offset, shape, mode=mode)
+     - np.ravel_multi_index(np.array([1, 1, 1]), shape, mode=mode))
 
     # Caution: allow out-of-bound index for performance.
     class pcnDict(dict):
         def __getitem__(self, index):
             return self.get(index, index+displacements)
-    pcn = pcnDict(zip(bi, bpcn))
+    pcn = pcnDict(zip(bndry_idx, nghbr_idx))
     return pcn
 
 
@@ -110,35 +123,13 @@ def _get_offsets(dim, corner=True):
         ...
     """
     offs = [-1, 0, 1]
-    offsets = list(product(offs, repeat=dim))
+    offsets = list(itertools.product(offs, repeat=dim))
     if corner:
         offsets.remove((0,)*dim)
     else:
         offsets = [i for i in offsets if i.count(0) == 2]
     offsets = np.array(offsets, dtype=np.int32)
-    return offsets
-
-
-def _boundary_i_bcn(shape, dtype, offsets, corner, boundary_flag):
-    # returns boundary indices and boundary's neighbor indices.
-    boundary_indices = _get_boundary_indices(shape, dtype)
-    boundary_coords = np.array(np.unravel_index(boundary_indices, shape),
-                               dtype=dtype)
-    bpcn = _boundary_pcn(boundary_coords, offsets, shape, corner,
-                         boundary_flag=boundary_flag).astype(dtype)
-    return boundary_indices, bpcn
-
-
-def _boundary_pcn(coords, offsets, shape, corner, boundary_flag):
-    if boundary_flag == 'periodic':
-        mode = 'wrap'
-    elif boundary_flag == 'outflow':
-        mode = 'clip'
-    else:
-        raise Exception("unknown boundary mode")
-    newcoords = coords[:, :, None] + np.transpose(offsets)[:, None, :]
-    output = np.ravel_multi_index(newcoords, shape, mode=mode)
-    return output
+    return offsets.T
 
 
 def _get_boundary_indices(shape, dtype):
@@ -176,18 +167,3 @@ def _get_boundary_indices(shape, dtype):
         ndnis[i] = shape[i]-1
         bi += list(np.ravel_multi_index(ndnis, shape).flatten())
     return bi
-
-
-def _compute_displacement(shape, corner):
-    nps = np.prod(shape)
-    # save on memory when applicable
-    if nps < 2**31:
-        dtype = np.int32
-    else:
-        dtype = np.int64
-    dim = len(shape)
-    offsets = _get_offsets(dim, corner)
-    factor = np.cumprod(np.append([1], shape[::-1]))[:-1][::-1]
-    factor = factor.astype(dtype)
-    displacements = (offsets*factor).sum(axis=1)
-    return displacements
