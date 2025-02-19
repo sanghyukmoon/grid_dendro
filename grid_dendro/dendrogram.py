@@ -371,49 +371,64 @@ class Dendrogram:
 
         Parameters
         ----------
-        start_indices : numpy.ndarray
+        start_indices : array-like
             (ks, js, is) of the local domain
-        target_shape : numpy.ndarray
+        target_shape : array-like
             (nz, ny, nx) of the local domain
         """
+        start_indices = np.array(start_indices)
+        target_shape = np.array(target_shape)
         if direction == 'forward':
             for k, v in self.nodes.items():
-                local_indices = np.unravel_index(v, self._arr_shape, order='C') - start_indices[:,None]
-                self.nodes[k] = np.unique(np.ravel_multi_index(local_indices, target_shape, mode='clip'
-                                                               ).astype(self._dtype))
+                local_indices = (np.unravel_index(v, self._arr_shape, order='C')
+                                 - start_indices[:, None])
+                self.nodes[k] = np.unique(
+                    np.ravel_multi_index(
+                        local_indices, target_shape, mode='clip', order='C'
+                    ).astype(self._dtype)
+                )
             # TODO reindex children, parent, ancestor, descendants
 
         if direction == 'backward':
             # Reindex nodes
             new_keys = dict()
             for k, v in self.nodes.items():
-                global_indices = np.unravel_index(v, self._arr_shape, order='C') + start_indices[:,None]
+                global_indices = (np.unravel_index(v, self._arr_shape, order='C')
+                                  + start_indices[:,None])
                 global_indices = global_indices % target_shape[:,None]
-                self.nodes[k] = np.ravel_multi_index(global_indices, target_shape, mode='raise'
-                                                     ).astype(self._dtype)
+                self.nodes[k] = np.ravel_multi_index(
+                                    global_indices, target_shape, mode='raise', order='C'
+                                ).astype(self._dtype)
                 # Transform keys
-                global_indices = np.unravel_index(k, self._arr_shape, order='C') + start_indices
+                global_indices = (np.unravel_index(k, self._arr_shape, order='C')
+                                  + start_indices)
                 global_indices = global_indices % target_shape
-                new_keys[k] = np.ravel_multi_index(global_indices, target_shape, mode='raise'
-                                                   ).astype(self._dtype)
+                new_keys[k] = np.ravel_multi_index(
+                                  global_indices, target_shape, mode='raise', order='C'
+                              ).astype(self._dtype)
             self.nodes = {new_keys[k]: v for k, v in self.nodes.items()}
 
             # Reindex children
             new_keys = dict()
             for k, v in self.children.items():
                 if len(v) != 0:
-                    global_indices = np.unravel_index(np.array(v), self._arr_shape, order='C'
-                                                      ) + start_indices[:,None]
+                    global_indices = (
+                        np.unravel_index(np.array(v), self._arr_shape, order='C')
+                        + start_indices[:,None]
+                    )
                     global_indices = global_indices % target_shape[:,None]
-                    self.children[k] = list(np.ravel_multi_index(global_indices,
-                                                                 target_shape,
-                                                                 mode='raise'
-                                                                 ).astype(self._dtype))
+                    self.children[k] = list(
+                        np.ravel_multi_index(
+                            global_indices, target_shape, mode='raise', order='C'
+                        ).astype(self._dtype)
+                    )
                 # Transform keys
-                global_indices = np.unravel_index(k, self._arr_shape, order='C') + start_indices
+                global_indices = (np.unravel_index(k, self._arr_shape, order='C')
+                                  + start_indices)
                 global_indices = global_indices % target_shape
-                new_keys[k] = np.ravel_multi_index(global_indices, target_shape,
-                                                   mode='raise').astype(self._dtype)
+                new_keys[k] = np.ravel_multi_index(
+                    global_indices, target_shape, mode='raise', order='C'
+                ).astype(self._dtype)
             self.children = {new_keys[k]: v for k, v in self.children.items()}
             # TODO: Reindex parent, ancestor, descendants
 
