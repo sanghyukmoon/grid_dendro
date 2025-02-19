@@ -110,9 +110,8 @@ class Dendrogram:
         parent_array[list(self.minima)] = list(self.minima)
 
         # Load neighbor dictionary.
-        my_neighbors = boundary.precompute_neighbor(self._arr_shape,
-                                                    self._boundary_flag,
-                                                    corner=True)
+        my_neighbors = boundary.NeighborIndex(self._arr_shape, self._boundary_flag,
+                                              corner=True)
         if self._verbose:
             print("Start climbing up the tree from the leaf nodes.\t"
                   f"Number of nodes = {len(self.nodes)}")

@@ -3,34 +3,7 @@ import itertools
 import numpy as np
 
 
-def get_edge_cells(cells, pcn):
-    """Find edge cells of the given region
-
-    Parameters
-    ----------
-    cells : array_like
-        flattened indices that defines some region
-    pcn : array_like
-        precomputed neighbors.
-
-    Return
-    ------
-    edge_cells : array_like
-        flattened indices that defines edge cells of the given region
-    """
-    cells = np.array(cells)
-    # For each cell, are there neighboring cells which is not contained
-    # in the given region? That is, is there any element of "pcn" which is
-    # not contained in "cells"?
-    neighbors = [pcn[i] for i in cells]
-    adjacent_exterior = np.isin(neighbors, cells, invert=True)
-    # If any of N_neighbor cells fall in exterior region, mark True.
-    edge_mask = np.any(adjacent_exterior, axis=1)
-    edge_cells = cells[edge_mask]
-    return edge_cells
-
-
-class precompute_neighbor(dict):
+class NeighborIndex(dict):
     """Dictionary mapping from the cell index to the indices of its neighbors
 
     The object acts like a pseudo-array of the shape (Ncells, N_neighbors),
@@ -40,15 +13,6 @@ class precompute_neighbor(dict):
     indices on-the-fly by k + displacements.
 
     Caution: allow out-of-bound index for performance.
-
-    Examples
-    --------
-    pcn = pcnDict()
-    pcn[1][0] is the flattened index of the (-1,-1,-1) neighbor of the
-    (k,j,i) = (0,0,1) cell, which is
-    (k,j,i) = (-1, -1, 0) = (Nz-1, Ny-1, 0)
-    for periodic BC. See docstring of get_offsets for the ordering of
-    neighbor directions.
 
     Parameters
     ----------
@@ -60,6 +24,15 @@ class precompute_neighbor(dict):
     corner : Boolean, default: True
         If true, the corner cells are counted as neighbors
         (26 neighbors in total)
+
+    Examples
+    --------
+    pcn = pcnDict()
+    pcn[1][0] is the flattened index of the (-1,-1,-1) neighbor of the
+    (k,j,i) = (0,0,1) cell, which is
+    (k,j,i) = (-1, -1, 0) = (Nz-1, Ny-1, 0)
+    for periodic BC. See docstring of get_offsets for the ordering of
+    neighbor directions.
     """
     def __init__(self, shape, boundary_flag, corner=True):
         if boundary_flag == 'periodic':
@@ -95,6 +68,34 @@ class precompute_neighbor(dict):
 
     def __missing__(self, key):
         return self.get(key, key + self.displacements)
+
+
+def get_edge_cells(cells, pcn):
+    """Helper function to find edge cells of the given region
+
+    Parameters
+    ----------
+    cells : array_like
+        flattened indices that defines some region
+    pcn : array_like
+        precomputed neighbors.
+
+    Return
+    ------
+    edge_cells : array_like
+        flattened indices that defines edge cells of the given region
+    """
+    cells = np.array(cells)
+    # For each cell, are there neighboring cells which is not contained
+    # in the given region? That is, is there any element of "pcn" which is
+    # not contained in "cells"?
+    neighbors = [pcn[i] for i in cells]
+    adjacent_exterior = np.isin(neighbors, cells, invert=True)
+    # If any of N_neighbor cells fall in exterior region, mark True.
+    edge_mask = np.any(adjacent_exterior, axis=1)
+    edge_cells = cells[edge_mask]
+    return edge_cells
+
 
 def _get_offsets(dim, corner=True):
     """Compute 1-D flattened array offsets corresponding to neighbors
