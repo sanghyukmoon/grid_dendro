@@ -83,9 +83,9 @@ def precompute_neighbor(shape, boundary_flag, corner=True):
     nghbr_idx = np.ravel_multi_index(nghbr_idx, shape, mode=mode).astype(dtype)
 
     p0 = np.array([1, 1, 1])
-    displacements = (np.ravel_multi_index(p0[:,None] + offset, shape, mode=mode
+    displacements = (np.ravel_multi_index(p0[:,None] + offset, shape, mode='raise'
                                           ).astype(dtype)
-                     - np.ravel_multi_index(p0, shape, mode=mode).astype(dtype))
+                     - np.ravel_multi_index(p0, shape, mode='raise').astype(dtype))
 
     # Caution: allow out-of-bound index for performance.
     class pcnDict(dict):
