@@ -179,7 +179,17 @@ class Dendrogram:
         # it seems that using native int results in better performance
         # (maybe because int64 better fits in 64bit system).
 
-        self._fully_constructed = True if early_termination is None else False
+        if early_termination is None:
+            self._fully_constructed = True
+        else:
+            self._fully_constructed = False
+            for k in self.minima:
+                if self.parent[k] == k:
+                    self.nodes.pop(k)
+                    self.parent.pop(k)
+                    self.children.pop(k)
+                    self.ancestor.pop(k)
+                    self.descendants.pop(k)
 
         # Find leaves and trunk
         self._find_leaves()
