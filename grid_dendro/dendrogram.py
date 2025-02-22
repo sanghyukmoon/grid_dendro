@@ -52,11 +52,12 @@ class Dendrogram:
         # Create leaf nodes by finding all local minima.
         if self._boundary_flag == 'periodic':
             filter_mode = 'wrap'
+        elif self._boundary_flag == 'outflow':
+            filter_mode = 'nearest'
         else:
             msg = f"Boundary flag {self.boundary_flag} is not supported"
             raise ValueError(msg)
-        arr_min_filtered = minimum_filter(arr, size=3, mode=filter_mode
-                                          ).flatten()
+        arr_min_filtered = minimum_filter(arr, size=3, mode=filter_mode).flatten()
         arr = arr.flatten()
         self.minima = set((arr == arr_min_filtered).nonzero()[0])
 
