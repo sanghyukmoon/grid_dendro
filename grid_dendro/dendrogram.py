@@ -421,7 +421,7 @@ class Dendrogram:
                               ).astype(self._dtype)
             self.nodes = {new_keys[k]: v for k, v in self.nodes.items()}
 
-            # Reindex children
+            # Reindex children and descendants
             new_keys = dict()
             for k, v in self.children.items():
                 if len(v) != 0:
@@ -443,6 +443,32 @@ class Dendrogram:
                     global_indices, target_shape, mode='raise', order='C'
                 ).astype(self._dtype)
             self.children = {new_keys[k]: v for k, v in self.children.items()}
+
+
+            new_keys = dict()
+            for k, v in self.descendants.items():
+                if len(v) != 0:
+                    global_indices = (
+                        np.unravel_index(np.array(v), self._arr_shape, order='C')
+                        + start_indices[:,None]
+                    )
+                    global_indices = global_indices % target_shape[:,None]
+                    self.descendants[k] = list(
+                        np.ravel_multi_index(
+                            global_indices, target_shape, mode='raise', order='C'
+                        ).astype(self._dtype)
+                    )
+                # Transform keys
+                global_indices = (np.unravel_index(k, self._arr_shape, order='C')
+                                  + start_indices)
+                global_indices = global_indices % target_shape
+                new_keys[k] = np.ravel_multi_index(
+                    global_indices, target_shape, mode='raise', order='C'
+                ).astype(self._dtype)
+            self.descendants = {new_keys[k]: v for k, v in self.descendants.items()}
+
+
+            self._find_leaves()
             # TODO: Reindex parent, ancestor, descendants
 
     def find_minimum(self, node):
