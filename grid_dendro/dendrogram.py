@@ -119,7 +119,7 @@ class Dendrogram:
                   f"Number of nodes = {len(self.nodes)}")
         # Climb up the potential and construct dendrogram.
         counter = 0
-        for cell in iter(self.cells_ordered):
+        for cell in self.cells_ordered:
             if cell in self.minima:
                 # Performance critical to have type(self.minima) = set for
                 # efficient "in" operation.
