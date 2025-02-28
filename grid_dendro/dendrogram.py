@@ -479,6 +479,20 @@ class Dendrogram:
             self.descendants = {new_keys[k]: v for k, v in self.descendants.items()}
 
 
+            new_minima = set()
+            for k in self.minima:
+                # Transform keys
+                global_indices = (np.unravel_index(k, self._arr_shape, order='C')
+                                  + start_indices)
+                global_indices = global_indices % target_shape
+                new_minima.add(
+                    np.ravel_multi_index(
+                        global_indices, target_shape, mode='raise', order='C'
+                    ).astype(self._dtype)
+                )
+            self.minima = new_minima
+
+
             self._find_leaves()
             # TODO: Reindex parent, ancestor, descendants
 
