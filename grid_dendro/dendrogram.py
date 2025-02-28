@@ -414,87 +414,32 @@ class Dendrogram:
             # TODO reindex children, parent, ancestor, descendants
 
         if direction == 'backward':
-            # Reindex nodes
-            new_keys = dict()
-            for k, v in self.nodes.items():
-                global_indices = (np.unravel_index(v, self._arr_shape, order='C')
-                                  + start_indices[:,None])
-                global_indices = global_indices % target_shape[:,None]
-                self.nodes[k] = np.ravel_multi_index(
-                                    global_indices, target_shape, mode='raise', order='C'
-                                ).astype(self._dtype)
-                # Transform keys
-                global_indices = (np.unravel_index(k, self._arr_shape, order='C')
-                                  + start_indices)
-                global_indices = global_indices % target_shape
-                new_keys[k] = np.ravel_multi_index(
-                                  global_indices, target_shape, mode='raise', order='C'
-                              ).astype(self._dtype)
-            self.nodes = {new_keys[k]: v for k, v in self.nodes.items()}
-
-            # Reindex children and descendants
-            new_keys = dict()
-            for k, v in self.children.items():
-                if len(v) != 0:
-                    global_indices = (
-                        np.unravel_index(np.array(v), self._arr_shape, order='C')
-                        + start_indices[:,None]
-                    )
-                    global_indices = global_indices % target_shape[:,None]
-                    self.children[k] = list(
-                        np.ravel_multi_index(
-                            global_indices, target_shape, mode='raise', order='C'
-                        ).astype(self._dtype)
-                    )
-                # Transform keys
-                global_indices = (np.unravel_index(k, self._arr_shape, order='C')
-                                  + start_indices)
-                global_indices = global_indices % target_shape
-                new_keys[k] = np.ravel_multi_index(
-                    global_indices, target_shape, mode='raise', order='C'
-                ).astype(self._dtype)
-            self.children = {new_keys[k]: v for k, v in self.children.items()}
-
-
-            new_keys = dict()
-            for k, v in self.descendants.items():
-                if len(v) != 0:
-                    global_indices = (
-                        np.unravel_index(np.array(v), self._arr_shape, order='C')
-                        + start_indices[:,None]
-                    )
-                    global_indices = global_indices % target_shape[:,None]
-                    self.descendants[k] = list(
-                        np.ravel_multi_index(
-                            global_indices, target_shape, mode='raise', order='C'
-                        ).astype(self._dtype)
-                    )
-                # Transform keys
-                global_indices = (np.unravel_index(k, self._arr_shape, order='C')
-                                  + start_indices)
-                global_indices = global_indices % target_shape
-                new_keys[k] = np.ravel_multi_index(
-                    global_indices, target_shape, mode='raise', order='C'
-                ).astype(self._dtype)
-            self.descendants = {new_keys[k]: v for k, v in self.descendants.items()}
-
-
-            new_minima = set()
-            for k in self.minima:
-                # Transform keys
-                global_indices = (np.unravel_index(k, self._arr_shape, order='C')
-                                  + start_indices)
-                global_indices = global_indices % target_shape
-                new_minima.add(
-                    np.ravel_multi_index(
-                        global_indices, target_shape, mode='raise', order='C'
-                    ).astype(self._dtype)
+            def _local_to_global(lidx):
+                if isinstance(lidx, list) and len(lidx) == 0:
+                    return []
+                k, j, i = np.unravel_index(lidx, self._arr_shape, order='C')
+                kl, jl, il = start_indices
+                gidx = (
+                    (kl + k) % target_shape[0],
+                    (jl + j) % target_shape[1],
+                    (il + i) % target_shape[2]
                 )
-            self.minima = new_minima
+                gidx = np.ravel_multi_index(
+                           gidx, target_shape, mode='raise', order='C'
+                       ).astype(self._dtype)
+                return gidx
 
+            for dname in ['nodes', 'parent', 'children', 'ancestor', 'descendants']:
+                d = getattr(self, dname)
+                new_keys = _local_to_global(list(d.keys()))
+                new_vals = [_local_to_global(v) for v in d.values()]
+                setattr(self, dname, dict(zip(new_keys, new_vals)))
+
+            for k in list(self.minima):
+                self.minima.remove(k)
+                self.minima.add(_local_to_global(k))
 
             self._find_leaves()
-            # TODO: Reindex parent, ancestor, descendants
 
     def find_minimum(self, node):
         """Find leaf that is at the potential minimum in this node
