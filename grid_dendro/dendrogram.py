@@ -73,7 +73,7 @@ class Dendrogram:
         else:
             raise MemoryError("Input array size is too large")
 
-    def construct(self, early_termination=None):
+    def construct(self, max_level=0):
         """Construct dendrogram
 
         Constructs dendrogram dictionaries: nodes, parent, children,
@@ -163,9 +163,10 @@ class Dendrogram:
                         print("We have reached the trunk. Stop climbing up")
                     break
                 counter += 1
-                if counter == early_termination:
+                if counter == max_level:
                     if self._verbose:
                         print("Terminating early.")
+                    self._fully_constructed = False
                     break
 
         # Construct parent dictionary from parent_array
@@ -179,17 +180,17 @@ class Dendrogram:
         # it seems that using native int results in better performance
         # (maybe because int64 better fits in 64bit system).
 
-        if early_termination is None:
-            self._fully_constructed = True
-        else:
-            self._fully_constructed = False
+        if max_level > 0:
             for k in self.minima:
                 if self.parent[k] == k:
+                    # This minimum has not been visited. Remove it.
                     self.nodes.pop(k)
                     self.parent.pop(k)
                     self.children.pop(k)
                     self.ancestor.pop(k)
                     self.descendants.pop(k)
+        else:
+            self._fully_constructed = True
 
         # Find leaves and trunk
         self._find_leaves()
