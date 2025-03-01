@@ -73,7 +73,7 @@ class Dendrogram:
         else:
             raise MemoryError("Input array size is too large")
 
-    def construct(self, max_level=0, start_from=None):
+    def construct(self, max_level=0):
         """Construct dendrogram
 
         Constructs dendrogram dictionaries: nodes, parent, children,
@@ -119,11 +119,7 @@ class Dendrogram:
                   f"Number of nodes = {len(self.nodes)}")
         # Climb up the potential and construct dendrogram.
         counter = 0
-        if start_from is None:
-            idx = 0
-        else:
-            idx = np.nonzero(self.cells_ordered == start_from)[0][0]
-        for cell in self.cells_ordered[idx:]:
+        for cell in self.cells_ordered:
             if cell in self.minima:
                 # Performance critical to have type(self.minima) = set for
                 # efficient "in" operation.
@@ -137,10 +133,7 @@ class Dendrogram:
             num_nghbr_nodes = len(neighboring_nodes)
 
             if num_nghbr_nodes == 0:
-                if start_from is None:
-                    raise ValueError("Should not reach here")
-                else:
-                    parent_array[cell] = cell
+                raise ValueError("Should not reach here")
             elif num_nghbr_nodes == 1:
                 # Add this cell to the existing node
                 nd = neighboring_nodes.pop()
