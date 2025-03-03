@@ -426,8 +426,8 @@ class Dendrogram:
             for k in list(self.minima):
                 self.minima.remove(k)
                 self.minima.add(_local_to_global(k))
-
             self._find_leaves()
+            self._find_trunk()
 
     def find_minimum(self, node):
         """Find leaf that is at the potential minimum in this node
