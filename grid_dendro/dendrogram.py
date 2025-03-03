@@ -187,6 +187,12 @@ class Dendrogram:
         bud = self._find_bud(ncells_min)
         while bud is not None:
             parent = self.parent[bud]
+            if bud == self._find_trunk():
+                assert len(self.nodes) == 1
+                print("There is only one node left, and it is a bud"
+                      " This rarely happens in locally constructed dendrogram."
+                      " Stop pruning.")
+                break
             siblings = set(self.children[parent])
             sibling_buds = {nd for nd in siblings if nd in self.leaves
                             and len(self.nodes[nd]) < ncells_min}
@@ -211,6 +217,7 @@ class Dendrogram:
             else:
                 # Subsume short buds to the longest bud and remove the knag.
                 shorter_buds = sibling_buds.copy()
+                # TODO since pop is random, this does not necessarily return longest bud.
                 longest_bud = sibling_buds.pop()
                 rank_min = np.where(self.cells_ordered == longest_bud)[0][0]
                 while len(sibling_buds) > 0:
@@ -601,6 +608,7 @@ class Dendrogram:
                             " Something must be wrong")
         else:
             self.trunk = trunk.pop()
+            return self.trunk
 
 
 def filter_by_dict(dat, node_dict=None, cells=None,
