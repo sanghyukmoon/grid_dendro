@@ -527,6 +527,12 @@ document.write(`
         <span class="n">bud</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">_find_bud</span><span class="p">(</span><span class="n">ncells_min</span><span class="p">)</span>
         <span class="k">while</span> <span class="n">bud</span> <span class="ow">is</span> <span class="ow">not</span> <span class="kc">None</span><span class="p">:</span>
             <span class="n">parent</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">parent</span><span class="p">[</span><span class="n">bud</span><span class="p">]</span>
+            <span class="k">if</span> <span class="n">bud</span> <span class="o">==</span> <span class="bp">self</span><span class="o">.</span><span class="n">_find_trunk</span><span class="p">():</span>
+                <span class="k">assert</span> <span class="nb">len</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">nodes</span><span class="p">)</span> <span class="o">==</span> <span class="mi">1</span>
+                <span class="nb">print</span><span class="p">(</span><span class="s2">&quot;There is only one node left, and it is a bud&quot;</span>
+                      <span class="s2">&quot; This rarely happens in locally constructed dendrogram.&quot;</span>
+                      <span class="s2">&quot; Stop pruning.&quot;</span><span class="p">)</span>
+                <span class="k">break</span>
             <span class="n">siblings</span> <span class="o">=</span> <span class="nb">set</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">children</span><span class="p">[</span><span class="n">parent</span><span class="p">])</span>
             <span class="n">sibling_buds</span> <span class="o">=</span> <span class="p">{</span><span class="n">nd</span> <span class="k">for</span> <span class="n">nd</span> <span class="ow">in</span> <span class="n">siblings</span> <span class="k">if</span> <span class="n">nd</span> <span class="ow">in</span> <span class="bp">self</span><span class="o">.</span><span class="n">leaves</span>
                             <span class="ow">and</span> <span class="nb">len</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">nodes</span><span class="p">[</span><span class="n">nd</span><span class="p">])</span> <span class="o">&lt;</span> <span class="n">ncells_min</span><span class="p">}</span>
@@ -551,6 +557,7 @@ document.write(`
             <span class="k">else</span><span class="p">:</span>
                 <span class="c1"># Subsume short buds to the longest bud and remove the knag.</span>
                 <span class="n">shorter_buds</span> <span class="o">=</span> <span class="n">sibling_buds</span><span class="o">.</span><span class="n">copy</span><span class="p">()</span>
+                <span class="c1"># TODO since pop is random, this does not necessarily return longest bud.</span>
                 <span class="n">longest_bud</span> <span class="o">=</span> <span class="n">sibling_buds</span><span class="o">.</span><span class="n">pop</span><span class="p">()</span>
                 <span class="n">rank_min</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">where</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">cells_ordered</span> <span class="o">==</span> <span class="n">longest_bud</span><span class="p">)[</span><span class="mi">0</span><span class="p">][</span><span class="mi">0</span><span class="p">]</span>
                 <span class="k">while</span> <span class="nb">len</span><span class="p">(</span><span class="n">sibling_buds</span><span class="p">)</span> <span class="o">&gt;</span> <span class="mi">0</span><span class="p">:</span>
@@ -759,8 +766,8 @@ document.write(`
             <span class="k">for</span> <span class="n">k</span> <span class="ow">in</span> <span class="nb">list</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">minima</span><span class="p">):</span>
                 <span class="bp">self</span><span class="o">.</span><span class="n">minima</span><span class="o">.</span><span class="n">remove</span><span class="p">(</span><span class="n">k</span><span class="p">)</span>
                 <span class="bp">self</span><span class="o">.</span><span class="n">minima</span><span class="o">.</span><span class="n">add</span><span class="p">(</span><span class="n">_local_to_global</span><span class="p">(</span><span class="n">k</span><span class="p">))</span>
-
-            <span class="bp">self</span><span class="o">.</span><span class="n">_find_leaves</span><span class="p">()</span></div>
+            <span class="bp">self</span><span class="o">.</span><span class="n">_find_leaves</span><span class="p">()</span>
+            <span class="bp">self</span><span class="o">.</span><span class="n">_find_trunk</span><span class="p">()</span></div>
 
 <div class="viewcode-block" id="Dendrogram.find_minimum"><a class="viewcode-back" href="../../dendrogram.html#grid_dendro.dendrogram.Dendrogram.find_minimum">[docs]</a>    <span class="k">def</span><span class="w"> </span><span class="nf">find_minimum</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">node</span><span class="p">):</span>
 <span class="w">        </span><span class="sd">&quot;&quot;&quot;Find leaf that is at the potential minimum in this node</span>
@@ -940,7 +947,8 @@ document.write(`
             <span class="k">raise</span> <span class="ne">Exception</span><span class="p">(</span><span class="s2">&quot;There are more than one trunk.&quot;</span>
                             <span class="s2">&quot; Something must be wrong&quot;</span><span class="p">)</span>
         <span class="k">else</span><span class="p">:</span>
-            <span class="bp">self</span><span class="o">.</span><span class="n">trunk</span> <span class="o">=</span> <span class="n">trunk</span><span class="o">.</span><span class="n">pop</span><span class="p">()</span></div>
+            <span class="bp">self</span><span class="o">.</span><span class="n">trunk</span> <span class="o">=</span> <span class="n">trunk</span><span class="o">.</span><span class="n">pop</span><span class="p">()</span>
+            <span class="k">return</span> <span class="bp">self</span><span class="o">.</span><span class="n">trunk</span></div>
 
 
 <div class="viewcode-block" id="filter_by_dict"><a class="viewcode-back" href="../../dendrogram.html#grid_dendro.dendrogram.filter_by_dict">[docs]</a><span class="k">def</span><span class="w"> </span><span class="nf">filter_by_dict</span><span class="p">(</span><span class="n">dat</span><span class="p">,</span> <span class="n">node_dict</span><span class="o">=</span><span class="kc">None</span><span class="p">,</span> <span class="n">cells</span><span class="o">=</span><span class="kc">None</span><span class="p">,</span>
