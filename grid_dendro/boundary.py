@@ -54,9 +54,15 @@ class NeighborIndex(dict):
         bndry_idx = _get_boundary_indices(shape, dtype)
         bndry_idx_3d = np.array(np.unravel_index(bndry_idx, shape), dtype=dtype)
 
-        # shape of nghbr_idx = [N_boundary_cells, N_neighbors(=26 for corner=True)]
+        # shape of nghbr_idx = [{z, y, x}, N_boundary_cells, N_neighbors(=26 for corner=True)]
         nghbr_idx = bndry_idx_3d[:, :, None] + offset[:, None, :]
+        # flatten the index
         nghbr_idx = np.ravel_multi_index(nghbr_idx, shape, mode=mode, order='C').astype(dtype)
+        # Remove the duplicates and the self.
+        # Note that, when mode='clip', the out-of-bound indices are clipped to the boundary,
+        # resulting duplicated neighbors (this can also be the cell itself!). We thus
+        # remove them here. This should not affect when mode='wrap'.
+        nghbr_idx = [sorted(set(nghbr_idx[i]) - {bndry_idx[i]}) for i in range(len(nghbr_idx))]
 
         p0 = np.array([1, 1, 1])
         self.displacements = (np.ravel_multi_index(p0[:,None] + offset, shape, mode='raise',
