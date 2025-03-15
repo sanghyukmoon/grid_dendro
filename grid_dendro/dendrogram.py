@@ -217,9 +217,9 @@ class Dendrogram:
             else:
                 # Subsume short buds to the longest bud and remove the knag.
                 shorter_buds = sibling_buds.copy()
-                # TODO since pop is random, this does not necessarily return longest bud.
                 longest_bud = sibling_buds.pop()
                 rank_min = np.where(self.cells_ordered == longest_bud)[0][0]
+                # Find the longest bud by comparing the order in cells_ordered
                 while len(sibling_buds) > 0:
                     nd = sibling_buds.pop()
                     rank = np.where(self.cells_ordered == nd)[0][0]
