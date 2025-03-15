@@ -557,9 +557,9 @@ document.write(`
             <span class="k">else</span><span class="p">:</span>
                 <span class="c1"># Subsume short buds to the longest bud and remove the knag.</span>
                 <span class="n">shorter_buds</span> <span class="o">=</span> <span class="n">sibling_buds</span><span class="o">.</span><span class="n">copy</span><span class="p">()</span>
-                <span class="c1"># TODO since pop is random, this does not necessarily return longest bud.</span>
                 <span class="n">longest_bud</span> <span class="o">=</span> <span class="n">sibling_buds</span><span class="o">.</span><span class="n">pop</span><span class="p">()</span>
                 <span class="n">rank_min</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">where</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">cells_ordered</span> <span class="o">==</span> <span class="n">longest_bud</span><span class="p">)[</span><span class="mi">0</span><span class="p">][</span><span class="mi">0</span><span class="p">]</span>
+                <span class="c1"># Find the longest bud by comparing the order in cells_ordered</span>
                 <span class="k">while</span> <span class="nb">len</span><span class="p">(</span><span class="n">sibling_buds</span><span class="p">)</span> <span class="o">&gt;</span> <span class="mi">0</span><span class="p">:</span>
                     <span class="n">nd</span> <span class="o">=</span> <span class="n">sibling_buds</span><span class="o">.</span><span class="n">pop</span><span class="p">()</span>
                     <span class="n">rank</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">where</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">cells_ordered</span> <span class="o">==</span> <span class="n">nd</span><span class="p">)[</span><span class="mi">0</span><span class="p">][</span><span class="mi">0</span><span class="p">]</span>
